@@ -1,0 +1,7 @@
+# PyPi publishing tools
+setuptools
+wheel
+twine
+
+# UAV Collision Avoidance
+pyside6
