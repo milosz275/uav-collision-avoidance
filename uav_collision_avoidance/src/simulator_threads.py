@@ -43,12 +43,17 @@ class SimulatorThreads(QMainWindow):
         self.setCentralWidget(self.label)
 
         self.worker_thread = WorkerThread(self)
+        self.worker_thread_2 = WorkerThread(self)
 
         self.worker_thread.started.connect(self.worker_started)
         self.worker_thread.finished.connect(self.worker_finished)
         self.worker_thread.data_updated.connect(self.data_updated)
-
         self.worker_thread.start()
+
+        self.worker_thread_2.started.connect(self.worker_started)
+        self.worker_thread_2.finished.connect(self.worker_finished)
+        self.worker_thread_2.data_updated.connect(self.data_updated)
+        self.worker_thread_2.start()
 
         self.show()
         return
@@ -70,4 +75,7 @@ class SimulatorThreads(QMainWindow):
         self.worker_thread.requestInterruption()
         self.worker_thread.quit()
         self.worker_thread.wait()
+        self.worker_thread_2.requestInterruption()
+        self.worker_thread_2.quit()
+        self.worker_thread_2.wait()
         event.accept()
