@@ -8,10 +8,9 @@ class WorkerThread(QThread):
 
     def __init__(self, simulator):
         super().__init__()
-        self.simulator = simulator  # Reference to the SimulatorThreads instance
+        self.simulator = simulator
 
     def run(self):
-        # Increment the number in the worker thread
         while not self.isInterruptionRequested():
             self.simulator.number += 1
             new_data = self.simulator.number
