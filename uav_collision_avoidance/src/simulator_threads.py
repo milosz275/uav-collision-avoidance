@@ -18,6 +18,17 @@ class WorkerThread(QThread):
             self.data_updated.emit(str(new_data))
             self.sleep(1)
 
+class RenderThread(QThread):
+    def __init__(self, simulator):
+        super().__init__()
+        self.simulator = simulator
+
+    def run(self):
+        while not self.isInterruptionRequested():
+            self.simulator.update_data(self.simulator.number)
+            print(".")
+            self.msleep(100)
+
 class SimulatorThreads(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
@@ -43,7 +54,7 @@ class SimulatorThreads(QMainWindow):
         self.setCentralWidget(self.label)
 
         self.worker_thread = WorkerThread(self)
-        self.worker_thread_2 = WorkerThread(self)
+        self.worker_thread_2 = RenderThread(self)
 
         self.worker_thread.started.connect(self.worker_started)
         self.worker_thread.finished.connect(self.worker_finished)
@@ -52,7 +63,6 @@ class SimulatorThreads(QMainWindow):
 
         self.worker_thread_2.started.connect(self.worker_started)
         self.worker_thread_2.finished.connect(self.worker_finished)
-        self.worker_thread_2.data_updated.connect(self.data_updated)
         self.worker_thread_2.start()
 
         self.show()
