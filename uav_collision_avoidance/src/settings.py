@@ -5,7 +5,8 @@ class Settings:
     """Settings"""
     screen_resolution : QSize
     resolution : tuple
-    refresh_rate = 60
+    refresh_rate : int = 60
+    g_acceleration : float = 9.81
 
     @classmethod
     def __init__(cls) -> None:
