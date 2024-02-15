@@ -1,7 +1,8 @@
-# settings.py
+# simulation_settings.py
+
 from PySide6.QtCore import QSize
 
-class Settings:
+class SimulationSettings:
     """Settings"""
     screen_resolution : QSize
     resolution : tuple
