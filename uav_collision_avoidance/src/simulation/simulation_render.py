@@ -2,9 +2,9 @@
 
 import sys
 from typing import List
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QGraphicsPixmapItem
 from PySide6.QtCore import Qt, QObject, QThread, Signal
-from PySide6.QtGui import QPaintEvent, QPainter, QColor, QBrush, QKeyEvent, QIcon
+from PySide6.QtGui import QPaintEvent, QPainter, QColor, QBrush, QKeyEvent, QIcon, QTransform
 
 from src.aircraft.aircraft_render import AircraftRender
 from src.simulation.simulation_settings import SimulationSettings
@@ -33,8 +33,23 @@ class SimulationRender(QWidget):
     def paintEvent(self, event: QPaintEvent) -> None:
         painter = QPainter(self)
         for aircraft in self.aircrafts:
+            aircraft_pixmap = QGraphicsPixmapItem(self.simulation_state.aircraft_image.scaled(aircraft.size / self.simulation_state.scale, aircraft.size / self.simulation_state.scale))
+            aircraft_pixmap.setPos(
+                aircraft.position.x() / self.simulation_state.scale,
+                aircraft.position.y() / self.simulation_state.scale)
+            aircraft_pixmap.setScale(1)
+
+            transform = QTransform()
+            transform.rotate(aircraft.yaw_angle + 90)
+            transform.translate(-1/2 * (aircraft.size / self.simulation_state.scale), -1/2 * (aircraft.size / self.simulation_state.scale))
+            aircraft_pixmap.setTransform(transform)
+
+            if aircraft.safezone_occupied:
+                aircraft_pixmap.setOpacity(0.6)
+
             painter.setBrush(QColor(aircraft.color))
             painter.drawRect(int(aircraft.x), int(aircraft.y), 50, 50)
+            painter.drawPixmap(aircraft_pixmap)
         return super().paintEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
