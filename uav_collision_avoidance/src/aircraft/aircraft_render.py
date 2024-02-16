@@ -11,12 +11,13 @@ from src.simulation.simulation_state import SimulationState
 class AircraftRender(QObject):
     """Aircraft graphical representation"""
 
-    positionChanged = Signal(float, float)
+    positionChanged = Signal(float, float, float)
 
     def __init__(self, color : str, vehicle : AircraftVehicle, state : SimulationState) -> None:
         super().__init__()
         self.x = 0
         self.y = 0
+        self.z = 0
         self.color = color
         self.state = state
         if vehicle:
@@ -24,8 +25,8 @@ class AircraftRender(QObject):
             self.vehicle.positionChanged.connect(self.update)
         return
     
-    def move(self, dx, dy) -> None:
-        self.vehicle.move(dx, dy)
+    def move(self, dx, dy, dz) -> None:
+        self.vehicle.move(dx, dy, dz)
         return
 
     def set_vehicle(self, vehicle) -> None:
@@ -35,7 +36,8 @@ class AircraftRender(QObject):
         return
 
     def update(self) -> None:
-        self.x = self.vehicle.x / self.state.scale
-        self.y = self.vehicle.y / self.state.scale
-        self.positionChanged.emit(self.x, self.y)
+        self.x = self.vehicle.position.x / self.state.scale
+        self.y = self.vehicle.position.y / self.state.scale
+        self.z = self.vehicle.position.z / self.state.scale
+        self.positionChanged.emit(self.x, self.y, self.z)
         return
