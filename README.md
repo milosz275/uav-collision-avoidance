@@ -4,6 +4,9 @@ Python project regarding implementation of UAV physics and collision detection/a
 
 ## Introduction
 
+## Premises
+3-dimensional space defined in XYZ coordinate system, where X and Y describe flat horizontal plane and Z is height above the sea level.
+
 ## Technologies
 
 ## Algorithms
