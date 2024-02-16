@@ -10,3 +10,4 @@ class SimulationState:
 
     def toggle_pause(self) -> None:
         self._is_paused = not self._is_paused
+        return

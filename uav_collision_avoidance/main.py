@@ -1,4 +1,5 @@
 # main.py
+
 import sys
 from PySide6.QtWidgets import QApplication
 from src.simulation.simulation_settings import SimulationSettings

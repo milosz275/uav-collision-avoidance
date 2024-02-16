@@ -9,3 +9,4 @@ class Aircraft():
     def __init__(self, x : float, y : float, color : str) -> None:
         self.vehicle = AircraftVehicle(x=x, y=y, speed=100)
         self.render = AircraftRender(color=color, vehicle=self.vehicle)
+        return

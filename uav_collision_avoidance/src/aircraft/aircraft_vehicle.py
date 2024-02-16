@@ -8,13 +8,15 @@ from PySide6.QtGui import QPainter, QColor, QBrush, QKeyEvent
 class AircraftVehicle(QObject):
     positionChanged = Signal(float, float)
 
-    def __init__(self, x : float, y : float, speed : float):
+    def __init__(self, x : float, y : float, speed : float) -> None:
         super().__init__()
         self.x = x
         self.y = y
         self.speed = speed
+        return
 
-    def move(self, dx, dy):
+    def move(self, dx, dy) -> None:
         self.x += dx
         self.y += dy
         self.positionChanged.emit(self.x, self.y)
+        return

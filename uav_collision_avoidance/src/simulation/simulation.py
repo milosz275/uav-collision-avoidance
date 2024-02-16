@@ -34,6 +34,7 @@ class Simulation(QMainWindow):
 
         self.simulation_thread = SimulationPhysics([self.aircraft1.vehicle, self.aircraft2.vehicle], self.state)
         self.simulation_thread.start()
+        return
     
     def closeEvent(self, event: QCloseEvent) -> None:
         self.simulation_thread.requestInterruption()

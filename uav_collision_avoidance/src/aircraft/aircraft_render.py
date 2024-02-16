@@ -10,7 +10,7 @@ from src.aircraft.aircraft_vehicle import AircraftVehicle
 class AircraftRender(QObject):
     positionChanged = Signal(float, float)
 
-    def __init__(self, color : str, vehicle : AircraftVehicle):
+    def __init__(self, color : str, vehicle : AircraftVehicle) -> None:
         super().__init__()
         self.scale = 1
         self.x = 0
@@ -19,13 +19,16 @@ class AircraftRender(QObject):
         if vehicle:
             self.vehicle = vehicle
             self.vehicle.positionChanged.connect(self.update)
+        return
 
-    def set_vehicle(self, vehicle):
+    def set_vehicle(self, vehicle) -> None:
         if not self.vehicle:
             self.vehicle = vehicle
             self.vehicle.positionChanged.connect(self.update)
+        return
 
-    def update(self):
+    def update(self) -> None:
         self.x = self.vehicle.x / self.scale
         self.y = self.vehicle.y / self.scale
         self.positionChanged.emit(self.x, self.y)
+        return
