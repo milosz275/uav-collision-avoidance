@@ -3,11 +3,13 @@
 from PySide6.QtCore import QSize
 
 class SimulationSettings:
-    """Settings"""
+    """Settings for the simulation"""
+
     screen_resolution : QSize
     resolution : tuple
-    refresh_rate : int = 60
     g_acceleration : float = 9.81
+    simulation_frequency : int = 100 # simulations each second
+    simulation_threshold : int = 1000 // simulation_frequency # for 100fps it is 10ms
 
     @classmethod
     def __init__(cls) -> None:
