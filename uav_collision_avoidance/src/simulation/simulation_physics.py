@@ -10,16 +10,18 @@ from src.aircraft.aircraft_vehicle import AircraftVehicle
 from src.simulation.simulation_state import SimulationState
 
 class SimulationPhysics(QThread):
-    def __init__(self, aircrafts : List[AircraftVehicle], simulation_state : SimulationState) -> None:
-        super().__init__()
+    """Thread running simulation's physics"""
+
+    def __init__(self, parent, aircrafts : List[AircraftVehicle], simulation_state : SimulationState) -> None:
+        super(SimulationPhysics, self).__init__(parent)
         self.aircrafts = aircrafts
         self.simulation_state = simulation_state
         return
         
     def run(self) -> None:
         while not self.isInterruptionRequested():
-            if not self.simulation_state.is_paused():
+            if not self.simulation_state.is_paused:
                 for aircraft in self.aircrafts:
                     aircraft.move(1, 1)
-            self.msleep(10)
+            self.msleep(self.simulation_state.simulation_threshold)
         return super().run()
