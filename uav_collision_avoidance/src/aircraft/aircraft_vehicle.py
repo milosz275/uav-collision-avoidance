@@ -10,17 +10,23 @@ from src.simulation.simulation_state import SimulationState
 class AircraftVehicle(QObject):
     """Aircraft physical UAV"""
 
-    positionChanged = Signal(float, float)
+    positionChanged = Signal(float, float, float)
 
     def __init__(self, position : QVector3D, speed : QVector3D, state : SimulationState) -> None:
         super().__init__()
         self.position = position
+        if self.position.z < 0:
+            self.position.setZ(0)
         self.speed = speed
         self.state = state
         return
 
-    def move(self, dx, dy) -> None:
-        self.x += dx
-        self.y += dy
-        self.positionChanged.emit(self.x, self.y)
+    def move(self, dx : float, dy : float, dz : float) -> None:
+        self.position.setX(self.position.x + dx)
+        self.position.setY(self.position.y + dy)
+        self.position.setZ(self.position.z + dz)
+        self.positionChanged.emit(self.position.x, self.position.y, self.position.z)
         return
+    
+    def absolute_speed(self) -> float:
+        return self.speed.length()
