@@ -20,6 +20,10 @@ class AircraftRender(QObject):
             self.vehicle = vehicle
             self.vehicle.positionChanged.connect(self.update)
         return
+    
+    def move(self, dx, dy) -> None:
+        self.vehicle.move(dx, dy)
+        return
 
     def set_vehicle(self, vehicle) -> None:
         if not self.vehicle:
