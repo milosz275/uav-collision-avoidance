@@ -4,15 +4,28 @@ import sys
 from typing import List
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton
 from PySide6.QtCore import Qt, QObject, QThread, Signal
-from PySide6.QtGui import QPaintEvent, QPainter, QColor, QBrush, QKeyEvent
+from PySide6.QtGui import QPaintEvent, QPainter, QColor, QBrush, QKeyEvent, QIcon
 
 from src.aircraft.aircraft_render import AircraftRender
+from src.simulation.simulation_settings import SimulationSettings
 
 class SimulationRender(QWidget):
-    def __init__(self, aircrafts : List[AircraftRender], simulator):
+    """Main widget rendering the simulation"""
+
+    def __init__(self, aircrafts : List[AircraftRender], simulation_state):
         super().__init__()
+        self.simulation_state = simulation_state
+
+        self.bounding_box_resolution = [SimulationSettings.resolution[0], SimulationSettings.resolution[1]]
+        self.setGeometry(0, 0, SimulationSettings.resolution[0] + 10, SimulationSettings.resolution[1] + 10)
+        self.setWindowTitle("UAV Collision Avoidance")
+
+        self.icon = QIcon()
+        self.icon.addPixmap(self.simulation_state.aircraft_image, QIcon.Mode.Normal, QIcon.State.Off)
+        self.setWindowIcon(self.icon)
+
         self.aircrafts = aircrafts
-        self.simulator = simulator
+        
         for aircraft in self.aircrafts:
             aircraft.positionChanged.connect(self.update)
         return
@@ -26,7 +39,7 @@ class SimulationRender(QWidget):
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         if event.key() == Qt.Key.Key_Slash:
-            self.simulator.toggle_pause()
+            self.simulation_state.toggle_pause()
         step = 5
         for aircraft in self.aircrafts:
             if aircraft.color == "blue":
