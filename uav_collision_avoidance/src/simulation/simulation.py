@@ -23,8 +23,8 @@ class Simulation(QMainWindow):
 
         self.state = SimulationState(SimulationSettings.simulation_threshold)
 
-        self.aircraft1 = Aircraft(10, 10, "red", self.state)
-        self.aircraft2 = Aircraft(100, 100, "blue", self.state)
+        self.aircraft1 = Aircraft(10, 10, 1000, "red", self.state)
+        self.aircraft2 = Aircraft(100, 100, 1000, "blue", self.state)
 
         self.render_widget = SimulationRender([self.aircraft1.render, self.aircraft2.render], self.state)
         self.render_widget.show()
