@@ -20,6 +20,8 @@ class SimulationRender(QWidget):
         self.setGeometry(0, 0, SimulationSettings.resolution[0] + 10, SimulationSettings.resolution[1] + 10)
         self.setWindowTitle("UAV Collision Avoidance")
 
+        self.painter : QPainter = None
+
         self.icon = QIcon()
         self.icon.addPixmap(self.simulation_state.aircraft_image, QIcon.Mode.Normal, QIcon.State.Off)
         self.setWindowIcon(self.icon)
@@ -31,25 +33,28 @@ class SimulationRender(QWidget):
         return
 
     def paintEvent(self, event: QPaintEvent) -> None:
-        painter = QPainter(self)
         for aircraft in self.aircrafts:
-            aircraft_pixmap = QGraphicsPixmapItem(self.simulation_state.aircraft_image.scaled(aircraft.size / self.simulation_state.scale, aircraft.size / self.simulation_state.scale))
+            self.painter = QPainter(self)
+
+            aircraft_pixmap = QGraphicsPixmapItem(self.simulation_state.aircraft_image.scaled(aircraft.size, aircraft.size))
             aircraft_pixmap.setPos(
-                aircraft.position.x() / self.simulation_state.scale,
-                aircraft.position.y() / self.simulation_state.scale)
+                aircraft.position.x(),
+                aircraft.position.y())
             aircraft_pixmap.setScale(1)
 
             transform = QTransform()
             transform.rotate(aircraft.yaw_angle + 90)
-            transform.translate(-1/2 * (aircraft.size / self.simulation_state.scale), -1/2 * (aircraft.size / self.simulation_state.scale))
+            transform.translate(-1/2 * (aircraft.size), -1/2 * (aircraft.size))
             aircraft_pixmap.setTransform(transform)
 
             if aircraft.safezone_occupied:
                 aircraft_pixmap.setOpacity(0.6)
 
-            painter.setBrush(QColor(aircraft.color))
-            painter.drawRect(int(aircraft.x), int(aircraft.y), 50, 50)
-            painter.drawPixmap(aircraft_pixmap)
+            self.painter.drawPixmap(
+                int(aircraft.position.x()),
+                int(aircraft.position.y()),
+                aircraft_pixmap.pixmap())
+            self.painter.end()
         return super().paintEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
