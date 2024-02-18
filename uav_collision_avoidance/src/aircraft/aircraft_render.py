@@ -36,8 +36,8 @@ class AircraftRender(QObject):
         return
 
     def update(self) -> None:
-        self.x = self.vehicle.position.x / self.state.scale
-        self.y = self.vehicle.position.y / self.state.scale
-        self.z = self.vehicle.position.z / self.state.scale
+        self.x = self.vehicle.position.x() / self.state.scale
+        self.y = self.vehicle.position.y() / self.state.scale
+        self.z = self.vehicle.position.z() / self.state.scale
         self.positionChanged.emit(self.x, self.y, self.z)
         return

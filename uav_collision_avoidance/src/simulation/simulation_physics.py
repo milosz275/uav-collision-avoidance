@@ -22,6 +22,6 @@ class SimulationPhysics(QThread):
         while not self.isInterruptionRequested():
             if not self.simulation_state.is_paused:
                 for aircraft in self.aircrafts:
-                    aircraft.move(1, 1)
+                    aircraft.move(1, 1, 0)
             self.msleep(self.simulation_state.simulation_threshold)
         return super().run()
