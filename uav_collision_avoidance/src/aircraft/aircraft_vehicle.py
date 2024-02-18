@@ -19,9 +19,14 @@ class AircraftVehicle(QObject):
             self.position.setZ(0)
         self.speed = speed
         self.state = state
+
+        self.size : float = 20.0
+        self.yaw_angle : float = 45.0
+        self.safezone_occupied : bool = False
+
         return
 
-    def move(self, dx : float, dy : float, dz : float) -> None:
+    def move(self, dx : float, dy : float, dz : float = 0.0) -> None:
         self.position.setX(self.position.x() + dx)
         self.position.setY(self.position.y() + dy)
         self.position.setZ(self.position.z() + dz)
