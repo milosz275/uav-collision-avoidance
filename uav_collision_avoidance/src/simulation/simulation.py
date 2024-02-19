@@ -5,6 +5,8 @@ from PySide6.QtWidgets import QMainWindow, QGraphicsScene, QGraphicsView, QGraph
 from PySide6.QtGui import QCloseEvent, QPen, QKeySequence, QPixmap, QTransform, QVector2D, QPolygonF, QIcon
 
 from src.aircraft.aircraft import Aircraft
+from src.aircraft.aircraft_vehicle import AircraftVehicle
+from src.aircraft.aircraft_render import AircraftRender
 from src.simulation.simulation_settings import SimulationSettings
 from src.simulation.simulation_physics import SimulationPhysics
 from src.simulation.simulation_state import SimulationState
@@ -24,16 +26,21 @@ class Simulation(QMainWindow):
 
         self.state = SimulationState(SimulationSettings.simulation_threshold)
 
-        self.aircraft1 = Aircraft(10, 10, 1000, "red", self.state)
-        self.aircraft2 = Aircraft(100, 100, 1000, "blue", self.state)
+        self.aircrafts : List[Aircraft] = [
+            Aircraft(10, 10, 1000, "red", self.state),
+            Aircraft(100, 100, 1000, "blue", self.state),
+        ]
 
-        self.simulation_render = SimulationRender([self.aircraft1.render, self.aircraft2.render], self.state)
+        self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle for aircraft in self.aircrafts]
+        self.aircraft_renders : List[AircraftRender] = [aircraft.render for aircraft in self.aircrafts]
+
+        self.simulation_render = SimulationRender(self.aircraft_renders, self.state)
         self.simulation_render.show()
 
-        self.simulation_physics = SimulationPhysics(self, [self.aircraft1.vehicle, self.aircraft2.vehicle], self.state)
+        self.simulation_physics = SimulationPhysics(self, self.aircraft_vehicles, self.state)
         self.simulation_physics.start()
 
-        self.simulation_adsb = SimulationADSB(self, [self.aircraft1.vehicle, self.aircraft2.vehicle], self.state)
+        self.simulation_adsb = SimulationADSB(self, self.aircraft_vehicles, self.state)
         self.simulation_adsb.start()
         return
     
