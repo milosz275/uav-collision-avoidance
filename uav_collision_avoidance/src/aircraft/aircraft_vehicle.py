@@ -1,6 +1,7 @@
 # aircraft_vehicle.py
 
 import sys
+from math import atan2, degrees
 from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton
 from PySide6.QtCore import Qt, QObject, QThread, Signal
 from PySide6.QtGui import QPainter, QColor, QBrush, QKeyEvent, QVector3D
@@ -21,7 +22,6 @@ class AircraftVehicle(QObject):
         self.state = state
 
         self.size : float = 20.0
-        self.yaw_angle : float = 45.0
         self.safezone_occupied : bool = False
 
         return
@@ -35,3 +35,6 @@ class AircraftVehicle(QObject):
     
     def absolute_speed(self) -> float:
         return self.speed.length()
+
+    def yaw_angle(self) -> float:
+        return degrees(atan2(self.speed.y(), self.speed.x()))

@@ -10,6 +10,6 @@ class Aircraft():
     """Main aircraft class"""
     
     def __init__(self, x : float, y : float, height : float, color : str, state : SimulationState) -> None:
-        self.vehicle = AircraftVehicle(position=QVector3D(x, y, height), speed=QVector3D(50, 0 , 50), state=state)
+        self.vehicle = AircraftVehicle(position=QVector3D(x, y, height), speed=QVector3D(50, 50 , 0), state=state)
         self.render = AircraftRender(color=color, vehicle=self.vehicle, state=state)
         return

@@ -1,10 +1,11 @@
 # simulation_render.py
 
 import sys
+from copy import copy
 from typing import List
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QGraphicsPixmapItem
-from PySide6.QtCore import Qt, QObject, QThread, Signal
-from PySide6.QtGui import QPaintEvent, QPainter, QColor, QBrush, QKeyEvent, QIcon, QTransform
+from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QGraphicsPixmapItem, QLabel
+from PySide6.QtCore import Qt, QObject, QThread, Signal, QPoint
+from PySide6.QtGui import QPaintEvent, QPainter, QColor, QBrush, QKeyEvent, QIcon, QTransform, QImage, QPicture, QPixmap
 
 from src.aircraft.aircraft_render import AircraftRender
 from src.simulation.simulation_settings import SimulationSettings
@@ -23,7 +24,7 @@ class SimulationRender(QWidget):
         self.painter : QPainter = None
 
         self.icon = QIcon()
-        self.icon.addPixmap(self.simulation_state.aircraft_image, QIcon.Mode.Normal, QIcon.State.Off)
+        self.icon.addPixmap(self.simulation_state.aircraft_pixmap, QIcon.Mode.Normal, QIcon.State.Off)
         self.setWindowIcon(self.icon)
 
         self.aircrafts = aircrafts
@@ -34,27 +35,24 @@ class SimulationRender(QWidget):
 
     def paintEvent(self, event: QPaintEvent) -> None:
         for aircraft in self.aircrafts:
-            self.painter = QPainter(self)
+            pixmap = self.simulation_state.aircraft_pixmap.scaled(aircraft.size, aircraft.size)
 
-            aircraft_pixmap = QGraphicsPixmapItem(self.simulation_state.aircraft_image.scaled(aircraft.size, aircraft.size))
-            aircraft_pixmap.setPos(
+            painter = QPainter(self)
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+            painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
+            painter.translate(QPoint(
                 aircraft.position.x(),
-                aircraft.position.y())
-            aircraft_pixmap.setScale(1)
+                aircraft.position.y()))
 
             transform = QTransform()
-            transform.rotate(aircraft.yaw_angle + 90)
-            transform.translate(-1/2 * (aircraft.size), -1/2 * (aircraft.size))
-            aircraft_pixmap.setTransform(transform)
-
-            if aircraft.safezone_occupied:
-                aircraft_pixmap.setOpacity(0.6)
-
-            self.painter.drawPixmap(
+            transform.rotate(aircraft.yaw_angle)
+            rotated_pixmap : QPixmap = pixmap.transformed(transform)
+            
+            painter.drawPixmap(
                 int(aircraft.position.x()),
                 int(aircraft.position.y()),
-                aircraft_pixmap.pixmap())
-            self.painter.end()
+                rotated_pixmap)
+            painter.end()
         return super().paintEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent) -> None:

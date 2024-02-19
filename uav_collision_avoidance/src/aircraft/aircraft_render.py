@@ -44,6 +44,6 @@ class AircraftRender(QObject):
         self.position.setZ(self.vehicle.position.z() / self.state.scale)
         self.positionChanged.emit(self.position.x(), self.position.y(), self.position.z())
         self.size = self.vehicle.size / self.state.scale
-        self.yaw_angle = self.vehicle.yaw_angle
+        self.yaw_angle = self.vehicle.yaw_angle()
         self.safezone_occupied = self.vehicle.safezone_occupied
         return
