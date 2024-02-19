@@ -9,11 +9,11 @@ UAV Collision Avoidance is my bachelor's thesis project meeting problem of UAVs 
 3-dimensional space defined in XYZ coordinate system, where X and Y describe flat horizontal plane and Z is height above the sea level. In scope of this project, UAVs are considered HTOL drones (Horizontal Take-off and Landing). There is no gusts of wind assumpted.
 
 ## Technologies
-Python3[^1] project is wrapped as a PyPi package[^2]. PySide6[^3], which is PyQt library, was used for GUI implementation.
+Python3[^1] project is wrapped as a PyPi package[^2]. PySide6[^3], which is PyQt6 library, was used for GUI implementation.
 
 ## Structures
 
-## Sources
+## Algorithms
 
 ## Usage
 ~~Use `pip install uav-collision-avoidance` to install the app~~ or build it by cloning the repo and running the following commands:
