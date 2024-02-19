@@ -1,11 +1,9 @@
 # simulation_render.py
 
-import sys
-from copy import copy
 from typing import List
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton, QGraphicsPixmapItem, QLabel
-from PySide6.QtCore import Qt, QObject, QThread, Signal, QPoint
-from PySide6.QtGui import QPaintEvent, QPainter, QColor, QBrush, QKeyEvent, QIcon, QTransform, QImage, QPicture, QPixmap
+from PySide6.QtWidgets import QWidget
+from PySide6.QtCore import Qt, QPoint
+from PySide6.QtGui import QPaintEvent, QPainter, QKeyEvent, QIcon, QTransform, QPixmap, QCloseEvent
 
 from src.aircraft.aircraft_render import AircraftRender
 from src.simulation.simulation_settings import SimulationSettings
@@ -19,6 +17,7 @@ class SimulationRender(QWidget):
 
         self.bounding_box_resolution = [SimulationSettings.resolution[0], SimulationSettings.resolution[1]]
         self.setGeometry(0, 0, SimulationSettings.resolution[0] + 10, SimulationSettings.resolution[1] + 10)
+        self.setStyleSheet("background-color: white;")
         self.setWindowTitle("UAV Collision Avoidance")
 
         self.painter : QPainter = None
@@ -34,6 +33,7 @@ class SimulationRender(QWidget):
         return
 
     def paintEvent(self, event: QPaintEvent) -> None:
+        """Qt method painting the aircrafts"""
         for aircraft in self.aircrafts:
             pixmap = self.simulation_state.aircraft_pixmap.scaled(aircraft.size, aircraft.size)
 
@@ -56,6 +56,7 @@ class SimulationRender(QWidget):
         return super().paintEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
+        """Qt method controlling keyboard input"""
         if event.key() == Qt.Key.Key_Slash:
             self.simulation_state.toggle_pause()
         step = 5
@@ -79,3 +80,11 @@ class SimulationRender(QWidget):
                 elif event.key() == Qt.Key.Key_Down:
                     aircraft.move(0, step)
         return super().keyPressEvent(event)
+
+    def closeEvent(self, event: QCloseEvent) -> None:
+        """Qt method performed on the main window close event"""
+        for aircraft in self.aircrafts:
+            aircraft.disconnect_vehicle()
+            aircraft.positionChanged.disconnect(self.update)
+        event.accept()
+        return super().closeEvent(event)
