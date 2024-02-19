@@ -8,6 +8,7 @@ class SimulationState:
     def __init__(self, simulation_threshold : int) -> None:
         # simulation state
         self.simulation_threshold = simulation_threshold
+        self.adsb_threshold : float = 1000
         self.is_paused : bool = False
 
         # render state
