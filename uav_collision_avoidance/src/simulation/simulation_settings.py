@@ -29,7 +29,7 @@ class SimulationSettings:
         return (cls.resolution[0], cls.resolution[1])
 
     @classmethod
-    def set_refresh_rate(cls, rate) -> None:
-        """Sets the refresh rate"""
-        cls.refresh_rate = rate
+    def set_simulation_frequency(cls, simulation_frequency) -> None:
+        """Sets the simulations per second"""
+        cls.simulation_frequency = simulation_frequency
         return
