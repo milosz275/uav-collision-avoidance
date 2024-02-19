@@ -1,8 +1,9 @@
 # simulation.py
 
-from PySide6.QtCore import Qt, QPointF, QThread
-from PySide6.QtWidgets import QMainWindow, QGraphicsScene, QGraphicsView, QGraphicsRectItem, QGraphicsLineItem, QGraphicsSimpleTextItem, QGraphicsEllipseItem, QGraphicsPixmapItem, QGraphicsPolygonItem
-from PySide6.QtGui import QCloseEvent, QPen, QKeySequence, QPixmap, QTransform, QVector2D, QPolygonF, QIcon
+from typing import List
+
+from PySide6.QtWidgets import QMainWindow
+from PySide6.QtGui import QCloseEvent
 
 from src.aircraft.aircraft import Aircraft
 from src.aircraft.aircraft_vehicle import AircraftVehicle
@@ -12,10 +13,7 @@ from src.simulation.simulation_physics import SimulationPhysics
 from src.simulation.simulation_state import SimulationState
 from src.simulation.simulation_render import SimulationRender
 from src.simulation.simulation_adsb import SimulationADSB
-
-from typing import List
-from math import radians, sin, cos, atan2, degrees, dist, sqrt
-from copy import copy
+from src.simulation.simulation_flight_planner import SimulationFlightPlanner
 
 class Simulation(QMainWindow):
     """Main simulation App"""
@@ -40,15 +38,23 @@ class Simulation(QMainWindow):
         self.simulation_physics = SimulationPhysics(self, self.aircraft_vehicles, self.state)
         self.simulation_physics.start()
 
+        self.simulation_flight_planner = SimulationFlightPlanner(self, self.aircraft_vehicles, self.state)
+        self.simulation_flight_planner.start()
+
         self.simulation_adsb = SimulationADSB(self, self.aircraft_vehicles, self.state)
         self.simulation_adsb.start()
         return
     
     def stop_simulation(self) -> None:
+        """Finishes all active simulation threads"""
         if self.simulation_physics:
             self.simulation_physics.requestInterruption()
             self.simulation_physics.quit()
             self.simulation_physics.wait()
+        if self.simulation_flight_planner:
+            self.simulation_flight_planner.requestInterruption()
+            self.simulation_flight_planner.quit()
+            self.simulation_flight_planner.wait()
         if self.simulation_adsb:
             self.simulation_adsb.requestInterruption()
             self.simulation_adsb.quit()
@@ -56,7 +62,8 @@ class Simulation(QMainWindow):
         return
     
     def closeEvent(self, event: QCloseEvent) -> None:
-        self.simulation_render.close()
+        """Qt method performed on the main window close event"""
         self.stop_simulation()
+        self.simulation_render.close()
         event.accept()
         return super().closeEvent(event)
