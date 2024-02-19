@@ -13,7 +13,6 @@ from src.simulation.simulation_physics import SimulationPhysics
 from src.simulation.simulation_state import SimulationState
 from src.simulation.simulation_render import SimulationRender
 from src.simulation.simulation_adsb import SimulationADSB
-from src.simulation.simulation_flight_planner import SimulationFlightPlanner
 
 class Simulation(QMainWindow):
     """Main simulation App"""
@@ -38,9 +37,6 @@ class Simulation(QMainWindow):
         self.simulation_physics = SimulationPhysics(self, self.aircraft_vehicles, self.state)
         self.simulation_physics.start()
 
-        self.simulation_flight_planner = SimulationFlightPlanner(self, self.aircraft_vehicles, self.state)
-        self.simulation_flight_planner.start()
-
         self.simulation_adsb = SimulationADSB(self, self.aircraft_vehicles, self.state)
         self.simulation_adsb.start()
         return
@@ -51,10 +47,6 @@ class Simulation(QMainWindow):
             self.simulation_physics.requestInterruption()
             self.simulation_physics.quit()
             self.simulation_physics.wait()
-        if self.simulation_flight_planner:
-            self.simulation_flight_planner.requestInterruption()
-            self.simulation_flight_planner.quit()
-            self.simulation_flight_planner.wait()
         if self.simulation_adsb:
             self.simulation_adsb.requestInterruption()
             self.simulation_adsb.quit()
