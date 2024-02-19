@@ -1,10 +1,7 @@
 # simulation_adsb.py
 
-import sys
 from typing import List
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton
-from PySide6.QtCore import Qt, QObject, QThread, Signal
-from PySide6.QtGui import QPainter, QColor, QBrush, QKeyEvent
+from PySide6.QtCore import QThread
 
 from src.aircraft.aircraft_vehicle import AircraftVehicle
 from src.simulation.simulation_state import SimulationState
@@ -19,6 +16,7 @@ class SimulationADSB(QThread):
         return
         
     def run(self) -> None:
+        """Runs ADS-B simulation thread"""
         while not self.isInterruptionRequested():
             if not self.simulation_state.is_paused:
                 for aircraft in self.aircrafts:
