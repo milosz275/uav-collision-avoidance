@@ -9,7 +9,11 @@ from src.simulation.simulation_state import SimulationState
 class Aircraft():
     """Main aircraft class"""
     
+    current_id : int = 0
+
     def __init__(self, x : float, y : float, height : float, color : str, state : SimulationState) -> None:
-        self.vehicle = AircraftVehicle(position=QVector3D(x, y, height), speed=QVector3D(50, 50 , 0), state=state)
+        self.aircraft_id = Aircraft.current_id
+        Aircraft.current_id += 1
+        self.vehicle = AircraftVehicle(self.aircraft_id, position=QVector3D(x, y, height), speed=QVector3D(50, 50 , 0), state=state)
         self.render = AircraftRender(color=color, vehicle=self.vehicle, state=state)
         return
