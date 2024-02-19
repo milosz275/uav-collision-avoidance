@@ -13,6 +13,7 @@ from src.simulation.simulation import Simulation
 def main(args):
     """Executes main function"""
     app = QApplication(args)
+    app.setApplicationName("UAV Collsion Avoidance")
     SimulationSettings.screen_resolution = app.primaryScreen().size()
     sim = Simulation()
     sys.exit(app.exec())
