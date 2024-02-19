@@ -1,10 +1,8 @@
 # aircraft_vehicle.py
 
-import sys
 from math import atan2, degrees
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QPushButton
-from PySide6.QtCore import Qt, QObject, QThread, Signal
-from PySide6.QtGui import QPainter, QColor, QBrush, QKeyEvent, QVector3D
+from PySide6.QtCore import QObject, Signal
+from PySide6.QtGui import QVector3D
 
 from src.simulation.simulation_state import SimulationState
 
@@ -28,6 +26,7 @@ class AircraftVehicle(QObject):
         return
 
     def move(self, dx : float, dy : float, dz : float = 0.0) -> None:
+        """Applies delta position change for the vehicle"""
         self.position.setX(self.position.x() + dx)
         self.position.setY(self.position.y() + dy)
         self.position.setZ(self.position.z() + dz)
@@ -35,13 +34,17 @@ class AircraftVehicle(QObject):
         return
     
     def absolute_speed(self) -> float:
+        """Returns absolute speed"""
         return self.speed.length()
     
     def horizontal_speed(self) -> float:
+        """Returns horizontal speed"""
         return QVector3D(self.speed.x(), self.speed.y(), 0).length()
     
     def vertical_speed(self) -> float:
+        """Returns vertical speed"""
         return QVector3D(0, 0, self.speed.z()).length()
 
     def yaw_angle(self) -> float:
+        """Returns yaw angle"""
         return degrees(atan2(self.speed.y(), self.speed.x()))
