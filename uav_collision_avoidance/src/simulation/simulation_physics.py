@@ -1,6 +1,7 @@
 # simulation_physics.py
 
 from typing import List
+
 from PySide6.QtCore import QThread, QTime
 
 from src.aircraft.aircraft_vehicle import AircraftVehicle

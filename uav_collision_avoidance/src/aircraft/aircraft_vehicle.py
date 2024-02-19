@@ -1,6 +1,7 @@
 # aircraft_vehicle.py
 
 from math import atan2, degrees
+
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QVector3D
 

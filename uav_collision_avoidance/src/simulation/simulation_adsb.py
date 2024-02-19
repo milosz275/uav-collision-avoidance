@@ -1,6 +1,7 @@
 # simulation_adsb.py
 
 from typing import List
+
 from PySide6.QtCore import QThread
 
 from src.aircraft.aircraft_vehicle import AircraftVehicle
