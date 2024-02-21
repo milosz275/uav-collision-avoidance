@@ -5,6 +5,7 @@ from PySide6.QtGui import QVector3D
 
 from src.aircraft.aircraft_render import AircraftRender
 from src.aircraft.aircraft_vehicle import AircraftVehicle
+from src.aircraft.aircraft_fcc import AircraftFCC
 from src.simulation.simulation_state import SimulationState
 
 class Aircraft(QObject):
@@ -16,6 +17,7 @@ class Aircraft(QObject):
         self.aircraft_id = self.get_id()
         self.vehicle = AircraftVehicle(self.aircraft_id, position=QVector3D(x, y, height), speed=QVector3D(50, 50 , 0), state=state)
         self.render = AircraftRender(color=color, vehicle=self.vehicle, state=state)
+        self.fcc = AircraftFCC()
         return
 
     def get_id(self):
