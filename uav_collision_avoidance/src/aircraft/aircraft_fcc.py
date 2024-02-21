@@ -6,4 +6,8 @@ class AircraftFCC(QObject):
     """Aircraft Flight Control Computer"""
 
     def __init__(self) -> None:
-        pass
+        super().__init__()
+        
+        self.safezone_occupied : bool = False
+
+        return
