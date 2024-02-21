@@ -4,6 +4,7 @@ from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QVector3D
 
 from src.aircraft.aircraft_vehicle import AircraftVehicle
+from src.aircraft.aircraft_fcc import AircraftFCC
 from src.simulation.simulation_state import SimulationState
 
 class AircraftRender(QObject):
@@ -11,14 +12,15 @@ class AircraftRender(QObject):
 
     positionChanged = Signal(float, float, float)
 
-    def __init__(self, color : str, vehicle : AircraftVehicle, state : SimulationState) -> None:
+    def __init__(self, color : str, vehicle : AircraftVehicle, fcc : AircraftFCC, state : SimulationState) -> None:
         super().__init__()
-        self.position : QVector3D = QVector3D(0, 0, 0)
-        self.color = color
         self.state = state
+        self.fcc = fcc
 
+        # fields updated with AircraftVehicle and AircraftFCC
+        self.position : QVector3D = QVector3D(0, 0, 0)
         self.size : float = 0.0
-        self.yaw_angle : float = 45.0
+        self.yaw_angle : float = 0.0
         self.safezone_occupied : bool = False
 
         if vehicle:
