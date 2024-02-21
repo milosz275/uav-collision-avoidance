@@ -25,6 +25,9 @@ cd uav-collision-avoidance
 python main.py
 ```
 
+## Remarks
+One coding convention is not preserved in the scope of the project. Qt's methods are CamelCase formatted and the rest is snake_case, default Python naming convention.
+
 ## Authors
 - [Miłosz Maculewicz](https://github.com/mldxo)
 
