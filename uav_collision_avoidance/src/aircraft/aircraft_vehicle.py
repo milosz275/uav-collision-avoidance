@@ -22,7 +22,6 @@ class AircraftVehicle(QObject):
         self.state = state
 
         self.size : float = 20.0
-        self.safezone_occupied : bool = False
 
         return
 
