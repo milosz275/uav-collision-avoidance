@@ -1,12 +1,13 @@
 # aircraft.py
 
+from PySide6.QtCore import QObject
 from PySide6.QtGui import QVector3D
 
 from src.aircraft.aircraft_render import AircraftRender
 from src.aircraft.aircraft_vehicle import AircraftVehicle
 from src.simulation.simulation_state import SimulationState
 
-class Aircraft():
+class Aircraft(QObject):
     """Main aircraft class"""
     
     current_id : int = 0
