@@ -1,8 +1,9 @@
 # simulation_state.py
 
+from PySide6.QtCore import QSettings
 from PySide6.QtGui import QPixmap, QImage
 
-class SimulationState:
+class SimulationState(QSettings):
     """Class defining simulation's traits"""
 
     def __init__(self, simulation_threshold : int) -> None:
