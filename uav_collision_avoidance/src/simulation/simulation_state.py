@@ -10,10 +10,11 @@ class SimulationState(QSettings):
         # simulation state
         self.simulation_threshold = simulation_threshold
         self.adsb_threshold : float = 1000
+        self.time_scale : float = 0.5 # define slow motion or fast forward
         self.is_paused : bool = False
 
         # render state
-        self.scale : float = 1.0
+        self.scale : float = 2.0 # define gui scaling
 
         # assets
         self.aircraft_pixmap : QPixmap = QPixmap()
