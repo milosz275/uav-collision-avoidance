@@ -24,8 +24,8 @@ class Simulation(QMainWindow):
         self.state = SimulationState(SimulationSettings.simulation_threshold)
 
         self.aircrafts : List[Aircraft] = [
-            Aircraft(10, 10, 1000, "red", self.state),
-            Aircraft(100, 100, 1000, "blue", self.state),
+            Aircraft(10, 10, 1000, self.state),
+            Aircraft(100, 100, 1000, self.state),
         ]
 
         self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle for aircraft in self.aircrafts]
