@@ -24,8 +24,9 @@ class SimulationADSB(QThread):
                 for aircraft in self.aircrafts:
                     print("Aircraft id: " + str(aircraft.aircraft_id) +
                           "; speed: " + "{:.2f}".format(aircraft.absolute_speed()) +
-                          "; yaw angle: " + str(aircraft.yaw_angle()) +
-                          "; pitch angle: " + str(aircraft.pitch_angle()) +
-                          "; roll angle: " + str(aircraft.roll_angle))
+                          "; yaw angle: " + "{:.2f}".format(aircraft.yaw_angle()) +
+                          "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle()) +
+                          "; roll angle: " + "{:.2f}".format(aircraft.roll_angle) +
+                          "; distance covered: " + "{:.2f}".format(aircraft.distance_covered))
             self.msleep(max(0, 1000 - start_timestamp.msecsTo(QTime.currentTime())))
         return super().run()
