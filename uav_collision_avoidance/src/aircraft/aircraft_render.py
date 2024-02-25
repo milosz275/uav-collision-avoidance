@@ -51,11 +51,11 @@ class AircraftRender(QObject):
 
     def update(self) -> None:
         """Updates graphical location of the render based on vehicle position"""
-        self.position.setX(self.vehicle.position.x() / self.state.scale)
-        self.position.setY(self.vehicle.position.y() / self.state.scale)
-        self.position.setZ(self.vehicle.position.z() / self.state.scale)
+        self.position.setX(self.vehicle.position.x() * self.state.scale)
+        self.position.setY(self.vehicle.position.y() * self.state.scale)
+        self.position.setZ(self.vehicle.position.z() * self.state.scale)
         self.position_changed.emit(self.position.x(), self.position.y(), self.position.z())
-        self.size = self.vehicle.size / self.state.scale
+        self.size = self.vehicle.size * self.state.scale
         self.yaw_angle = self.vehicle.yaw_angle()
         self.pitch_angle = self.vehicle.pitch_angle()
         self.roll_angle = self.vehicle.roll_angle
