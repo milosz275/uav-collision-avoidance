@@ -1,5 +1,6 @@
 # simulation_render.py
 
+from math import cos, radians
 from typing import List
 
 from PySide6.QtWidgets import QWidget
@@ -30,13 +31,15 @@ class SimulationRender(QWidget):
         self.aircrafts = aircrafts
         
         for aircraft in self.aircrafts:
-            aircraft.positionChanged.connect(self.update)
+            aircraft.position_changed.connect(self.update)
         return
 
     def paintEvent(self, event: QPaintEvent) -> None:
         """Qt method painting the aircrafts"""
+        if self.simulation_state.aircraft_pixmap.isNull():
+            return super().paintEvent(event)
         for aircraft in self.aircrafts:
-            pixmap = self.simulation_state.aircraft_pixmap.scaled(aircraft.size, aircraft.size)
+            pixmap : QPixmap = self.simulation_state.aircraft_pixmap.scaled(aircraft.size, aircraft.size)
 
             painter = QPainter(self)
             painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
@@ -44,7 +47,10 @@ class SimulationRender(QWidget):
             painter.translate(QPoint(
                 aircraft.position.x(),
                 aircraft.position.y()))
-
+            pixmap = pixmap.scaled(
+                pixmap.width() * abs(cos(radians(aircraft.roll_angle))),
+                pixmap.height() * abs(cos(radians(aircraft.pitch_angle))))
+            
             transform = QTransform()
             transform.rotate(aircraft.yaw_angle)
             rotated_pixmap : QPixmap = pixmap.transformed(transform)
@@ -62,7 +68,7 @@ class SimulationRender(QWidget):
             self.simulation_state.toggle_pause()
         step = 5
         for aircraft in self.aircrafts:
-            if aircraft.color == "blue":
+            if aircraft.aircraft_id == "0":
                 if event.key() == Qt.Key.Key_A:
                     aircraft.move(-step, 0)
                 elif event.key() == Qt.Key.Key_D:
@@ -71,7 +77,7 @@ class SimulationRender(QWidget):
                     aircraft.move(0, -step)
                 elif event.key() == Qt.Key.Key_S:
                     aircraft.move(0, step)
-            else:
+            elif aircraft.aircraft_id == "1":
                 if event.key() == Qt.Key.Key_Left:
                     aircraft.move(-step, 0)
                 elif event.key() == Qt.Key.Key_Right:
@@ -86,6 +92,6 @@ class SimulationRender(QWidget):
         """Qt method performed on the main window close event"""
         for aircraft in self.aircrafts:
             aircraft.disconnect_vehicle()
-            aircraft.positionChanged.disconnect(self.update)
+            aircraft.position_changed.disconnect(self.update)
         event.accept()
         return super().closeEvent(event)
