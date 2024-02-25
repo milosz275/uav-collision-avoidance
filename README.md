@@ -6,7 +6,7 @@ Python project regarding implementation of UAV physics and collision detection/a
 UAV Collision Avoidance is my bachelor's thesis project meeting problem of UAVs safe cooperation in the 3D space. Project implements functional physics calculations, scalable GUI, realistic ADS-B probable collision avoidance systems and on-board flight planning.
 
 ## Premises
-3-dimensional space defined in XYZ coordinate system, where X and Y describe flat horizontal plane and Z is height above the sea level. In scope of this project, UAVs are considered HTOL drones (Horizontal Take-off and Landing). The space is shared by two/three UAVs. There is no other objects or gusts of wind assumpted. The default distance unit is meters [m] and speed is meters per second [m/s] 
+3-dimensional space defined in XYZ coordinate system, where X and Y describe flat horizontal plane and Z is height above the sea level. In scope of this project, UAVs are considered HTOL drones (Horizontal Take-off and Landing). The space is shared by two/three UAVs. There is no other objects or gusts of wind assumpted. The default distance unit is meters [m] and speed is meters per second [m/s]. There is no aerodynamic lift force assumed at this moment.
 
 ## Technologies
 Python3[^1] project is wrapped as a PyPi package[^2]. PySide6[^3], which is PyQt6 library, was used for GUI implementation.
