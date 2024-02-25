@@ -10,4 +10,8 @@ class AircraftFCC(QObject):
         
         self.safezone_occupied : bool = False
 
+        self.target_yaw_angle : float = 0.0
+        self.target_roll_angle : float = 0.0
+        self.target_pitch_angle : float = 0.0
+
         return
