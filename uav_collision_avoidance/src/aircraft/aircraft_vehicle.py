@@ -5,6 +5,7 @@ from math import atan2, degrees, sqrt
 from PySide6.QtCore import QObject, Signal
 from PySide6.QtGui import QVector3D
 
+from src.aircraft.aircraft_fcc import AircraftFCC
 from src.simulation.simulation_state import SimulationState
 
 class AircraftVehicle(QObject):
@@ -12,19 +13,20 @@ class AircraftVehicle(QObject):
 
     position_changed = Signal(float, float, float)
 
-    def __init__(self, aircraft_id : int, position : QVector3D, speed : QVector3D, state : SimulationState) -> None:
+    def __init__(self, aircraft_id : int, position : QVector3D, speed : QVector3D, fcc : AircraftFCC, state : SimulationState) -> None:
         super().__init__()
         self.aircraft_id = aircraft_id
         self.position = position
         if self.position.z() < 0:
             self.position.setZ(0)
         self.speed = speed
+        self.fcc = fcc
         self.state = state
 
         self.size : float = 20.0
         self.course : float = self.yaw_angle()
-        self.roll_angle = 0.0
-
+        self.roll_angle = 0.0 # bank angle
+        self.distance_covered : float = 0.0
         return
     
     def move(self, dx : float, dy : float, dz : float = 0.0) -> None:
@@ -63,9 +65,24 @@ class AircraftVehicle(QObject):
         return QVector3D(0, 0, self.speed.z()).length()
 
     def yaw_angle(self) -> float:
-        """Returns yaw angle"""
+        """Returns yaw (heading) angle"""
         return degrees(atan2(self.speed.x(), -self.speed.y()))
 
     def pitch_angle(self) -> float:
         """Returns pitch angle"""
         return degrees(atan2(self.speed.z(), sqrt(self.speed.x() ** 2 + self.speed.y() ** 2)))
+
+    def adjust_yaw_angle(self, dang : float) -> None:
+        """"""
+
+        return
+
+    def adjust_pitch_angle(self, dang : float) -> None:
+        """"""
+
+        return
+
+    def adjust_roll_angle(self, dang : float) -> None:
+        """"""
+        self.roll_angle += dang
+        return
