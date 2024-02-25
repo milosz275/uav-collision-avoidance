@@ -22,6 +22,10 @@ class SimulationADSB(QThread):
             start_timestamp = QTime.currentTime()
             if not self.simulation_state.is_paused:
                 for aircraft in self.aircrafts:
-                    print(str(aircraft.aircraft_id) + "- speed: " + str(aircraft.absolute_speed()))
+                    print("Aircraft id: " + str(aircraft.aircraft_id) +
+                          "; speed: " + "{:.2f}".format(aircraft.absolute_speed()) +
+                          "; yaw angle: " + str(aircraft.yaw_angle()) +
+                          "; pitch angle: " + str(aircraft.pitch_angle()) +
+                          "; roll angle: " + str(aircraft.roll_angle))
             self.msleep(max(0, 1000 - start_timestamp.msecsTo(QTime.currentTime())))
         return super().run()
