@@ -4,7 +4,7 @@ from math import cos, radians
 from typing import List
 
 from PySide6.QtWidgets import QWidget
-from PySide6.QtCore import Qt, QPoint
+from PySide6.QtCore import Qt, QPoint, Signal
 from PySide6.QtGui import QPaintEvent, QPainter, QKeyEvent, QIcon, QTransform, QPixmap, QCloseEvent
 
 from src.aircraft.aircraft_render import AircraftRender
@@ -12,6 +12,8 @@ from src.simulation.simulation_settings import SimulationSettings
 
 class SimulationRender(QWidget):
     """Main widget rendering the simulation"""
+
+    rendered = Signal(bool)
 
     def __init__(self, aircrafts : List[AircraftRender], simulation_state):
         super().__init__()
@@ -39,6 +41,8 @@ class SimulationRender(QWidget):
         if self.simulation_state.aircraft_pixmap.isNull():
             return super().paintEvent(event)
         for aircraft in self.aircrafts:
+            self.rendered.emit(True)
+            
             pixmap : QPixmap = self.simulation_state.aircraft_pixmap.scaled(aircraft.size, aircraft.size)
 
             painter = QPainter(self)
