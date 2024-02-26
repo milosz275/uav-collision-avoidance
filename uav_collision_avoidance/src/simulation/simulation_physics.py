@@ -32,13 +32,13 @@ class SimulationPhysics(QThread):
                 elapsed_time : float = self.previous_timestamp.msecsTo(start_timestamp) * self.simulation_state.time_scale
                 for aircraft in self.aircrafts:
                     aircraft.adjust_roll_angle((1.0 / self.roll_dynamic_delay) * (aircraft.fcc.target_roll_angle - aircraft.roll_angle))
-                    delta_pos : QVector3D = QVector3D(
+                    delta_pos : QVector3D = QVector3D( # m/ms
                         aircraft.speed.x() * elapsed_time,
                         aircraft.speed.y() * elapsed_time,
                         aircraft.speed.z() * elapsed_time,
                     )
                     old_pos : QVector3D = copy(aircraft.position)
-                    aircraft.move(
+                    aircraft.move( # m/s
                         delta_pos.x() / 1000.0,
                         delta_pos.y() / 1000.0,
                         delta_pos.z() / 1000.0,
