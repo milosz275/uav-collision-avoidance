@@ -6,15 +6,16 @@ from PySide6.QtGui import QPixmap, QImage
 class SimulationState(QSettings):
     """Class defining simulation's traits"""
 
-    def __init__(self, simulation_threshold : int) -> None:
+    def __init__(self, simulation_threshold : float, adsb_threshold : float) -> None:
         # simulation state
         self.simulation_threshold = simulation_threshold
-        self.adsb_threshold : float = 1000
+        self.adsb_threshold = adsb_threshold
         self.time_scale : float = 0.5 # define slow motion or fast forward
         self.is_paused : bool = False
 
         # render state
         self.scale : float = 2.0 # define gui scaling
+        self.fps : float = 0.0
 
         # assets
         self.aircraft_pixmap : QPixmap = QPixmap()
