@@ -13,6 +13,7 @@ from src.simulation.simulation_physics import SimulationPhysics
 from src.simulation.simulation_state import SimulationState
 from src.simulation.simulation_render import SimulationRender
 from src.simulation.simulation_adsb import SimulationADSB
+from src.simulation.simulation_fps import SimulationFPS
 
 class Simulation(QMainWindow):
     """Main simulation App"""
@@ -21,7 +22,7 @@ class Simulation(QMainWindow):
         super().__init__()
         SimulationSettings().__init__()
 
-        self.state = SimulationState(SimulationSettings.simulation_threshold)
+        self.state = SimulationState(SimulationSettings.simulation_threshold, SimulationSettings.adsb_threshold)
 
         self.aircrafts : List[Aircraft] = [
             Aircraft(10, 10, 1000, self.state),
@@ -39,6 +40,9 @@ class Simulation(QMainWindow):
 
         self.simulation_adsb = SimulationADSB(self, self.aircraft_vehicles, self.state)
         self.simulation_adsb.start()
+
+        self.simulation_fps = SimulationFPS(self, self.simulation_render, self.state)
+        self.simulation_fps.start()
         return
     
     def stop_simulation(self) -> None:
@@ -51,6 +55,10 @@ class Simulation(QMainWindow):
             self.simulation_adsb.requestInterruption()
             self.simulation_adsb.quit()
             self.simulation_adsb.wait()
+        if self.simulation_fps:
+            self.simulation_fps.requestInterruption()
+            self.simulation_fps.quit()
+            self.simulation_fps.wait()
         return
     
     def closeEvent(self, event: QCloseEvent) -> None:
