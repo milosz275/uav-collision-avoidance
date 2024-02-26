@@ -9,7 +9,8 @@ class SimulationSettings:
     resolution : tuple
     g_acceleration : float = 9.81
     simulation_frequency : int = 100 # simulations each second
-    simulation_threshold : int = 1000 // simulation_frequency # for 100fps it is 10ms
+    simulation_threshold : float = 1000 // simulation_frequency # for 100fps it is 10ms
+    adsb_threshold : float = 1000
 
     @classmethod
     def __init__(cls) -> None:
