@@ -4,6 +4,7 @@ from typing import List
 
 from PySide6.QtWidgets import QMainWindow
 from PySide6.QtGui import QCloseEvent
+from PySide6.QtCore import QThread
 
 from src.aircraft.aircraft import Aircraft
 from src.aircraft.aircraft_vehicle import AircraftVehicle
@@ -12,6 +13,7 @@ from src.simulation.simulation_settings import SimulationSettings
 from src.simulation.simulation_physics import SimulationPhysics
 from src.simulation.simulation_state import SimulationState
 from src.simulation.simulation_render import SimulationRender
+from src.simulation.simulation_widget import SimulationWidget
 from src.simulation.simulation_adsb import SimulationADSB
 from src.simulation.simulation_fps import SimulationFPS
 
@@ -22,7 +24,7 @@ class Simulation(QMainWindow):
         super().__init__()
         SimulationSettings().__init__()
 
-        self.state = SimulationState(SimulationSettings.simulation_threshold, SimulationSettings.adsb_threshold)
+        self.state = SimulationState(SimulationSettings())
 
         self.aircrafts : List[Aircraft] = [
             Aircraft(10, 10, 1000, self.state),
@@ -32,17 +34,20 @@ class Simulation(QMainWindow):
         self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle for aircraft in self.aircrafts]
         self.aircraft_renders : List[AircraftRender] = [aircraft.render for aircraft in self.aircrafts]
 
-        self.simulation_render = SimulationRender(self.aircraft_renders, self.state)
-        self.simulation_render.show()
-
         self.simulation_physics = SimulationPhysics(self, self.aircraft_vehicles, self.state)
-        self.simulation_physics.start()
+        self.simulation_physics.start(priority=QThread.Priority.TimeCriticalPriority)
 
         self.simulation_adsb = SimulationADSB(self, self.aircraft_vehicles, self.state)
-        self.simulation_adsb.start()
+        self.simulation_adsb.start(priority=QThread.Priority.NormalPriority)
 
-        self.simulation_fps = SimulationFPS(self, self.simulation_render, self.state)
-        self.simulation_fps.start()
+        self.simulation_fps = SimulationFPS(self, self.state)
+        self.simulation_fps.start(priority=QThread.Priority.NormalPriority)
+
+        self.simulation_widget = SimulationWidget(self.aircraft_renders, self.simulation_fps, self.state)
+        self.simulation_widget.show()
+
+        self.simulation_render = SimulationRender(self, self.simulation_widget, self.state)
+        self.simulation_render.start(priority=QThread.Priority.NormalPriority)
         return
     
     def stop_simulation(self) -> None:
@@ -55,6 +60,10 @@ class Simulation(QMainWindow):
             self.simulation_adsb.requestInterruption()
             self.simulation_adsb.quit()
             self.simulation_adsb.wait()
+        if self.simulation_render:
+            self.simulation_render.requestInterruption()
+            self.simulation_render.quit()
+            self.simulation_render.wait()
         if self.simulation_fps:
             self.simulation_fps.requestInterruption()
             self.simulation_fps.quit()
@@ -64,6 +73,5 @@ class Simulation(QMainWindow):
     def closeEvent(self, event: QCloseEvent) -> None:
         """Qt method performed on the main window close event"""
         self.stop_simulation()
-        self.simulation_render.close()
         event.accept()
         return super().closeEvent(event)
