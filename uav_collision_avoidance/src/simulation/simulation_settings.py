@@ -8,9 +8,11 @@ class SimulationSettings:
     screen_resolution : QSize
     resolution : tuple
     g_acceleration : float = 9.81
-    simulation_frequency : int = 100 # simulations each second
-    simulation_threshold : float = 1000 // simulation_frequency # for 100fps it is 10ms
-    adsb_threshold : float = 1000
+    simulation_frequency : float = 60.0 # simulations each second
+    simulation_threshold : float = 1000.0 / simulation_frequency # for 100fps it is 10ms
+    gui_render_frequency : float = 70.0
+    gui_render_threshold : float =  1000.0 / gui_render_frequency
+    adsb_threshold : float = 1000.0
 
     @classmethod
     def __init__(cls) -> None:
