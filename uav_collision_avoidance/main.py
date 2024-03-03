@@ -4,7 +4,7 @@ import sys
 import platform
 if platform.system() == 'Windows':
     import ctypes
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('io.github.mldxo.uav-collision-avoidance.1')
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('io.github.mldxo.uav-collision-avoidance.1.0')
 
 from PySide6.QtWidgets import QApplication
 from src.simulation.simulation_settings import SimulationSettings
@@ -14,6 +14,7 @@ def main(args):
     """Executes main function"""
     app = QApplication(args)
     app.setApplicationName("UAV Collsion Avoidance")
+    app.setApplicationVersion("1.0")
     SimulationSettings.screen_resolution = app.primaryScreen().size()
     sim = Simulation()
     sys.exit(app.exec())
