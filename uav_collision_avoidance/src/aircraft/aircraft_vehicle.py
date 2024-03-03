@@ -2,7 +2,7 @@
 
 from math import atan2, degrees, sqrt
 
-from PySide6.QtCore import QObject, Signal
+from PySide6.QtCore import QObject
 from PySide6.QtGui import QVector3D
 
 from src.aircraft.aircraft_fcc import AircraftFCC
@@ -11,7 +11,8 @@ from src.simulation.simulation_state import SimulationState
 class AircraftVehicle(QObject):
     """Aircraft physical UAV"""
 
-    position_changed = Signal(float, float, float)
+    roll_dynamic_delay : float = 1000 # ms
+    pitch_dynamic_delay : float = 2000 # ms
 
     def __init__(self, aircraft_id : int, position : QVector3D, speed : QVector3D, fcc : AircraftFCC, state : SimulationState) -> None:
         super().__init__()
@@ -34,7 +35,6 @@ class AircraftVehicle(QObject):
         self.position.setX(self.position.x() + dx)
         self.position.setY(self.position.y() + dy)
         self.position.setZ(self.position.z() + dz)
-        self.position_changed.emit(self.position.x(), self.position.y(), self.position.z())
         return
     
     def accelerate(self, dx : float, dy : float, dz : float) -> None:
@@ -71,18 +71,3 @@ class AircraftVehicle(QObject):
     def pitch_angle(self) -> float:
         """Returns pitch angle"""
         return degrees(atan2(self.speed.z(), sqrt(self.speed.x() ** 2 + self.speed.y() ** 2)))
-
-    def adjust_yaw_angle(self, dang : float) -> None:
-        """"""
-
-        return
-
-    def adjust_pitch_angle(self, dang : float) -> None:
-        """"""
-
-        return
-
-    def adjust_roll_angle(self, dang : float) -> None:
-        """"""
-        self.roll_angle += dang
-        return
