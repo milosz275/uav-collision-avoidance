@@ -17,6 +17,7 @@ def main(args):
     app.setApplicationVersion("1.0")
     SimulationSettings.screen_resolution = app.primaryScreen().size()
     sim = Simulation()
+    sim.run_realtime()
     sys.exit(app.exec())
 
 if __name__ == "__main__":
