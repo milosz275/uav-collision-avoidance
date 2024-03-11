@@ -33,15 +33,25 @@ class AircraftVehicle(QObject):
         self.__distance_covered : float = 0.0
         return
     
+    def aircraft_id(self) -> int:
+        return self.__aircraft_id
+    
     def position(self) -> QVector3D:
         return self.__position
+    
+    def speed(self) -> QVector3D:
+        return self.__speed
     
     def size(self) -> float:
         return self.__size
     
-    def roll_angle(self, new_roll_angle : float = 0.0) -> float:
-        self.__roll_angle = new_roll_angle
+    def roll_angle(self, roll_angle_delta : float = 0.0) -> float:
+        self.__roll_angle += roll_angle_delta
         return self.__roll_angle
+    
+    def distance_covered(self, distance_covered_delta : float = 0.0) -> float:
+        self.__distance_covered += distance_covered_delta
+        return self.__distance_covered
     
     def fcc(self) -> AircraftFCC:
         return self.__fcc
