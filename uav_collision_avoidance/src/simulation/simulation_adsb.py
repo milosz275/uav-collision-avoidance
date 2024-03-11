@@ -25,14 +25,14 @@ class SimulationADSB(QThread):
                 self.adsb_cycles += 1
                 aircrafts = self.aircrafts.copy()
                 for aircraft in aircrafts:
-                    if aircraft.aircraft_id == 0:
-                        print("Aircraft id: " + str(aircraft.aircraft_id) +
+                    if aircraft.aircraft_id() == 0:
+                        print("Aircraft id: " + str(aircraft.aircraft_id()) +
                             "; speed: " + "{:.2f}".format(aircraft.absolute_speed()) +
-                            "; x: " + "{:.2f}".format(aircraft.position.x()) +
+                            "; x: " + "{:.2f}".format(aircraft.position().x()) +
                             "; yaw angle: " + "{:.2f}".format(aircraft.yaw_angle()) +
                             "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle()) +
-                            "; roll angle: " + "{:.2f}".format(aircraft.roll_angle) +
-                            "; distance covered: " + "{:.2f}".format(aircraft.distance_covered) +
+                            "; roll angle: " + "{:.2f}".format(aircraft.roll_angle()) +
+                            "; distance covered: " + "{:.2f}".format(aircraft.distance_covered()) +
                             "; fps: " + "{:.2f}".format(self.simulation_state.fps) +
                             "; t: " + str(self.adsb_cycles) +
                             "; phys: " + str(self.simulation_state.physics_cycles))
