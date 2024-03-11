@@ -44,10 +44,10 @@ class SimulationPhysics(QThread):
             return
         for aircraft in self.aircrafts:
             # flight control computer
-            aircraft.fcc.update()
+            aircraft.fcc().update()
 
             # roll angle
-            aircraft.roll_angle += ((1.0 / (aircraft.roll_dynamic_delay / elapsed_time)) * (aircraft.fcc.target_roll_angle - aircraft.roll_angle))
+            aircraft.roll_angle(aircraft.roll_angle() + ((1.0 / (aircraft.roll_dynamic_delay / elapsed_time)) * (aircraft.fcc().target_roll_angle - aircraft.roll_angle)))
 
             # pitch angle
 
