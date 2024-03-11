@@ -23,7 +23,9 @@ class Simulation(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         SimulationSettings().__init__()
+        return
 
+    def run_realtime(self) -> None:
         self.state = SimulationState(SimulationSettings())
 
         self.aircrafts : List[Aircraft] = [
@@ -31,8 +33,8 @@ class Simulation(QMainWindow):
             Aircraft(100, 100, 1000, self.state),
         ]
 
-        self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle for aircraft in self.aircrafts]
-        self.aircraft_renders : List[AircraftRender] = [aircraft.render for aircraft in self.aircrafts]
+        self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle() for aircraft in self.aircrafts]
+        self.aircraft_renders : List[AircraftRender] = [aircraft.render() for aircraft in self.aircrafts]
 
         self.simulation_physics = SimulationPhysics(self, self.aircraft_vehicles, self.state)
         self.simulation_physics.start(priority=QThread.Priority.TimeCriticalPriority)
@@ -50,7 +52,10 @@ class Simulation(QMainWindow):
         self.simulation_render.start(priority=QThread.Priority.NormalPriority)
         return
     
-    def stop_simulation(self) -> None:
+    def run_prerender(self) -> None:
+        return
+
+    def __stop_simulation(self) -> None:
         """Finishes all active simulation threads"""
         if self.simulation_physics:
             self.simulation_physics.requestInterruption()
@@ -72,6 +77,6 @@ class Simulation(QMainWindow):
     
     def closeEvent(self, event: QCloseEvent) -> None:
         """Qt method performed on the main window close event"""
-        self.stop_simulation()
+        self.__stop_simulation()
         event.accept()
         return super().closeEvent(event)
