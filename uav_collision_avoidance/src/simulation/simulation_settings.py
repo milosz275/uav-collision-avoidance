@@ -8,9 +8,9 @@ class SimulationSettings:
     screen_resolution : QSize
     resolution : tuple
     g_acceleration : float = 9.81
-    simulation_frequency : float = 60.0 # simulations each second
-    simulation_threshold : float = 1000.0 / simulation_frequency # for 100fps it is 10ms
-    gui_render_frequency : float = 70.0
+    simulation_frequency : float = 100.0
+    simulation_threshold : float = 1000.0 / simulation_frequency
+    gui_render_frequency : float = 100.0
     gui_render_threshold : float =  1000.0 / gui_render_frequency
     adsb_threshold : float = 1000.0
 
@@ -27,7 +27,7 @@ class SimulationSettings:
         return
     
     @classmethod
-    def get_resolution(cls) -> None:
+    def get_resolution(cls) -> tuple[float, float]:
         """Gets the resolution"""
         return (cls.resolution[0], cls.resolution[1])
 
