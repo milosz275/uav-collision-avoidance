@@ -29,12 +29,12 @@ class SimulationPhysics(QThread):
                 elapsed_time : float = self.simulation_state.simulation_threshold # * self.simulation_state.time_scale
                 self.update_aircrafts(elapsed_time)
                 for aircraft in self.aircrafts:
-                    old_pos : QVector3D = copy(aircraft.position)
+                    old_pos : QVector3D = copy(aircraft.position())
                     aircraft.move(
-                        aircraft.speed.x() * elapsed_time / 1000.0,
-                        aircraft.speed.y() * elapsed_time / 1000.0,
-                        aircraft.speed.z() * elapsed_time / 1000.0)
-                    aircraft.distance_covered += dist(old_pos.toTuple(), aircraft.position.toTuple())
+                        aircraft.speed().x() * elapsed_time / 1000.0,
+                        aircraft.speed().y() * elapsed_time / 1000.0,
+                        aircraft.speed().z() * elapsed_time / 1000.0)
+                    aircraft.distance_covered(dist(old_pos.toTuple(), aircraft.position().toTuple()))
             self.msleep(max(0, (self.simulation_state.simulation_threshold) - start_timestamp.msecsTo(QTime.currentTime())))
         return super().run()
 
@@ -47,23 +47,23 @@ class SimulationPhysics(QThread):
             aircraft.fcc().update()
 
             # roll angle
-            aircraft.roll_angle(aircraft.roll_angle() + ((1.0 / (aircraft.roll_dynamic_delay / elapsed_time)) * (aircraft.fcc().target_roll_angle - aircraft.roll_angle)))
+            aircraft.roll_angle((1.0 / (aircraft.roll_dynamic_delay / elapsed_time)) * (aircraft.fcc().target_roll_angle - aircraft.roll_angle()))
 
             # pitch angle
 
             # yaw angle
-            if aircraft.roll_angle == 0.0:
+            if aircraft.roll_angle() == 0.0:
                 return
             current_yaw_angle : float = aircraft.yaw_angle()
             current_horizontal_speed : float = aircraft.horizontal_speed()
-            delta_yaw_angle : float = self.simulation_state.g_acceleration * tan(radians(aircraft.roll_angle)) / (current_horizontal_speed / elapsed_time)
+            delta_yaw_angle : float = self.simulation_state.g_acceleration * tan(radians(aircraft.roll_angle())) / (current_horizontal_speed / elapsed_time)
 
             new_yaw_angle_radians : float = radians(current_yaw_angle)
             new_yaw_angle_radians += radians(delta_yaw_angle)
             new_yaw_angle : float = degrees(new_yaw_angle_radians)
 
-            aircraft.speed.setX(sin(radians(new_yaw_angle)) * current_horizontal_speed)
-            aircraft.speed.setY(-cos(radians(new_yaw_angle)) * current_horizontal_speed)
+            aircraft.speed().setX(sin(radians(new_yaw_angle)) * current_horizontal_speed)
+            aircraft.speed().setY(-cos(radians(new_yaw_angle)) * current_horizontal_speed)
         return
 
     def count_cycles(self) -> None:
