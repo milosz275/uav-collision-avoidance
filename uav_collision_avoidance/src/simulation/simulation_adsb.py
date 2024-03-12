@@ -23,8 +23,8 @@ class SimulationADSB(QThread):
             start_timestamp = QTime.currentTime()
             if not self.simulation_state.is_paused:
                 self.adsb_cycles += 1
-                aircrafts = self.aircrafts.copy()
-                for aircraft in aircrafts:
+                self.simulation_state.update_adsb_settings()
+                for aircraft in self.aircrafts:
                     if aircraft.aircraft_id() == 0:
                         print("Aircraft id: " + str(aircraft.aircraft_id()) +
                             "; speed: " + "{:.2f}".format(aircraft.absolute_speed()) +
