@@ -18,28 +18,37 @@ class SimulationPhysics(QThread):
         self.aircrafts = aircrafts
         self.simulation_state = simulation_state
         self.cycles : int = 0
+        self.global_start_timestamp : QTime = None
+        self.global_stop_timestamp : QTime = None
         return
 
     def run(self) -> None:
         """Runs physics simulation thread"""
+        self.global_start_timestamp = QTime.currentTime()
         while not self.isInterruptionRequested():
             start_timestamp = QTime.currentTime()
             if not self.simulation_state.is_paused:
                 self.count_cycles()
+                self.simulation_state.update_simulation_settings()
                 elapsed_time : float = self.simulation_state.simulation_threshold # * self.simulation_state.time_scale
-                self.update_aircrafts(elapsed_time)
-                for aircraft in self.aircrafts:
-                    old_pos : QVector3D = copy(aircraft.position())
-                    aircraft.move(
-                        aircraft.speed().x() * elapsed_time / 1000.0,
-                        aircraft.speed().y() * elapsed_time / 1000.0,
-                        aircraft.speed().z() * elapsed_time / 1000.0)
-                    aircraft.distance_covered(dist(old_pos.toTuple(), aircraft.position().toTuple()))
+                self.update_aircrafts_speed(elapsed_time)
+                self.update_aircrafts_position(elapsed_time)     
             self.msleep(max(0, (self.simulation_state.simulation_threshold) - start_timestamp.msecsTo(QTime.currentTime())))
+        self.global_stop_timestamp = QTime.currentTime()
         return super().run()
 
-    def update_aircrafts(self, elapsed_time : float) -> None:
-        """"""
+    def update_aircrafts_position(self, elapsed_time : float) -> None:
+        """Updates aircrafts position"""
+        for aircraft in self.aircrafts:
+            old_pos : QVector3D = copy(aircraft.position())
+            aircraft.move(
+                aircraft.speed().x() * elapsed_time / 1000.0,
+                aircraft.speed().y() * elapsed_time / 1000.0,
+                aircraft.speed().z() * elapsed_time / 1000.0)
+            aircraft.distance_covered(dist(old_pos.toTuple(), aircraft.position().toTuple()))
+    
+    def update_aircrafts_speed(self, elapsed_time : float) -> None:
+        """Updates aircrafts movement speed and angles"""
         if elapsed_time == 0.0:
             return
         for aircraft in self.aircrafts:
@@ -67,7 +76,7 @@ class SimulationPhysics(QThread):
         return
 
     def count_cycles(self) -> None:
-        """"""
+        """Increments physics cycle counter"""
         self.cycles += 1
         self.simulation_state.physics_cycles = self.cycles
         return
