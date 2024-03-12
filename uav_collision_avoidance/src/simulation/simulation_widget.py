@@ -38,13 +38,13 @@ class SimulationWidget(QWidget):
             return super().paintEvent(event)
         self.simulation_fps.count_frame()
         for aircraft in self.aircrafts:
-            pixmap : QPixmap = self.simulation_state.aircraft_pixmap.scaled(aircraft.size, aircraft.size)
+            pixmap : QPixmap = self.simulation_state.aircraft_pixmap.scaled(
+                aircraft.size * abs(cos(radians(aircraft.roll_angle))),
+                aircraft.size * abs(cos(radians(aircraft.pitch_angle)))
+            )
             painter = QPainter(self)
             painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
             painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
-            pixmap = pixmap.scaled(
-                aircraft.size * abs(cos(radians(aircraft.roll_angle))),
-                aircraft.size * abs(cos(radians(aircraft.pitch_angle))))
             painter.translate(QPointF(
                 aircraft.position.x(),
                 aircraft.position.y()))
