@@ -2,9 +2,9 @@
 
 from typing import List
 
-from PySide6.QtWidgets import QMainWindow
-from PySide6.QtGui import QCloseEvent
 from PySide6.QtCore import QThread
+from PySide6.QtGui import QCloseEvent
+from PySide6.QtWidgets import QMainWindow
 
 from src.aircraft.aircraft import Aircraft
 from src.aircraft.aircraft_vehicle import AircraftVehicle

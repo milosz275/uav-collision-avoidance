@@ -3,9 +3,9 @@
 from math import cos, radians
 from typing import List
 
-from PySide6.QtWidgets import QWidget
 from PySide6.QtCore import Qt, QPointF
 from PySide6.QtGui import QPaintEvent, QPainter, QKeyEvent, QIcon, QPixmap, QCloseEvent
+from PySide6.QtWidgets import QWidget
 
 from src.aircraft.aircraft_render import AircraftRender
 from src.simulation.simulation_fps import SimulationFPS
