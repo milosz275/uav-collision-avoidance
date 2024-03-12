@@ -23,9 +23,15 @@ class Simulation(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         SimulationSettings().__init__()
+        self.is_running : bool = False
         return
 
     def run_realtime(self) -> None:
+        """Executes realtime simulation"""
+        if self.is_running:
+            print("Another instance already running")
+            return
+        self.is_running = True
         self.state = SimulationState(SimulationSettings())
 
         self.aircrafts : List[Aircraft] = [
@@ -50,33 +56,49 @@ class Simulation(QMainWindow):
 
         self.simulation_render = SimulationRender(self, self.simulation_widget, self.state)
         self.simulation_render.start(priority=QThread.Priority.NormalPriority)
+
+        self.simulation_widget.stop_signal.connect(self.stop_simulation)
         return
     
     def run_prerender(self) -> None:
+        """Executes prerender simulation"""
+        if self.is_running:
+            print("Another instance already running")
+            return
+        self.is_running = True
+        # todo
         return
 
-    def __stop_simulation(self) -> None:
+    def stop_simulation(self) -> None:
         """Finishes all active simulation threads"""
-        if self.simulation_physics:
-            self.simulation_physics.requestInterruption()
-            self.simulation_physics.quit()
-            self.simulation_physics.wait()
-        if self.simulation_adsb:
-            self.simulation_adsb.requestInterruption()
-            self.simulation_adsb.quit()
-            self.simulation_adsb.wait()
-        if self.simulation_render:
-            self.simulation_render.requestInterruption()
-            self.simulation_render.quit()
-            self.simulation_render.wait()
-        if self.simulation_fps:
-            self.simulation_fps.requestInterruption()
-            self.simulation_fps.quit()
-            self.simulation_fps.wait()
+        if not self.is_running:
+            return
+
+        self.simulation_physics.requestInterruption()
+        self.simulation_adsb.requestInterruption()
+        self.simulation_render.requestInterruption()
+        self.simulation_fps.requestInterruption()
+
+        self.simulation_physics.quit()
+        self.simulation_physics.wait()
+
+        simulated_time : float = self.state.physics_cycles / (1000 / self.state.simulation_threshold)
+        real_time_pauses : float = self.simulation_physics.global_start_timestamp.msecsTo(self.simulation_physics.global_stop_timestamp) / 1000
+        real_time : float = real_time_pauses - (self.state.time_paused / 1000)
+        print("Time simulated: " + "{:.2f}".format(simulated_time) + "s")
+        print("Time elapsed: " + "{:.2f}".format(real_time) + "s (" + "{:.2f}".format(real_time_pauses) + "s with pauses)")
+        print("Time efficiency: " + "{:.2f}".format(simulated_time / real_time * 100) + "%")
+
+        self.simulation_adsb.quit()
+        self.simulation_adsb.wait()
+        self.simulation_render.quit()
+        self.simulation_render.wait()
+        self.simulation_fps.quit()
+        self.simulation_fps.wait()
         return
     
     def closeEvent(self, event: QCloseEvent) -> None:
         """Qt method performed on the main window close event"""
-        self.__stop_simulation()
+        self.stop_simulation()
         event.accept()
         return super().closeEvent(event)
