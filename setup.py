@@ -5,9 +5,12 @@ from setuptools import setup, find_packages
 with open("README.md", "r") as file:
     description = file.read()
 
+with open("version", "r") as file:
+    version = file.read()
+
 setup(
     name = "uav-collision-avoidance",
-    version = "1.0",
+    version = version,
     packages = find_packages(),
     install_requires = [
         "pyside6"
@@ -17,6 +20,6 @@ setup(
             "uav-collision-avoidance = uav_collision_avoidance:main",
         ],
     },
-    long_description=description,
-    long_description_content_type="text/markdown",
+    long_description = description,
+    long_description_content_type = "text/markdown",
 )
