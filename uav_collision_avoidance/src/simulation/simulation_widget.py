@@ -3,7 +3,7 @@
 from math import cos, radians
 from typing import List
 
-from PySide6.QtCore import Qt, QPointF
+from PySide6.QtCore import Qt, QPointF, Signal
 from PySide6.QtGui import QPaintEvent, QPainter, QKeyEvent, QIcon, QPixmap, QCloseEvent
 from PySide6.QtWidgets import QWidget
 
@@ -13,6 +13,7 @@ from src.simulation.simulation_settings import SimulationSettings
 
 class SimulationWidget(QWidget):
     """Main widget representing the simulation"""
+    stop_signal = Signal(str)
 
     def __init__(self, aircrafts : List[AircraftRender], simulation_fps : SimulationFPS, simulation_state : SimulationSettings):
         super().__init__()
@@ -38,7 +39,6 @@ class SimulationWidget(QWidget):
         self.simulation_fps.count_frame()
         for aircraft in self.aircrafts:
             pixmap : QPixmap = self.simulation_state.aircraft_pixmap.scaled(aircraft.size, aircraft.size)
-
             painter = QPainter(self)
             painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
             painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
@@ -49,7 +49,9 @@ class SimulationWidget(QWidget):
                 aircraft.position.x(),
                 aircraft.position.y()))
             painter.rotate(aircraft.yaw_angle)
-
+            painter.translate(QPointF(
+                -aircraft.size / 2,
+                -aircraft.size / 2))
             painter.drawPixmap(0, 0, pixmap)
             painter.drawEllipse(0, 0,
                 aircraft.size * abs(cos(radians(aircraft.roll_angle))),
@@ -87,11 +89,12 @@ class SimulationWidget(QWidget):
 
     def closeEvent(self, event: QCloseEvent) -> None:
         """Qt method performed on the main window close event"""
+        self.stop_signal.emit("stop")
         event.accept()
         return super().closeEvent(event)
 
     def update_aircrafts(self) -> None:
-        """"""
+        """Updates aircrafts position"""
         for aircraft in self.aircrafts:
             aircraft.update()
         return
