@@ -1,6 +1,6 @@
 # simulation_state.py
 
-from PySide6.QtCore import QSettings
+from PySide6.QtCore import QSettings, QTime
 from PySide6.QtGui import QPixmap
 
 from src.simulation.simulation_settings import SimulationSettings
@@ -15,6 +15,8 @@ class SimulationState(QSettings):
         # self.time_scale : float = 1.0 # define slow motion or fast forward
         self.physics_cycles : int = 0
         self.is_paused : bool = False
+        self.pause_start_timestamp : QTime = None
+        self.time_paused : int = 0.0 # ms
 
         # render state
         self.gui_scale : float = 1.0 # define gui scaling
@@ -26,14 +28,34 @@ class SimulationState(QSettings):
         return
     
     def update_settings(self) -> None:
-        """"""
-        self.simulation_threshold = self.simulation_settings.simulation_threshold
+        """Updates all state settings"""
+        self.update_render_settings()
+        self.update_simulation_settings()
+        self.update_adsb_settings()
+        return
+    
+    def update_render_settings(self) -> None:
+        """Updates simulation render state settings"""
         self.gui_render_threshold = self.simulation_settings.gui_render_threshold
-        self.adsb_threshold = self.simulation_settings.adsb_threshold
+        return
+    
+    def update_simulation_settings(self) -> None:
+        """Updates simulation physics state settings"""
+        self.simulation_threshold = self.simulation_settings.simulation_threshold
         self.g_acceleration = self.simulation_settings.g_acceleration
+        return
+    
+    def update_adsb_settings(self) -> None:
+        """Updates simulation ADS-B state settings"""
+        self.adsb_threshold = self.simulation_settings.adsb_threshold
         return
 
     def toggle_pause(self) -> None:
         """Pauses the simulation"""
-        self.is_paused = not self.is_paused
+        if self.is_paused:
+            self.time_paused += self.pause_start_timestamp.msecsTo(QTime.currentTime())
+            self.is_paused = False
+        else:
+            self.pause_start_timestamp = QTime.currentTime()
+            self.is_paused = True
         return
