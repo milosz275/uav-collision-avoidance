@@ -1,5 +1,6 @@
 # simulation.py
 
+import logging
 from typing import List
 
 from PySide6.QtCore import QThread
@@ -31,6 +32,7 @@ class Simulation(QMainWindow):
         if self.is_running:
             print("Another instance already running")
             return
+        logging.info("Starting realtime simulation")
         self.is_running = True
         self.state = SimulationState(SimulationSettings())
 
@@ -65,6 +67,7 @@ class Simulation(QMainWindow):
         if self.is_running:
             print("Another instance already running")
             return
+        logging.info("Starting prerendered simulation")
         self.is_running = True
         # todo
         return
@@ -73,6 +76,7 @@ class Simulation(QMainWindow):
         """Finishes all active simulation threads"""
         if not self.is_running:
             return
+        logging.info("Stopping simulation")
 
         self.simulation_physics.requestInterruption()
         self.simulation_adsb.requestInterruption()
