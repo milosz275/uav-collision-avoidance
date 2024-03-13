@@ -44,7 +44,7 @@ class Simulation(QMainWindow):
         self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle() for aircraft in self.aircrafts]
         self.aircraft_renders : List[AircraftRender] = [aircraft.render() for aircraft in self.aircrafts]
 
-        self.simulation_physics = SimulationPhysics(self, self.aircraft_vehicles, self.state)
+        self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
         self.simulation_physics.start(priority=QThread.Priority.TimeCriticalPriority)
 
         self.simulation_adsb = SimulationADSB(self, self.aircraft_vehicles, self.state)
@@ -86,12 +86,15 @@ class Simulation(QMainWindow):
         self.simulation_physics.quit()
         self.simulation_physics.wait()
 
+        if self.state.is_paused:
+            self.state.append_paused_time()
         simulated_time : float = self.state.physics_cycles / (1000 / self.state.simulation_threshold)
         real_time_pauses : float = self.simulation_physics.global_start_timestamp.msecsTo(self.simulation_physics.global_stop_timestamp) / 1000
         real_time : float = real_time_pauses - (self.state.time_paused / 1000)
         print("Time simulated: " + "{:.2f}".format(simulated_time) + "s")
         print("Time elapsed: " + "{:.2f}".format(real_time) + "s (" + "{:.2f}".format(real_time_pauses) + "s with pauses)")
         print("Time efficiency: " + "{:.2f}".format(simulated_time / real_time * 100) + "%")
+        logging.info("Calculated time efficiency: " + "{:.2f}".format(simulated_time / real_time * 100) + "%")
 
         self.simulation_adsb.quit()
         self.simulation_adsb.wait()
