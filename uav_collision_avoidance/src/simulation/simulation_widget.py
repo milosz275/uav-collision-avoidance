@@ -4,8 +4,8 @@ from math import cos, radians
 from typing import List
 
 from PySide6.QtCore import Qt, QPointF, Signal
-from PySide6.QtGui import QPaintEvent, QPainter, QKeyEvent, QIcon, QPixmap, QCloseEvent
-from PySide6.QtWidgets import QWidget
+from PySide6.QtGui import QPaintEvent, QPainter, QKeyEvent, QMouseEvent, QIcon, QPixmap, QCloseEvent
+from PySide6.QtWidgets import QWidget, QApplication
 
 from src.aircraft.aircraft_render import AircraftRender
 from src.simulation.simulation_fps import SimulationFPS
@@ -22,7 +22,13 @@ class SimulationWidget(QWidget):
         self.simulation_state = simulation_state
 
         self.bounding_box_resolution = [SimulationSettings.resolution[0], SimulationSettings.resolution[1]]
-        self.setGeometry(0, 0, SimulationSettings.resolution[0] + 10, SimulationSettings.resolution[1] + 10)
+        window_width : float = SimulationSettings.resolution[0] + 10
+        window_height : float = SimulationSettings.resolution[1] + 10
+        self.setGeometry(
+            SimulationSettings.screen_resolution.width() / 2 - window_width / 2,
+            SimulationSettings.screen_resolution.height() / 2 - window_height / 2,
+            window_width,
+            window_height)
         self.setStyleSheet("background-color: white;")
         self.setWindowTitle("UAV Collision Avoidance")
 
@@ -59,6 +65,19 @@ class SimulationWidget(QWidget):
                 aircraft.size * abs(cos(radians(aircraft.pitch_angle))))
             painter.end()
         return super().paintEvent(event)
+
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        """Qt method controlling single click mouse input"""
+        if event.button() == Qt.MouseButton.LeftButton:
+            print("click x: " + str(event.pos().x()) + "; y: " + str(event.pos().y()))
+        elif event.button() == Qt.MouseButton.LeftButton:
+            QApplication.beep() # does not work in Linux
+        return super().mousePressEvent(event)
+    
+    def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
+        """Qt method controlling double click mouse input"""
+        self.close()
+        return super().mouseDoubleClickEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         """Qt method controlling keyboard input"""
