@@ -14,19 +14,25 @@ class Aircraft(QObject):
     current_id : int = 0
 
     def __init__(self, position : QVector3D, speed : QVector3D, state : SimulationState) -> None:
-        self.__aircraft_id = self.obtain_id()
-        self.__fcc = AircraftFCC()
-        self.__vehicle = AircraftVehicle(self.__aircraft_id, position=position, speed=speed, fcc=self.__fcc, state=state)
+        self.__aircraft_id = self.__obtain_id__()
+        self.__vehicle = AircraftVehicle(self.__aircraft_id, position=position, speed=speed, state=state)
+        self.__fcc = AircraftFCC(self.__vehicle)
         self.__render = AircraftRender(self.__aircraft_id, vehicle=self.__vehicle, fcc=self.__fcc, state=state)
         return
     
-    def vehicle(self):
+    def vehicle(self) -> AircraftVehicle:
+        """Returns aircraft vehicle"""
         return self.__vehicle
     
-    def render(self):
+    def fcc(self) -> AircraftFCC:
+        """Returns aircraft fcc"""
+        return self.__fcc
+    
+    def render(self) -> AircraftRender:
+        """Returns aircraft render"""
         return self.__render
 
-    def obtain_id(self):
+    def __obtain_id__(self) -> int:
         """Gets unique id for the aircraft"""
         aircraft_id = Aircraft.current_id
         Aircraft.current_id += 1
