@@ -4,7 +4,7 @@ import logging
 from typing import List
 
 from PySide6.QtCore import QThread
-from PySide6.QtGui import QCloseEvent
+from PySide6.QtGui import QCloseEvent, QVector3D
 from PySide6.QtWidgets import QMainWindow
 
 from src.aircraft.aircraft import Aircraft
@@ -37,8 +37,8 @@ class Simulation(QMainWindow):
         self.state = SimulationState(SimulationSettings())
 
         self.aircrafts : List[Aircraft] = [
-            Aircraft(10, 10, 1000, self.state),
-            Aircraft(100, 100, 1000, self.state),
+            Aircraft(position=QVector3D(10, 10, 1000), speed=QVector3D(100, 100, 0), state=self.state),
+            Aircraft(position=QVector3D(100, 100, 1000), speed=QVector3D(100, 0, 0), state=self.state),
         ]
 
         self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle() for aircraft in self.aircrafts]
