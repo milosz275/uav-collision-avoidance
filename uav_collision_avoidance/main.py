@@ -11,9 +11,9 @@ logging.basicConfig(filename="logs/simulation.log", level=logging.DEBUG, format=
 
 import sys
 import platform
-if platform.system() == 'Windows':
+if platform.system() == "Windows":
     import ctypes
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(f'io.github.mldxo.uav-collision-avoidance.{version}')
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(f"io.github.mldxo.uav-collision-avoidance.{version}")
 logging.info(f"Detected platform: {platform.system()}")
 
 from PySide6.QtWidgets import QApplication
