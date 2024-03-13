@@ -95,6 +95,16 @@ class SimulationPhysics(QThread):
             current_yaw_angle : float = aircraft.yaw_angle()
             current_horizontal_speed : float = aircraft.horizontal_speed()
             delta_yaw_angle : float = self.simulation_state.g_acceleration * tan(radians(aircraft.roll_angle())) / (current_horizontal_speed / elapsed_time)
+            if delta_yaw_angle > 0:
+                delta = current_yaw_angle - fcc.target_yaw_angle
+                if abs(delta) < delta_yaw_angle:
+                    delta_yaw_angle = delta
+            elif delta_yaw_angle < 0:
+                delta = current_yaw_angle - fcc.target_yaw_angle
+                if abs(delta) < delta_yaw_angle:
+                    delta_yaw_angle = -delta
+            else:
+                delta_yaw_angle = 0
 
             new_yaw_angle_radians : float = radians(current_yaw_angle)
             new_yaw_angle_radians += radians(delta_yaw_angle)
