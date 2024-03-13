@@ -16,7 +16,7 @@ class SimulationState(QSettings):
         self.physics_cycles : int = 0
         self.is_paused : bool = False
         self.pause_start_timestamp : QTime = None
-        self.time_paused : int = 0.0 # ms
+        self.time_paused : int = 0 # ms
 
         # render state
         self.gui_scale : float = 1.0 # define gui scaling
@@ -50,10 +50,15 @@ class SimulationState(QSettings):
         self.adsb_threshold = self.simulation_settings.adsb_threshold
         return
 
+    def append_paused_time(self) -> None:
+        """"""
+        if self.pause_start_timestamp is not None:
+            self.time_paused += self.pause_start_timestamp.msecsTo(QTime.currentTime())
+
     def toggle_pause(self) -> None:
         """Pauses the simulation"""
         if self.is_paused:
-            self.time_paused += self.pause_start_timestamp.msecsTo(QTime.currentTime())
+            self.append_paused_time()
             self.is_paused = False
         else:
             self.pause_start_timestamp = QTime.currentTime()
