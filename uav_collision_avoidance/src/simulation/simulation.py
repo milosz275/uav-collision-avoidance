@@ -1,5 +1,6 @@
 # simulation.py
 
+import csv
 import logging
 from typing import List
 
@@ -9,6 +10,7 @@ from PySide6.QtWidgets import QMainWindow
 
 from src.aircraft.aircraft import Aircraft
 from src.aircraft.aircraft_vehicle import AircraftVehicle
+from src.aircraft.aircraft_fcc import AircraftFCC
 from src.aircraft.aircraft_render import AircraftRender
 from src.simulation.simulation_settings import SimulationSettings
 from src.simulation.simulation_physics import SimulationPhysics
@@ -41,12 +43,13 @@ class Simulation(QMainWindow):
         ]
 
         self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle() for aircraft in self.aircrafts]
+        self.aircraft_fccs : List[AircraftFCC] = [aircraft.fcc() for aircraft in self.aircrafts]
         self.aircraft_renders : List[AircraftRender] = [aircraft.render() for aircraft in self.aircrafts]
 
         self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
         self.simulation_physics.start(priority=QThread.Priority.TimeCriticalPriority)
 
-        self.simulation_adsb = SimulationADSB(self, self.aircraft_vehicles, self.state)
+        self.simulation_adsb = SimulationADSB(self, self.aircrafts, self.state)
         self.simulation_adsb.start(priority=QThread.Priority.NormalPriority)
 
         self.simulation_fps = SimulationFPS(self, self.state)
@@ -95,12 +98,24 @@ class Simulation(QMainWindow):
         print("Time efficiency: " + "{:.2f}".format(simulated_time / real_time * 100) + "%")
         logging.info("Calculated time efficiency: " + "{:.2f}".format(simulated_time / real_time * 100) + "%")
 
+        self.export_visited_locations()
+
         self.simulation_adsb.quit()
         self.simulation_adsb.wait()
         self.simulation_render.quit()
         self.simulation_render.wait()
         self.simulation_fps.quit()
         self.simulation_fps.wait()
+        return
+    
+    def export_visited_locations(self) -> None:
+        """"""
+        for aircraft in self.aircraft_fccs:
+            file = open(f"logs/visited-aircraft-{aircraft.aircraft_id}.csv", "w")
+            writer = csv.writer(file)
+            writer.writerow(["x","y","z"])
+            for position in aircraft.visited:
+                writer.writerow([("{:.2f}".format(position.x())),("{:.2f}".format(position.y())),("{:.2f}".format(position.z()))])
         return
     
     def closeEvent(self, event: QCloseEvent) -> None:
