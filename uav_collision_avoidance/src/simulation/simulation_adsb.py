@@ -4,15 +4,19 @@ from typing import List
 
 from PySide6.QtCore import QThread, QTime
 
+from src.aircraft.aircraft import Aircraft
 from src.aircraft.aircraft_vehicle import AircraftVehicle
+from src.aircraft.aircraft_fcc import AircraftFCC
 from src.simulation.simulation_state import SimulationState
 
 class SimulationADSB(QThread):
     """Thread running ADSB system for collision detection and avoidance"""
 
-    def __init__(self, parent, aircrafts : List[AircraftVehicle], simulation_state : SimulationState) -> None:
+    def __init__(self, parent, aircrafts : List[Aircraft], simulation_state : SimulationState) -> None:
         super(SimulationADSB, self).__init__(parent)
         self.aircrafts = aircrafts
+        self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle() for aircraft in self.aircrafts]
+        self.aircraft_fccs : List[AircraftFCC] = [aircraft.fcc() for aircraft in self.aircrafts]
         self.simulation_state = simulation_state
         self.adsb_cycles : int = 0
         return
@@ -24,11 +28,13 @@ class SimulationADSB(QThread):
             if not self.simulation_state.is_paused:
                 self.adsb_cycles += 1
                 self.simulation_state.update_adsb_settings()
-                for aircraft in self.aircrafts:
+                for aircraft in self.aircraft_vehicles:
+                    self.aircraft_fccs[aircraft.aircraft_id()].append_visited()
                     if aircraft.aircraft_id() == 0:
                         print("Aircraft id: " + str(aircraft.aircraft_id()) +
                             "; speed: " + "{:.2f}".format(aircraft.absolute_speed()) +
                             "; x: " + "{:.2f}".format(aircraft.position().x()) +
+                            "; y: " + "{:.2f}".format(aircraft.position().y()) +
                             "; yaw angle: " + "{:.2f}".format(aircraft.yaw_angle()) +
                             "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle()) +
                             "; roll angle: " + "{:.2f}".format(aircraft.roll_angle()) +
