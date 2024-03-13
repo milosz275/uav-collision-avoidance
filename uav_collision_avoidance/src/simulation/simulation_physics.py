@@ -40,6 +40,21 @@ class SimulationPhysics(QThread):
     def update_aircrafts_position(self, elapsed_time : float) -> None:
         """Updates aircrafts position"""
         for aircraft in self.aircrafts:
+            miss_distance : float = dist(aircraft.position().toTuple(), self.aircrafts[1 - aircraft.aircraft_id()].position().toTuple())
+            
+            # safezone occupancy
+            if miss_distance <= (aircraft.fcc().safezone_size() / 2):
+                if not aircraft.fcc().safezone_occupied():
+                    aircraft.fcc().safezone_occupied(True)
+                    print("Aircraft " + str(1 - aircraft.aircraft_id()) + " entered safezone of Aircraft " + str(aircraft.aircraft_id()))
+            else:
+                if aircraft.fcc().safezone_occupied():
+                    aircraft.fcc().safezone_occupied(False)
+                    print("Aircraft " + str(1 - aircraft.aircraft_id()) + " left safezone of Aircraft " + str(aircraft.aircraft_id()))
+
+            # collision
+
+            # covered distance and position
             old_pos : QVector3D = copy(aircraft.position())
             aircraft.move(
                 aircraft.speed().x() * elapsed_time / 1000.0,
