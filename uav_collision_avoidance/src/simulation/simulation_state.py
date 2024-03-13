@@ -15,6 +15,7 @@ class SimulationState(QSettings):
         # self.time_scale : float = 1.0 # define slow motion or fast forward
         self.physics_cycles : int = 0
         self.is_paused : bool = False
+        self.is_running : bool = True
         self.pause_start_timestamp : QTime = None
         self.time_paused : int = 0 # ms
 
@@ -61,6 +62,8 @@ class SimulationState(QSettings):
             self.append_paused_time()
             self.is_paused = False
         else:
+            if not self.is_running:
+                return
             self.pause_start_timestamp = QTime.currentTime()
             self.is_paused = True
         return
