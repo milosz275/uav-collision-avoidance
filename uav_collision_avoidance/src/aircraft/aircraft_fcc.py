@@ -27,7 +27,7 @@ class AircraftFCC(QObject):
 
         self.destinations : List[QVector3D] = [
             QVector3D(1000, 1000, 1000),
-            QVector3D(-100000, -100000, 1000),
+            QVector3D(10000, -100000, 1000),
         ]
         return
 
@@ -43,17 +43,22 @@ class AircraftFCC(QObject):
 
     def update(self) -> None:
         """Updates current targetted movement angles"""
+        if not self.destinations:
+            return
         destination = self.destinations[0]
         distance = dist(self.aircraft.position().toTuple(), destination.toTuple())
         if distance < self.aircraft.size():
             self.destinations.pop(0)
-            destination = self.destinations[0]
-
-        direction : QVector3D = destination - self.aircraft.position()
-        angle = degrees(atan2(direction.x(), direction.y()))
-        if angle < 0:
-            angle += 360
-        angle = 90 + angle
-        angle %= 360
+            if self.destinations:
+                destination = self.destinations[0]
+            else:
+                return
+        angle = degrees(atan2(
+            destination.y() - self.aircraft.position().y(),
+            destination.x() - self.aircraft.position().x()))
+        angle += 90
+        if angle > 180:
+            angle = angle - 180
+            angle *= -1
         self.target_yaw_angle = angle
         return
