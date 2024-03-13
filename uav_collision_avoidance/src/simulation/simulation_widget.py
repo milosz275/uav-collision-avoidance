@@ -13,6 +13,7 @@ from src.simulation.simulation_settings import SimulationSettings
 
 class SimulationWidget(QWidget):
     """Main widget representing the simulation"""
+    
     stop_signal = Signal(str)
 
     def __init__(self, aircrafts : List[AircraftRender], simulation_fps : SimulationFPS, simulation_state : SimulationSettings):
