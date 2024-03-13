@@ -24,16 +24,15 @@ class Simulation(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         SimulationSettings().__init__()
-        self.is_running : bool = False
+        self.state : SimulationState = None
         return
 
     def run_realtime(self) -> None:
         """Executes realtime simulation"""
-        if self.is_running:
+        if self.state is not None:
             print("Another instance already running")
             return
         logging.info("Starting realtime simulation")
-        self.is_running = True
         self.state = SimulationState(SimulationSettings())
 
         self.aircrafts : List[Aircraft] = [
@@ -64,17 +63,17 @@ class Simulation(QMainWindow):
     
     def run_prerender(self) -> None:
         """Executes prerender simulation"""
-        if self.is_running:
+        if self.state is not None:
             print("Another instance already running")
             return
         logging.info("Starting prerendered simulation")
-        self.is_running = True
+        self.state.is_running = True
         # todo
         return
 
     def stop_simulation(self) -> None:
         """Finishes all active simulation threads"""
-        if not self.is_running:
+        if not self.state.is_running:
             return
         logging.info("Stopping simulation")
 
