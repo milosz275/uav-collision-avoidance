@@ -7,7 +7,7 @@ from pathlib import Path
 Path("logs").mkdir(parents=True, exist_ok=True)
 
 import logging
-logging.basicConfig(filename="logs/simulator.log", level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s")
+logging.basicConfig(filename="logs/simulation.log", level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s")
 
 import sys
 import platform
