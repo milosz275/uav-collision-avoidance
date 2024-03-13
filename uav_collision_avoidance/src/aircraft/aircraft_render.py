@@ -40,5 +40,5 @@ class AircraftRender(QObject):
         self.yaw_angle = self.vehicle.yaw_angle()
         self.pitch_angle = self.vehicle.pitch_angle()
         self.roll_angle = self.vehicle.roll_angle()
-        self.safezone_occupied = self.fcc.safezone_occupied
+        self.safezone_occupied = self.fcc.safezone_occupied()
         return
