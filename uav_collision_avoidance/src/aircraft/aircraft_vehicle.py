@@ -5,7 +5,6 @@ from math import atan2, degrees, sqrt
 from PySide6.QtCore import QObject, QMutex, QMutexLocker
 from PySide6.QtGui import QVector3D
 
-from src.aircraft.aircraft_fcc import AircraftFCC
 from src.simulation.simulation_state import SimulationState
 
 class AircraftVehicle(QObject):
@@ -14,7 +13,7 @@ class AircraftVehicle(QObject):
     roll_dynamic_delay : float = 1000 # ms
     pitch_dynamic_delay : float = 2000 # ms
 
-    def __init__(self, aircraft_id : int, position : QVector3D, speed : QVector3D, fcc : AircraftFCC, state : SimulationState) -> None:
+    def __init__(self, aircraft_id : int, position : QVector3D, speed : QVector3D, state : SimulationState) -> None:
         super().__init__()
         self.__mutex : QMutex = QMutex()
         
@@ -24,7 +23,6 @@ class AircraftVehicle(QObject):
             self.__position.setZ(0)
         self.__speed = speed
 
-        self.__fcc = fcc
         self.__state = state
 
         self.__size : float = 20.0
@@ -58,10 +56,6 @@ class AircraftVehicle(QObject):
         """Returns covered distance"""
         self.__distance_covered += distance_covered_delta
         return self.__distance_covered
-    
-    def fcc(self) -> AircraftFCC:
-        """Returns fcc"""
-        return self.__fcc
     
     def move(self, dx : float, dy : float, dz : float = 0.0) -> None:
         """Applies position deltas for the vehicle"""
