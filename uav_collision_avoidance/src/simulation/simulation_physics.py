@@ -32,6 +32,9 @@ class SimulationPhysics(QThread):
         self.global_start_timestamp = QTime.currentTime()
         while not self.isInterruptionRequested():
             start_timestamp = QTime.currentTime()
+            if self.simulation_state.reset_demanded:
+                self.simulation_state.apply_reset()
+                self.aircraft_vehicles[0].teleport(10, 10, 1000)
             if not self.simulation_state.is_paused:
                 self.count_cycles()
                 self.simulation_state.update_simulation_settings()
@@ -95,20 +98,13 @@ class SimulationPhysics(QThread):
             current_yaw_angle : float = aircraft.yaw_angle()
             current_horizontal_speed : float = aircraft.horizontal_speed()
             delta_yaw_angle : float = self.simulation_state.g_acceleration * tan(radians(aircraft.roll_angle())) / (current_horizontal_speed / elapsed_time)
-            if delta_yaw_angle > 0:
-                delta = current_yaw_angle - fcc.target_yaw_angle
-                if abs(delta) < delta_yaw_angle:
-                    delta_yaw_angle = delta
-            elif delta_yaw_angle < 0:
-                delta = current_yaw_angle - fcc.target_yaw_angle
-                if abs(delta) < delta_yaw_angle:
-                    delta_yaw_angle = -delta
-            else:
-                delta_yaw_angle = 0
 
-            new_yaw_angle_radians : float = radians(current_yaw_angle)
-            new_yaw_angle_radians += radians(delta_yaw_angle)
-            new_yaw_angle : float = degrees(new_yaw_angle_radians)
+            if abs(current_yaw_angle - fcc.target_yaw_angle) < delta_yaw_angle:
+                new_yaw_angle = fcc.target_yaw_angle
+            else:
+                new_yaw_angle_radians : float = radians(current_yaw_angle)
+                new_yaw_angle_radians += radians(delta_yaw_angle)
+                new_yaw_angle : float = degrees(new_yaw_angle_radians)
 
             aircraft.speed().setX(sin(radians(new_yaw_angle)) * current_horizontal_speed)
             aircraft.speed().setY(-cos(radians(new_yaw_angle)) * current_horizontal_speed)
