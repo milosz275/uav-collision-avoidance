@@ -57,6 +57,14 @@ class AircraftVehicle(QObject):
         self.__distance_covered += distance_covered_delta
         return self.__distance_covered
     
+    def teleport(self, x : float, y : float, z : float = 0.0) -> None:
+        """Teleports the vehicle"""
+        locker = QMutexLocker(self.__mutex)
+        self.__position.setX(x)
+        self.__position.setY(y)
+        self.__position.setZ(z)
+        return
+
     def move(self, dx : float, dy : float, dz : float = 0.0) -> None:
         """Applies position deltas for the vehicle"""
         locker = QMutexLocker(self.__mutex)
