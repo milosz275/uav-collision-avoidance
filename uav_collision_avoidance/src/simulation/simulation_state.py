@@ -16,6 +16,7 @@ class SimulationState(QSettings):
         self.physics_cycles : int = 0
         self.is_paused : bool = False
         self.is_running : bool = True
+        self.reset_demanded : bool = False
         self.pause_start_timestamp : QTime = None
         self.time_paused : int = 0 # ms
 
@@ -52,7 +53,7 @@ class SimulationState(QSettings):
         return
 
     def append_paused_time(self) -> None:
-        """"""
+        """Appends time elapsed during recent pause"""
         if self.pause_start_timestamp is not None:
             self.time_paused += self.pause_start_timestamp.msecsTo(QTime.currentTime())
 
@@ -66,4 +67,14 @@ class SimulationState(QSettings):
                 return
             self.pause_start_timestamp = QTime.currentTime()
             self.is_paused = True
+        return
+
+    def reset(self) -> None:
+        """Resets simulation to its start state"""
+        self.reset_demanded = True
+        return
+
+    def apply_reset(self) -> None:
+        """Sets back simulation reset state"""
+        self.reset_demanded = False
         return
