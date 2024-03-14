@@ -85,6 +85,8 @@ class SimulationWidget(QWidget):
             self.close()
         elif event.key() == Qt.Key.Key_Slash:
             self.simulation_state.toggle_pause()
+        elif event.key() == Qt.Key.Key_R:
+            self.simulation_state.reset()
         step = 5
         for aircraft in self.aircrafts:
             if aircraft.aircraft_id == "0":
