@@ -38,7 +38,7 @@ class Simulation(QMainWindow):
         self.state = SimulationState(SimulationSettings())
 
         self.aircrafts : List[Aircraft] = [
-            Aircraft(position=QVector3D(10, 10, 1000), speed=QVector3D(100, 100, 0), state=self.state),
+            Aircraft(position=QVector3D(100, 10, 1000), speed=QVector3D(-50, 100, 0), state=self.state),
             Aircraft(position=QVector3D(100, 100, 1000), speed=QVector3D(100, 0, 0), state=self.state),
         ]
 
@@ -109,7 +109,7 @@ class Simulation(QMainWindow):
         return
     
     def export_visited_locations(self) -> None:
-        """"""
+        """Exports aircrafts visited location lists"""
         for aircraft in self.aircraft_fccs:
             file = open(f"logs/visited-aircraft-{aircraft.aircraft_id}.csv", "w")
             writer = csv.writer(file)
