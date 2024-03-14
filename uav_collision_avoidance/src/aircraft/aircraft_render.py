@@ -27,7 +27,7 @@ class AircraftRender(QObject):
         return
     
     def move(self, dx : float, dy : float, dz : float = 0.0) -> None:
-        """Remote method for moving vehicle"""
+        """Remotely moves aircraft vehicle"""
         self.vehicle.move(dx, dy, dz)
         return
 
