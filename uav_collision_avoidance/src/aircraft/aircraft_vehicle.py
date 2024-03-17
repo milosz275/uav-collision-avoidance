@@ -1,4 +1,4 @@
-# aircraft_vehicle.py
+""""""
 
 from math import atan2, degrees, sqrt
 
