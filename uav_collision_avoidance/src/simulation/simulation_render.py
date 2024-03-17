@@ -1,4 +1,4 @@
-# simulation_render.py
+""""""
 
 from PySide6.QtCore import QThread, QTime
 
