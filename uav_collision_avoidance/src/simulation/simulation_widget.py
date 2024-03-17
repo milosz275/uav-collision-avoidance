@@ -115,6 +115,8 @@ class SimulationWidget(QWidget):
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         """Qt method controlling keyboard input"""
+        if event.isAutoRepeat():
+            return super().keyPressEvent(event)
         if event.key() == Qt.Key.Key_Escape:
             self.close()
         elif event.key() == Qt.Key.Key_Slash:
@@ -140,6 +142,12 @@ class SimulationWidget(QWidget):
             elif event.key() == Qt.Key.Key_Down:
                 self.aircraft_fccs[1].target_yaw_angle = 180.0
         return super().keyPressEvent(event)
+    
+    def keyReleaseEvent(self, event: QKeyEvent) -> None:
+        """Qt method controlling keyboard input"""
+        if event.key() == Qt.Key.Key_Slash and event.isAutoRepeat() and self.simulation_state.is_paused:
+            self.simulation_state.toggle_pause()
+        return super().keyReleaseEvent(event)
 
     def closeEvent(self, event: QCloseEvent) -> None:
         """Qt method performed on the main window close event"""
