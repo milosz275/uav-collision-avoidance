@@ -1,16 +1,14 @@
-# setup.py
+"""Setup file for the uav-collision-avoidance"""
 
 from setuptools import setup, find_packages
+from uav_collision_avoidance.version import __version__ as version
 
-with open("README.md", "r") as file:
+with open("README.md", "r", encoding="utf-8") as file:
     description = file.read()
-
-with open("version", "r") as file:
-    version = file.read()
 
 setup(
     name = "uav-collision-avoidance",
-    version = version,
+    version = version.__version__,
     packages = find_packages(),
     install_requires = [
         "pyside6"
