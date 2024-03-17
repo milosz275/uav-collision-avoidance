@@ -167,3 +167,6 @@ cython_debug/
 
 # Simulator logs
 logs/
+
+# Linting
+.pylintrc
