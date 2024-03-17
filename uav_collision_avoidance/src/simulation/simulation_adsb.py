@@ -1,4 +1,4 @@
-# simulation_adsb.py
+""""""
 
 from typing import List
 
@@ -10,7 +10,7 @@ from src.aircraft.aircraft_fcc import AircraftFCC
 from src.simulation.simulation_state import SimulationState
 
 class SimulationADSB(QThread):
-    """Thread running ADSB system for collision detection and avoidance"""
+    """Thread running ADS-B system for collision detection and avoidance"""
 
     def __init__(self, parent, aircrafts : List[Aircraft], simulation_state : SimulationState) -> None:
         super(SimulationADSB, self).__init__(parent)
@@ -36,8 +36,10 @@ class SimulationADSB(QThread):
                             "; x: " + "{:.2f}".format(aircraft.position().x()) +
                             "; y: " + "{:.2f}".format(aircraft.position().y()) +
                             "; yaw angle: " + "{:.2f}".format(aircraft.yaw_angle()) +
+                            "; target yaw angle: " + "{:.2f}".format(self.aircraft_fccs[aircraft.aircraft_id()].target_yaw_angle) +
                             "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle()) +
                             "; roll angle: " + "{:.2f}".format(aircraft.roll_angle()) +
+                            "; target roll angle: " + "{:.2f}".format(self.aircraft_fccs[aircraft.aircraft_id()].target_roll_angle) +
                             "; distance covered: " + "{:.2f}".format(aircraft.distance_covered()) +
                             "; fps: " + "{:.2f}".format(self.simulation_state.fps) +
                             "; t: " + str(self.adsb_cycles) +
