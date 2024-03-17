@@ -1,4 +1,4 @@
-# simulation_state.py
+""""""
 
 from PySide6.QtCore import QSettings, QTime
 from PySide6.QtGui import QPixmap
