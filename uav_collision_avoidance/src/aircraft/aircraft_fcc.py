@@ -21,7 +21,7 @@ class AircraftFCC(QObject):
         self.__safezone_occupied : bool = False
         self.__safezone_size : float = 200.0
 
-        self.target_yaw_angle : float = 0.0
+        self.target_yaw_angle : float = 90.0
         self.target_roll_angle : float = 0.0
         self.target_pitch_angle : float = 0.0
         # self.target_speed : float = 100.0
@@ -61,30 +61,30 @@ class AircraftFCC(QObject):
 
     def update(self) -> None:
         """Updates current targetted movement angles"""
-        if not self.destinations:
-            return
-        
-        destination = self.destinations[0]
-        distance = dist(self.aircraft.position().toTuple(), destination.toTuple())
+        target_yaw_angle = self.target_yaw_angle
 
-        if distance < self.aircraft.size() / 2:
-            self.destinations_history.append(self.destinations.pop(0))
-            if self.destinations:
-                destination = self.destinations[0]
-                logging.info("Aircraft %s visited destination and took next one", self.aircraft.aircraft_id())
-                print(f"Aircraft {self.aircraft.aircraft_id()} visited destination and took next one")
-            else:
-                logging.info("Aircraft %s visited destination and is free now", self.aircraft.aircraft_id())
-                print(f"Aircraft {self.aircraft.aircraft_id()} visited destination and is free now")
-                return
-            
-        target_yaw_angle : float  = degrees(atan2(
-            destination.y() - self.aircraft.position().y(),
-            destination.x() - self.aircraft.position().x()))
-        target_yaw_angle += 90
-        if target_yaw_angle > 180:
-            target_yaw_angle = -180 + (target_yaw_angle - 180)
-        self.target_yaw_angle = target_yaw_angle
+        if self.destinations:
+            destination = self.destinations[0]
+            distance = dist(self.aircraft.position().toTuple(), destination.toTuple())
+
+            if distance < self.aircraft.size() / 2:
+                self.destinations_history.append(self.destinations.pop(0))
+                if self.destinations:
+                    destination = self.destinations[0]
+                    logging.info("Aircraft %s visited destination and took next one", self.aircraft.aircraft_id())
+                    print(f"Aircraft {self.aircraft.aircraft_id()} visited destination and took next one")
+                else:
+                    logging.info("Aircraft %s visited destination and is free now", self.aircraft.aircraft_id())
+                    print(f"Aircraft {self.aircraft.aircraft_id()} visited destination and is free now")
+                    return
+                
+            target_yaw_angle : float  = degrees(atan2(
+                destination.y() - self.aircraft.position().y(),
+                destination.x() - self.aircraft.position().x()))
+            target_yaw_angle += 90
+            if target_yaw_angle > 180:
+                target_yaw_angle = -180 + (target_yaw_angle - 180)
+            self.target_yaw_angle = target_yaw_angle
 
         current_yaw_angle : float = self.aircraft.yaw_angle()
         if target_yaw_angle < 0:
