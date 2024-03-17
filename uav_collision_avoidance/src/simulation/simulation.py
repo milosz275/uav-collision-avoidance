@@ -1,4 +1,4 @@
-# simulation.py
+""""""
 
 import csv
 import logging
@@ -38,7 +38,7 @@ class Simulation(QMainWindow):
         self.state = SimulationState(SimulationSettings())
 
         self.aircrafts : List[Aircraft] = [
-            Aircraft(position=QVector3D(100, 10, 1000), speed=QVector3D(-50, 100, 0), state=self.state),
+            Aircraft(position=QVector3D(10, 10, 1000), speed=QVector3D(50, 0, 0), state=self.state),
             Aircraft(position=QVector3D(100, 100, 1000), speed=QVector3D(100, 0, 0), state=self.state),
         ]
 
@@ -55,7 +55,7 @@ class Simulation(QMainWindow):
         self.simulation_fps = SimulationFPS(self, self.state)
         self.simulation_fps.start(priority=QThread.Priority.NormalPriority)
 
-        self.simulation_widget = SimulationWidget(self.aircraft_renders, self.simulation_fps, self.state)
+        self.simulation_widget = SimulationWidget(self.aircrafts, self.simulation_fps, self.state)
         self.simulation_widget.show()
 
         self.simulation_render = SimulationRender(self, self.simulation_widget, self.state)
