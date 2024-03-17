@@ -1,4 +1,4 @@
-# simulation_fps.py
+""""""
 
 from PySide6.QtCore import QThread, QTime
 from PySide6.QtGui import QCloseEvent
