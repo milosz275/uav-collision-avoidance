@@ -1,4 +1,4 @@
-# simulation_physics.py
+""""""
 
 import logging
 from copy import copy
@@ -7,6 +7,7 @@ from typing import List
 
 from PySide6.QtCore import QThread, QTime
 from PySide6.QtGui import QVector3D
+from PySide6.QtWidgets import QApplication
 
 from src.aircraft.aircraft import Aircraft
 from src.aircraft.aircraft_vehicle import AircraftVehicle
@@ -42,6 +43,7 @@ class SimulationPhysics(QThread):
                 self.update_aircrafts_speed(elapsed_time)
                 if self.update_aircrafts_position(elapsed_time):
                     logging.info("Aircrafts collided")
+                    QApplication.beep()
                     self.requestInterruption()
             self.msleep(max(0, (self.simulation_state.simulation_threshold) - start_timestamp.msecsTo(QTime.currentTime())))
         self.global_stop_timestamp = QTime.currentTime()
@@ -96,6 +98,8 @@ class SimulationPhysics(QThread):
             if aircraft.roll_angle() == 0.0:
                 return
             current_yaw_angle : float = aircraft.yaw_angle()
+            if abs(current_yaw_angle - fcc.target_yaw_angle) < 0.001:
+                return
             current_horizontal_speed : float = aircraft.horizontal_speed()
             delta_yaw_angle : float = self.simulation_state.g_acceleration * tan(radians(aircraft.roll_angle())) / (current_horizontal_speed / elapsed_time)
 
