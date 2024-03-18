@@ -66,7 +66,6 @@ class AircraftFCC(QObject):
         if self.destinations:
             destination = self.destinations[0]
             distance = dist(self.aircraft.position().toTuple(), destination.toTuple())
-
             if distance < self.aircraft.size() / 2:
                 self.destinations_history.append(self.destinations.pop(0))
                 if self.destinations:
@@ -77,14 +76,18 @@ class AircraftFCC(QObject):
                     logging.info("Aircraft %s visited destination and is free now", self.aircraft.aircraft_id())
                     print(f"Aircraft {self.aircraft.aircraft_id()} visited destination and is free now")
                     return
-                
-            target_yaw_angle : float  = degrees(atan2(
+            abs_target_yaw_angle : float  = degrees(atan2(
                 destination.y() - self.aircraft.position().y(),
                 destination.x() - self.aircraft.position().x()))
-            target_yaw_angle += 90
+            abs_target_yaw_angle += 90
+            if abs_target_yaw_angle < 0:
+                abs_target_yaw_angle += 360
+            elif abs_target_yaw_angle > 360:
+                abs_target_yaw_angle -= 360
+            target_yaw_angle = abs_target_yaw_angle
             if target_yaw_angle > 180:
                 target_yaw_angle = -180 + (target_yaw_angle - 180)
-            self.target_yaw_angle = target_yaw_angle
+            self.target_yaw_angle = target_yaw_angle # -180 to 180
 
         current_yaw_angle : float = self.aircraft.yaw_angle()
         if target_yaw_angle < 0:
@@ -92,11 +95,11 @@ class AircraftFCC(QObject):
         if current_yaw_angle < 0:
             current_yaw_angle += 360
         
-        difference = target_yaw_angle - current_yaw_angle
-        if abs(difference) < 4.0:
+        difference = (target_yaw_angle - current_yaw_angle + 180) % 360 - 180
+        if abs(difference) < 5.0:
             self.target_roll_angle = 0.0
             return
-        if difference > 0 and difference <= 180:
+        if difference > 0:
             self.target_roll_angle = 30.0
         else:
             self.target_roll_angle = -30.0
