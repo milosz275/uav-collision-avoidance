@@ -4,12 +4,14 @@ import sys
 import logging
 import platform
 import datetime
+import signal
 from pathlib import Path
 
 from PySide6.QtWidgets import QApplication
 from version import __version__ as version
 from src.simulation.simulation import Simulation, SimulationSettings
 
+signal.signal(signal.SIGINT, signal.SIG_DFL)
 try:
     start_time = datetime.datetime.now().strftime("%Y-%m-%d")
     Path("logs").mkdir(parents=True, exist_ok=True)
