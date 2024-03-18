@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as file:
 
 setup(
     name = "uav-collision-avoidance",
-    version = version.__version__,
+    version = version,
     packages = find_packages(),
     install_requires = [
         "pyside6"
