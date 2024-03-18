@@ -94,7 +94,10 @@ class Simulation(QMainWindow):
         real_time_pauses : float = self.simulation_physics.global_start_timestamp.msecsTo(self.simulation_physics.global_stop_timestamp) / 1000
         real_time : float = real_time_pauses - (self.state.time_paused / 1000)
         print("Time simulated: " + "{:.2f}".format(simulated_time) + "s")
-        print("Time elapsed: " + "{:.2f}".format(real_time) + "s (" + "{:.2f}".format(real_time_pauses) + "s with pauses)")
+        if real_time == real_time_pauses:
+            print("Time elapsed: " + "{:.2f}".format(real_time) + "s")
+        else:
+            print("Time elapsed: " + "{:.2f}".format(real_time) + "s (" + "{:.2f}".format(real_time_pauses) + "s with pauses)")
         print("Time efficiency: " + "{:.2f}".format(simulated_time / real_time * 100) + "%")
         logging.info("Calculated time efficiency: " + "{:.2f}".format(simulated_time / real_time * 100) + "%")
 
