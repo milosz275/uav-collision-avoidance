@@ -1,4 +1,4 @@
-""""""
+"""Simulation settings"""
 
 from PySide6.QtCore import QSize
 

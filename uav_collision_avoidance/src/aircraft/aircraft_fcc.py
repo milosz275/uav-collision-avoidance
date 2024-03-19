@@ -1,4 +1,4 @@
-""""""
+"""Aircraft Flight Control Computer"""
 
 import logging
 from copy import copy

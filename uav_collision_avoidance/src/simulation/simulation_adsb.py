@@ -1,4 +1,4 @@
-""""""
+"""Simulation ADS-B system simulation thread module"""
 
 from typing import List
 

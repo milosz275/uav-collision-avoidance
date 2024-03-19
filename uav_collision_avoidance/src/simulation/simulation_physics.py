@@ -1,4 +1,4 @@
-""""""
+"""Simulation physics thread module"""
 
 import logging
 from copy import copy

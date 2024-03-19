@@ -1,4 +1,4 @@
-""""""
+"""Simulation widget for the main window of the simulation app"""
 
 from math import cos, radians
 from typing import List

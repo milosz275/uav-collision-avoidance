@@ -1,4 +1,4 @@
-""""""
+"""Simulation rendering thread module"""
 
 from PySide6.QtCore import QThread, QTime
 
