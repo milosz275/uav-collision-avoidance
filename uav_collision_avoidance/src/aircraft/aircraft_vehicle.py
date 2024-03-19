@@ -1,4 +1,4 @@
-""""""
+"""Aircraft physical UAV class definition"""
 
 from math import atan2, degrees, sqrt
 
@@ -59,7 +59,7 @@ class AircraftVehicle(QObject):
     
     def teleport(self, x : float, y : float, z : float = 0.0) -> None:
         """Teleports the vehicle"""
-        locker = QMutexLocker(self.__mutex)
+        QMutexLocker(self.__mutex)
         self.__position.setX(x)
         self.__position.setY(y)
         self.__position.setZ(z)
@@ -67,7 +67,7 @@ class AircraftVehicle(QObject):
 
     def move(self, dx : float, dy : float, dz : float = 0.0) -> None:
         """Applies position deltas for the vehicle"""
-        locker = QMutexLocker(self.__mutex)
+        QMutexLocker(self.__mutex)
         self.__position.setX(self.__position.x() + dx)
         self.__position.setY(self.__position.y() + dy)
         self.__position.setZ(self.__position.z() + dz)
@@ -75,7 +75,7 @@ class AircraftVehicle(QObject):
     
     def accelerate(self, dx : float, dy : float, dz : float) -> None:
         """Applies speed deltas to the speed"""
-        locker = QMutexLocker(self.__mutex)
+        QMutexLocker(self.__mutex)
         if self.__position.x() + dx >= 0:
             self.__position.setX(self.__position.x() + dx)
         if self.__position.y() + dy >= 0:
@@ -86,31 +86,31 @@ class AircraftVehicle(QObject):
     
     def roll(self, dy) -> None:
         """Applies roll angle delta of the aircraft"""
-        locker = QMutexLocker(self.__mutex)
+        QMutexLocker(self.__mutex)
         self.__roll_angle += dy
         return
     
     def absolute_speed(self) -> float:
         """Returns absolute speed"""
-        locker = QMutexLocker(self.__mutex)
+        QMutexLocker(self.__mutex)
         return self.__speed.length()
     
     def horizontal_speed(self) -> float:
         """Returns horizontal speed"""
-        locker = QMutexLocker(self.__mutex)
+        QMutexLocker(self.__mutex)
         return QVector3D(self.__speed.x(), self.__speed.y(), 0).length()
     
     def vertical_speed(self) -> float:
         """Returns vertical speed"""
-        locker = QMutexLocker(self.__mutex)
+        QMutexLocker(self.__mutex)
         return QVector3D(0, 0, self.__speed.z()).length()
 
     def yaw_angle(self) -> float:
         """Returns yaw (heading) angle"""
-        locker = QMutexLocker(self.__mutex)
+        QMutexLocker(self.__mutex)
         return degrees(atan2(self.__speed.x(), -self.__speed.y()))
 
     def pitch_angle(self) -> float:
         """Returns pitch angle"""
-        locker = QMutexLocker(self.__mutex)
+        QMutexLocker(self.__mutex)
         return degrees(atan2(self.__speed.z(), sqrt(self.__speed.x() ** 2 + self.__speed.y() ** 2)))
