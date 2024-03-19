@@ -1,7 +1,8 @@
-""""""
+"""Simulation module"""
 
 import csv
 import logging
+import datetime
 from typing import List
 
 from PySide6.QtCore import QThread
@@ -35,7 +36,7 @@ class Simulation(QMainWindow):
             print("Another instance already running")
             return
         logging.info("Starting realtime simulation")
-        self.state = SimulationState(SimulationSettings())
+        self.state = SimulationState(SimulationSettings(), is_realtime=True)
 
         self.aircrafts : List[Aircraft] = [
             Aircraft(position=QVector3D(10, 10, 1000), speed=QVector3D(50, 0, 0), state=self.state),
@@ -73,12 +74,22 @@ class Simulation(QMainWindow):
         self.state.is_running = True
         # todo
         return
-
+    
     def stop_simulation(self) -> None:
-        """Finishes all active simulation threads"""
+        """Stops simulation"""
+        if self.state.is_realtime:
+            self.stop_realtime_simulation()
+        else:
+            self.stop_prerender_simulation()
+        self.state.reset_demanded = True
+        self.state.is_running = False
+        return
+
+    def stop_realtime_simulation(self) -> None:
+        """Finishes all active realtime simulation threads"""
         if not self.state.is_running:
             return
-        logging.info("Stopping simulation")
+        logging.info("Stopping realtime simulation")
 
         self.simulation_physics.requestInterruption()
         self.simulation_adsb.requestInterruption()
@@ -111,10 +122,22 @@ class Simulation(QMainWindow):
         self.simulation_fps.wait()
         return
     
+    def stop_prerender_simulation(self) -> None:
+        """Finishes all active prerender simulation threads"""
+        if not self.state.is_running:
+            return
+        logging.info("Stopping prerender simulation")
+        # todo
+        return
+    
     def export_visited_locations(self) -> None:
         """Exports aircrafts visited location lists"""
+        export_time = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         for aircraft in self.aircraft_fccs:
-            file = open(f"logs/visited-aircraft-{aircraft.aircraft_id}.csv", "w")
+            try:
+                file = open(f"logs/visited-aircraft-{aircraft.aircraft_id}-{export_time}.csv", "w")
+            except:
+                return
             writer = csv.writer(file)
             writer.writerow(["x","y","z"])
             for position in aircraft.visited:
