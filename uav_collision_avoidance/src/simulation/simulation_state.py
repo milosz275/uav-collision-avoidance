@@ -1,4 +1,4 @@
-""""""
+"""Simulation state module"""
 
 from PySide6.QtCore import QSettings, QTime
 from PySide6.QtGui import QPixmap
@@ -8,10 +8,11 @@ from src.simulation.simulation_settings import SimulationSettings
 class SimulationState(QSettings):
     """Class defining simulation's traits"""
 
-    def __init__(self, simulation_settings : SimulationSettings) -> None:
+    def __init__(self, simulation_settings : SimulationSettings, is_realtime : bool = True) -> None:
         # simulation state
         self.simulation_settings = simulation_settings
         self.update_settings()
+        self.is_realtime : bool = is_realtime
         # self.time_scale : float = 1.0 # define slow motion or fast forward
         self.physics_cycles : int = 0
         self.is_paused : bool = False
