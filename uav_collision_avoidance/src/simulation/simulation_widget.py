@@ -63,6 +63,7 @@ class SimulationWidget(QWidget):
                 aircraft.size * abs(cos(radians(aircraft.roll_angle))),
                 aircraft.size * abs(cos(radians(aircraft.pitch_angle)))
             )
+            # aircraft
             painter = QPainter(self)
             painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
             painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
@@ -77,14 +78,22 @@ class SimulationWidget(QWidget):
             painter.drawEllipse(0, 0,
                 aircraft.size * abs(cos(radians(aircraft.roll_angle))),
                 aircraft.size * abs(cos(radians(aircraft.pitch_angle))))
+            painter.rotate(-aircraft.yaw_angle)
+            painter.drawText(10, 10, f"Aircraft {aircraft.aircraft_id}")
             painter.end()
+
+            # destinations
             painter = QPainter(self)
             painter.setBrush(Qt.BrushStyle.SolidPattern)
-            for destination in aircraft.fcc.destinations:
+            for idx, destination in enumerate(aircraft.fcc.destinations):
                 painter.drawEllipse(
                     destination.x() * self.simulation_state.gui_scale - 5,
                     destination.y() * self.simulation_state.gui_scale - 5,
                     10, 10)
+                painter.drawText(
+                    destination.x() + 10,
+                    destination.y() + 10,
+                    f"Destination {idx} of Aircraft {aircraft.aircraft_id}")
             painter.end()
         return super().paintEvent(event)
 
