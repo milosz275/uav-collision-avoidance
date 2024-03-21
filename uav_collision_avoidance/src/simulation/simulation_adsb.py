@@ -15,8 +15,8 @@ class SimulationADSB(QThread):
     def __init__(self, parent, aircrafts : List[Aircraft], simulation_state : SimulationState) -> None:
         super(SimulationADSB, self).__init__(parent)
         self.aircrafts = aircrafts
-        self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle() for aircraft in self.aircrafts]
-        self.aircraft_fccs : List[AircraftFCC] = [aircraft.fcc() for aircraft in self.aircrafts]
+        self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle for aircraft in self.aircrafts]
+        self.aircraft_fccs : List[AircraftFCC] = [aircraft.fcc for aircraft in self.aircrafts]
         self.simulation_state = simulation_state
         self.adsb_cycles : int = 0
         return
@@ -29,18 +29,18 @@ class SimulationADSB(QThread):
                 self.adsb_cycles += 1
                 self.simulation_state.update_adsb_settings()
                 for aircraft in self.aircraft_vehicles:
-                    self.aircraft_fccs[aircraft.aircraft_id()].append_visited()
-                    if aircraft.aircraft_id() == 0:
-                        print("Aircraft id: " + str(aircraft.aircraft_id()) +
-                            "; speed: " + "{:.2f}".format(aircraft.absolute_speed()) +
-                            "; x: " + "{:.2f}".format(aircraft.position().x()) +
-                            "; y: " + "{:.2f}".format(aircraft.position().y()) +
-                            "; yaw angle: " + "{:.2f}".format(aircraft.yaw_angle()) +
-                            "; target yaw angle: " + "{:.2f}".format(self.aircraft_fccs[aircraft.aircraft_id()].target_yaw_angle) +
-                            "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle()) +
-                            "; roll angle: " + "{:.2f}".format(aircraft.roll_angle()) +
-                            "; target roll angle: " + "{:.2f}".format(self.aircraft_fccs[aircraft.aircraft_id()].target_roll_angle) +
-                            "; distance covered: " + "{:.2f}".format(aircraft.distance_covered()) +
+                    self.aircraft_fccs[aircraft.aircraft_id].append_visited()
+                    if aircraft.aircraft_id == 0:
+                        print("Aircraft id: " + str(aircraft.aircraft_id) +
+                            "; speed: " + "{:.2f}".format(aircraft.absolute_speed) +
+                            "; x: " + "{:.2f}".format(aircraft.position.x()) +
+                            "; y: " + "{:.2f}".format(aircraft.position.y()) +
+                            "; yaw angle: " + "{:.2f}".format(aircraft.yaw_angle) +
+                            "; target yaw angle: " + "{:.2f}".format(self.aircraft_fccs[aircraft.aircraft_id].target_yaw_angle) +
+                            "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle) +
+                            "; roll angle: " + "{:.2f}".format(aircraft.roll_angle) +
+                            "; target roll angle: " + "{:.2f}".format(self.aircraft_fccs[aircraft.aircraft_id].target_roll_angle) +
+                            "; distance covered: " + "{:.2f}".format(aircraft.distance_covered) +
                             "; fps: " + "{:.2f}".format(self.simulation_state.fps) +
                             "; t: " + str(self.adsb_cycles) +
                             "; phys: " + str(self.simulation_state.physics_cycles))

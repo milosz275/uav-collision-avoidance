@@ -12,7 +12,6 @@ from PySide6.QtWidgets import QMainWindow
 from src.aircraft.aircraft import Aircraft
 from src.aircraft.aircraft_vehicle import AircraftVehicle
 from src.aircraft.aircraft_fcc import AircraftFCC
-from src.aircraft.aircraft_render import AircraftRender
 from src.simulation.simulation_settings import SimulationSettings
 from src.simulation.simulation_physics import SimulationPhysics
 from src.simulation.simulation_state import SimulationState
@@ -39,13 +38,12 @@ class Simulation(QMainWindow):
         self.state = SimulationState(SimulationSettings(), is_realtime=True)
 
         self.aircrafts : List[Aircraft] = [
-            Aircraft(position=QVector3D(10, 10, 1000), speed=QVector3D(50, 0, 0), state=self.state),
+            Aircraft(position=QVector3D(10, 10, 1000), speed=QVector3D(50, 50, 0), state=self.state),
             Aircraft(position=QVector3D(100, 100, 1000), speed=QVector3D(100, 0, 0), state=self.state),
         ]
 
-        self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle() for aircraft in self.aircrafts]
-        self.aircraft_fccs : List[AircraftFCC] = [aircraft.fcc() for aircraft in self.aircrafts]
-        self.aircraft_renders : List[AircraftRender] = [aircraft.render() for aircraft in self.aircrafts]
+        self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle for aircraft in self.aircrafts]
+        self.aircraft_fccs : List[AircraftFCC] = [aircraft.fcc for aircraft in self.aircrafts]
 
         self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
         self.simulation_physics.start(priority=QThread.Priority.TimeCriticalPriority)

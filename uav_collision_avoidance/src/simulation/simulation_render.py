@@ -19,7 +19,6 @@ class SimulationRender(QThread):
         while not self.isInterruptionRequested():
             start_timestamp = QTime.currentTime()
             self.simulation_state.update_render_settings()
-            self.simulation_widget.update_aircrafts()
             self.simulation_widget.update()
             self.msleep(max(0, self.simulation_state.gui_render_threshold - start_timestamp.msecsTo(QTime.currentTime())))
         return super().run()

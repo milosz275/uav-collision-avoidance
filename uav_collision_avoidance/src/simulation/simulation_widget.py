@@ -11,7 +11,6 @@ from PySide6.QtWidgets import QWidget, QApplication
 from src.aircraft.aircraft import Aircraft
 from src.aircraft.aircraft_fcc import AircraftFCC
 from src.aircraft.aircraft_vehicle import AircraftVehicle
-from src.aircraft.aircraft_render import AircraftRender
 from src.simulation.simulation_fps import SimulationFPS
 from src.simulation.simulation_settings import SimulationSettings
 
@@ -23,11 +22,9 @@ class SimulationWidget(QWidget):
         super().__init__()
         self.aircrafts = aircrafts
         self.aircraft_vehicles : List[AircraftVehicle] = [
-            aircraft.vehicle() for aircraft in self.aircrafts]
+            aircraft.vehicle for aircraft in self.aircrafts]
         self.aircraft_fccs : List[AircraftFCC] = [
-            aircraft.fcc() for aircraft in self.aircrafts]
-        self.aircraft_renders : List[AircraftRender] = [
-            aircraft.render() for aircraft in self.aircrafts]
+            aircraft.fcc for aircraft in self.aircrafts]
         self.simulation_fps = simulation_fps
         self.simulation_state = simulation_state
 
@@ -46,65 +43,62 @@ class SimulationWidget(QWidget):
         self.icon.addPixmap(self.simulation_state.aircraft_pixmap, QIcon.Mode.Normal, QIcon.State.Off)
         self.setWindowIcon(self.icon)
         return
-    
-    def update_aircrafts(self) -> None:
-        """Updates aircrafts position"""
-        for aircraft in self.aircraft_renders:
-            aircraft.update()
-        return
 
     def paintEvent(self, event: QPaintEvent) -> None:
         """Qt method painting the aircrafts"""
         if self.simulation_state.aircraft_pixmap.isNull():
             return super().paintEvent(event)
         self.simulation_fps.count_frame()
-        for aircraft in self.aircraft_renders:
+        scale : float = self.simulation_state.gui_scale
+        for aircraft in self.aircraft_vehicles:
+            size : float = aircraft.size * scale
             pixmap : QPixmap = self.simulation_state.aircraft_pixmap.scaled(
-                aircraft.size * abs(cos(radians(aircraft.roll_angle))),
-                aircraft.size * abs(cos(radians(aircraft.pitch_angle)))
+                size * abs(cos(radians(aircraft.roll_angle))),
+                size * abs(cos(radians(aircraft.pitch_angle)))
             )
             painter = QPainter(self)
             painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
             painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
             painter.translate(QPointF(
-                aircraft.position.x(),
-                aircraft.position.y()))
+                aircraft.position.x() * scale,
+                aircraft.position.y() * scale))
             painter.rotate(aircraft.yaw_angle)
             painter.translate(QPointF(
-                -aircraft.size / 2,
-                -aircraft.size / 2))
+                -size / 2,
+                -size / 2))
             painter.drawPixmap(0, 0, pixmap)
             painter.drawEllipse(0, 0,
-                aircraft.size * abs(cos(radians(aircraft.roll_angle))),
-                aircraft.size * abs(cos(radians(aircraft.pitch_angle))))
+                size * abs(cos(radians(aircraft.roll_angle))),
+                size * abs(cos(radians(aircraft.pitch_angle))))
             painter.end()
             painter = QPainter(self)
             painter.setBrush(Qt.BrushStyle.SolidPattern)
-            for destination in aircraft.fcc.destinations:
+            for destination in self.aircraft_fccs[aircraft.aircraft_id].destinations:
                 painter.drawEllipse(
-                    destination.x() * self.simulation_state.gui_scale - 5,
-                    destination.y() * self.simulation_state.gui_scale - 5,
+                    destination.x() * scale - 5,
+                    destination.y() * scale - 5,
                     10, 10)
             painter.end()
         return super().paintEvent(event)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         """Qt method controlling single click mouse input"""
-        print("click x: " + str(event.pos().x() / self.simulation_state.gui_scale) + "; y: " + str(event.pos().y() / self.simulation_state.gui_scale))
+        scale : float = self.simulation_state.gui_scale
+        print("click x: " + str(event.pos().x() / scale) + "; y: " + str(event.pos().y() / scale))
         if event.button() == Qt.MouseButton.LeftButton:
             self.aircraft_fccs[0].push_destination_top(QVector3D(
-                float(event.pos().x() / self.simulation_state.gui_scale),
-                float(event.pos().y() / self.simulation_state.gui_scale),
+                float(event.pos().x() / scale),
+                float(event.pos().y() / scale),
                 1000.0))
         elif event.button() == Qt.MouseButton.RightButton:
             self.aircraft_fccs[0].append_destination(QVector3D(
-                float(event.pos().x() / self.simulation_state.gui_scale),
-                float(event.pos().y() / self.simulation_state.gui_scale),
+                float(event.pos().x() / scale),
+                float(event.pos().y() / scale),
                 1000.0))
         elif event.button() == Qt.MouseButton.MiddleButton:
             self.aircraft_vehicles[0].teleport(
-                float(event.pos().x() / self.simulation_state.gui_scale),
-                float(event.pos().y() / self.simulation_state.gui_scale),
+                float(event.pos().x() / scale),
+                float(event.pos().y() / scale),
                 1000.0)
         return super().mousePressEvent(event)
     

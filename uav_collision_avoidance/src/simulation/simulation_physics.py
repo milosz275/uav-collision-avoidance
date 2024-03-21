@@ -20,8 +20,8 @@ class SimulationPhysics(QThread):
     def __init__(self, parent, aircrafts : List[Aircraft], simulation_state : SimulationState) -> None:
         super(SimulationPhysics, self).__init__(parent)
         self.aircrafts = aircrafts
-        self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle() for aircraft in self.aircrafts]
-        self.aircraft_fccs : List[AircraftFCC] = [aircraft.fcc() for aircraft in self.aircrafts]
+        self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle for aircraft in self.aircrafts]
+        self.aircraft_fccs : List[AircraftFCC] = [aircraft.fcc for aircraft in self.aircrafts]
         self.simulation_state = simulation_state
         self.cycles : int = 0
         self.global_start_timestamp : QTime = None
@@ -53,31 +53,31 @@ class SimulationPhysics(QThread):
     def update_aircrafts_position(self, elapsed_time : float) -> bool:
         """Updates aircrafts position, returns true on collision"""
         for aircraft in self.aircraft_vehicles:
-            miss_distance : float = dist(aircraft.position().toTuple(), self.aircraft_vehicles[1 - aircraft.aircraft_id()].position().toTuple())
-            fcc : AircraftFCC = self.aircraft_fccs[aircraft.aircraft_id()]
+            miss_distance : float = dist(aircraft.position.toTuple(), self.aircraft_vehicles[1 - aircraft.aircraft_id].position.toTuple())
+            fcc : AircraftFCC = self.aircraft_fccs[aircraft.aircraft_id]
             
             # safezone occupancy
             if miss_distance <= (fcc.safezone_size() / 2):
                 if not fcc.safezone_occupied():
                     fcc.safezone_occupied(True)
-                    print("Aircraft " + str(1 - aircraft.aircraft_id()) + " entered safezone of Aircraft " + str(aircraft.aircraft_id()))
+                    print("Aircraft " + str(1 - aircraft.aircraft_id) + " entered safezone of Aircraft " + str(aircraft.aircraft_id))
             else:
                 if fcc.safezone_occupied():
                     fcc.safezone_occupied(False)
-                    print("Aircraft " + str(1 - aircraft.aircraft_id()) + " left safezone of Aircraft " + str(aircraft.aircraft_id()))
+                    print("Aircraft " + str(1 - aircraft.aircraft_id) + " left safezone of Aircraft " + str(aircraft.aircraft_id))
 
             # collision
-            if miss_distance <= aircraft.size():
+            if miss_distance <= aircraft.size:
                 print("Collision")
                 return True
                 
             # covered distance and position
-            old_pos : QVector3D = copy(aircraft.position())
+            old_pos : QVector3D = copy(aircraft.position)
             aircraft.move(
-                aircraft.speed().x() * elapsed_time / 1000.0,
-                aircraft.speed().y() * elapsed_time / 1000.0,
-                aircraft.speed().z() * elapsed_time / 1000.0)
-            aircraft.distance_covered(dist(old_pos.toTuple(), aircraft.position().toTuple()))
+                aircraft.speed.x() * elapsed_time / 1000.0,
+                aircraft.speed.y() * elapsed_time / 1000.0,
+                aircraft.speed.z() * elapsed_time / 1000.0)
+            aircraft.distance_covered = dist(old_pos.toTuple(), aircraft.position.toTuple())
         return False
     
     def update_aircrafts_speed_angles(self, elapsed_time : float) -> None:
@@ -85,18 +85,18 @@ class SimulationPhysics(QThread):
         if elapsed_time == 0.0:
             return
         for aircraft in self.aircraft_vehicles:
-            fcc : AircraftFCC = self.aircraft_fccs[aircraft.aircraft_id()]
+            fcc : AircraftFCC = self.aircraft_fccs[aircraft.aircraft_id]
             
             # flight control computer
             fcc.update()
 
             # roll angle
-            aircraft.roll_angle((1.0 / (aircraft.roll_dynamic_delay / elapsed_time)) * (fcc.target_roll_angle - aircraft.roll_angle()))
+            aircraft.roll_angle = (1.0 / (aircraft.roll_dynamic_delay / elapsed_time)) * (fcc.target_roll_angle - aircraft.roll_angle)
 
             # pitch angle
 
             # yaw angle
-            roll_angle : float = aircraft.roll_angle()
+            roll_angle : float = aircraft.roll_angle
 
             if roll_angle == 0.0:
                 continue
@@ -105,11 +105,11 @@ class SimulationPhysics(QThread):
             elif fcc.target_roll_angle < 0.0 and roll_angle > 0.0:
                 continue
 
-            current_yaw_angle : float = aircraft.yaw_angle()
+            current_yaw_angle : float = aircraft.yaw_angle
             target_yaw_angle : float = fcc.target_yaw_angle
             if abs(current_yaw_angle - target_yaw_angle) < 0.001:
                 continue
-            current_horizontal_speed : float = aircraft.horizontal_speed()
+            current_horizontal_speed : float = aircraft.horizontal_speed
             max_delta_yaw_angle : float = self.simulation_state.g_acceleration * tan(radians(roll_angle)) / (current_horizontal_speed / elapsed_time)
             max_delta_yaw_angle = abs(max_delta_yaw_angle)
             if roll_angle < 0.0:
@@ -121,8 +121,8 @@ class SimulationPhysics(QThread):
             else:
                 new_yaw_angle = current_yaw_angle + max_delta_yaw_angle
 
-            aircraft.speed().setX(sin(radians(new_yaw_angle)) * current_horizontal_speed)
-            aircraft.speed().setY(-cos(radians(new_yaw_angle)) * current_horizontal_speed)
+            aircraft.speed.setX(sin(radians(new_yaw_angle)) * current_horizontal_speed)
+            aircraft.speed.setY(-cos(radians(new_yaw_angle)) * current_horizontal_speed)
         return
 
     def count_cycles(self) -> None:

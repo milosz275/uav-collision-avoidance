@@ -56,7 +56,7 @@ class AircraftFCC(QObject):
     
     def append_visited(self) -> None:
         """Appends current location to visited list"""
-        self.visited.append(copy(self.aircraft.position()))
+        self.visited.append(copy(self.aircraft.position))
         return
 
     def update(self) -> None:
@@ -65,20 +65,20 @@ class AircraftFCC(QObject):
 
         if self.destinations:
             destination = self.destinations[0]
-            distance = dist(self.aircraft.position().toTuple(), destination.toTuple())
-            if distance < self.aircraft.size() / 2:
+            distance = dist(self.aircraft.position.toTuple(), destination.toTuple())
+            if distance < self.aircraft.size / 2:
                 self.destinations_history.append(self.destinations.pop(0))
                 if self.destinations:
                     destination = self.destinations[0]
-                    logging.info("Aircraft %s visited destination and took next one", self.aircraft.aircraft_id())
-                    print(f"Aircraft {self.aircraft.aircraft_id()} visited destination and took next one")
+                    logging.info("Aircraft %s visited destination and took next one", self.aircraft.aircraft_id)
+                    print(f"Aircraft {self.aircraft.aircraft_id} visited destination and took next one")
                 else:
-                    logging.info("Aircraft %s visited destination and is free now", self.aircraft.aircraft_id())
-                    print(f"Aircraft {self.aircraft.aircraft_id()} visited destination and is free now")
+                    logging.info("Aircraft %s visited destination and is free now", self.aircraft.aircraft_id)
+                    print(f"Aircraft {self.aircraft.aircraft_id} visited destination and is free now")
                     return
             abs_target_yaw_angle : float  = degrees(atan2(
-                destination.y() - self.aircraft.position().y(),
-                destination.x() - self.aircraft.position().x()))
+                destination.y() - self.aircraft.position.y(),
+                destination.x() - self.aircraft.position.x()))
             abs_target_yaw_angle += 90
             if abs_target_yaw_angle < 0:
                 abs_target_yaw_angle += 360
@@ -89,7 +89,7 @@ class AircraftFCC(QObject):
                 target_yaw_angle = -180 + (target_yaw_angle - 180)
             self.target_yaw_angle = target_yaw_angle # -180 to 180
 
-        current_yaw_angle : float = self.aircraft.yaw_angle()
+        current_yaw_angle : float = self.aircraft.yaw_angle
         if target_yaw_angle < 0:
             target_yaw_angle += 360
         if current_yaw_angle < 0:
