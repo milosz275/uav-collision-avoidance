@@ -52,17 +52,19 @@ class SimulationWidget(QWidget):
         scale : float = self.simulation_state.gui_scale
         for aircraft in self.aircraft_vehicles:
             size : float = aircraft.size * scale
+            yaw_angle : float = aircraft.yaw_angle
             pixmap : QPixmap = self.simulation_state.aircraft_pixmap.scaled(
                 size * abs(cos(radians(aircraft.roll_angle))),
                 size * abs(cos(radians(aircraft.pitch_angle)))
             )
+            # aircraft
             painter = QPainter(self)
             painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
             painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
             painter.translate(QPointF(
                 aircraft.position.x() * scale,
                 aircraft.position.y() * scale))
-            painter.rotate(aircraft.yaw_angle)
+            painter.rotate(yaw_angle)
             painter.translate(QPointF(
                 -size / 2,
                 -size / 2))
@@ -70,14 +72,22 @@ class SimulationWidget(QWidget):
             painter.drawEllipse(0, 0,
                 size * abs(cos(radians(aircraft.roll_angle))),
                 size * abs(cos(radians(aircraft.pitch_angle))))
+            painter.rotate(-yaw_angle)
+            painter.drawText(10, 10, f"Aircraft {aircraft.aircraft_id}")
             painter.end()
+
+            # destinations
             painter = QPainter(self)
             painter.setBrush(Qt.BrushStyle.SolidPattern)
-            for destination in self.aircraft_fccs[aircraft.aircraft_id].destinations:
+            for idx, destination in enumerate(self.aircraft_fccs[aircraft.aircraft_id].destinations):
                 painter.drawEllipse(
                     destination.x() * scale - 5,
                     destination.y() * scale - 5,
                     10, 10)
+                painter.drawText(
+                    destination.x() + 10,
+                    destination.y() + 10,
+                    f"Destination {idx} of Aircraft {aircraft.aircraft_id}")
             painter.end()
         return super().paintEvent(event)
 
