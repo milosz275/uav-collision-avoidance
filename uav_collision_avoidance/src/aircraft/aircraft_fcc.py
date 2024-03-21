@@ -89,6 +89,8 @@ class AircraftFCC(QObject):
                 target_yaw_angle = -180 + (target_yaw_angle - 180)
             self.target_yaw_angle = target_yaw_angle # -180 to 180
 
+            # todo: add pre-roll for next destination
+
         current_yaw_angle : float = self.aircraft.yaw_angle
         if target_yaw_angle < 0:
             target_yaw_angle += 360
@@ -96,7 +98,7 @@ class AircraftFCC(QObject):
             current_yaw_angle += 360
         
         difference = (target_yaw_angle - current_yaw_angle + 180) % 360 - 180
-        if abs(difference) < 8.0:
+        if abs(difference) < 6.0:
             self.target_roll_angle = 0.0
             return
         if difference > 0:
