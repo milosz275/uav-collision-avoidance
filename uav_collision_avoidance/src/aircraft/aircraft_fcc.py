@@ -96,7 +96,7 @@ class AircraftFCC(QObject):
             current_yaw_angle += 360
         
         difference = (target_yaw_angle - current_yaw_angle + 180) % 360 - 180
-        if abs(difference) < 5.0:
+        if abs(difference) < 8.0:
             self.target_roll_angle = 0.0
             return
         if difference > 0:
