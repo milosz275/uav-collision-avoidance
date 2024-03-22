@@ -20,9 +20,10 @@ class SimulationState(QSettings):
         self.reset_demanded : bool = False
         self.pause_start_timestamp : QTime = None
         self.time_paused : int = 0 # ms
+        self.__adsb_report : bool = True
 
         # render state
-        self.gui_scale : float = 1.0 # define gui scaling
+        self.gui_scale : float = 0.75 # define gui scaling
         self.fps : float = 0.0
 
         # assets
@@ -30,11 +31,21 @@ class SimulationState(QSettings):
         self.aircraft_pixmap.load("src/assets/aircraft.png")
         return
     
+    @property
+    def adsb_report(self) -> None:
+        """Returns ADS-B commandline info reporting flag"""
+        return self.__adsb_report
+
     def update_settings(self) -> None:
         """Updates all state settings"""
         self.update_render_settings()
         self.update_simulation_settings()
         self.update_adsb_settings()
+        return
+
+    def toggle_adsb_report(self) -> None:
+        """Toggles ADS-B commandline info report"""
+        self.__adsb_report = not self.__adsb_report
         return
     
     def update_render_settings(self) -> None:
