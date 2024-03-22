@@ -1,11 +1,11 @@
 """Simulation widget for the main window of the simulation app"""
 
-from math import cos, radians
+from math import cos, radians, sqrt, degrees, atan2
 from typing import List
 
 from PySide6.QtCore import Qt, QPointF, Signal
 from PySide6.QtGui import QPaintEvent, QPainter, QKeyEvent, \
-    QMouseEvent, QIcon, QPixmap, QCloseEvent, QVector3D
+    QMouseEvent, QIcon, QPixmap, QCloseEvent, QVector3D, QPolygonF
 from PySide6.QtWidgets import QWidget, QApplication
 
 from src.aircraft.aircraft import Aircraft
@@ -44,51 +44,119 @@ class SimulationWidget(QWidget):
         self.setWindowIcon(self.icon)
         return
 
-    def paintEvent(self, event: QPaintEvent) -> None:
+    def draw_aircraft(self, aircraft : AircraftVehicle, scale : float) -> None:
+        """Draws given aircraft vehicle"""
+        yaw_angle : float = aircraft.yaw_angle
+        size : float = aircraft.size * scale
+        pixmap : QPixmap = self.simulation_state.aircraft_pixmap.scaled(
+            size * abs(cos(radians(aircraft.roll_angle))),
+            size * abs(cos(radians(aircraft.pitch_angle)))
+        )
+
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
+        painter.translate(QPointF(
+            aircraft.position.x() * scale,
+            aircraft.position.y() * scale))
+        painter.rotate(yaw_angle)
+        painter.translate(QPointF(
+            -size / 2,
+            -size / 2))
+        painter.drawPixmap(0, 0, pixmap)
+        painter.drawEllipse(0, 0,
+            size * abs(cos(radians(aircraft.roll_angle))),
+            size * abs(cos(radians(aircraft.pitch_angle))))
+        painter.rotate(-yaw_angle)
+        painter.drawText(10, 10, f"Aircraft {aircraft.aircraft_id}")
+        painter.end()
+        return
+
+    def draw_destinations(self, aircraft : AircraftVehicle, scale : float) -> None:
+        """Draws destinations of given aircraft vehicle"""
+        for idx, destination in enumerate(self.aircraft_fccs[aircraft.aircraft_id].destinations):
+            self.draw_circle(destination, scale)
+            self.draw_text(destination, scale, f"Destination {idx} of Aircraft {aircraft.aircraft_id}")
+        return
+
+    def draw_text(self, point : QVector3D, scale : float, text : str) -> None:
+        """Draws text at given coordinates"""
+        painter = QPainter(self)
+        painter.setBrush(Qt.BrushStyle.SolidPattern)
+        painter.drawText(
+            point.x() * scale + 10,
+            point.y() * scale + 10,
+            text)
+        painter.end()
+        return
+
+    def draw_circle(self, point : QVector3D, scale : float) -> None:
+        """Draws circle at given coordinates"""
+        painter = QPainter(self)
+        painter.setBrush(Qt.BrushStyle.SolidPattern)
+        painter.drawEllipse(
+            point.x() * scale - 5,
+            point.y() * scale - 5,
+            10, 10)
+        painter.end()
+        return
+
+    def draw_line(self, point1 : QVector3D, point2 : QVector3D, scale : float) -> None:
+        """Draws line connecting given points"""
+        painter = QPainter(self)
+        painter.setBrush(Qt.BrushStyle.SolidPattern)
+        painter.drawLine(
+            int(point1.x() * scale),
+            int(point1.y() * scale),
+            int(point2.x() * scale),
+            int(point2.y() * scale))
+        painter.end()
+        return
+
+    def draw_vector(self, point1 : QVector3D, point2 : QVector3D, scale : float) -> None:
+        """Draws vector pointing from first to second point"""
+        self.draw_line(point1, point2, scale)
+        
+        painter = QPainter(self)
+        painter.setBrush(Qt.BrushStyle.SolidPattern)
+        angle = degrees(atan2(point1.x() - point2.x(), point1.y() - point2.y()))
+        arrowhead_size = SimulationSettings.screen_resolution.width() / 400 * scale
+        arrowhead_height = arrowhead_size * sqrt(3) / 2
+        polygon = QPolygonF()
+        polygon.append(
+            QPointF(
+                point2.x() * scale -arrowhead_size / 2,
+                point2.y() * scale + arrowhead_height / 3))
+        polygon.append(
+            QPointF(
+                point2.x() * scale + arrowhead_size / 2,
+                point2.y() * scale + arrowhead_height / 3))
+        polygon.append(
+            QPointF(
+                point2.x() * scale,
+                point2.y() * scale - 2 * arrowhead_height / 3))
+        painter.translate(
+            point2.x() * scale,
+            point2.y() * scale
+        )
+        painter.rotate(-angle)
+        painter.translate(
+            -point2.x() * scale,
+            -point2.y() * scale
+        )
+        painter.drawPolygon(polygon)
+        painter.end()
+        return
+
+    def paintEvent(self, event : QPaintEvent) -> None:
         """Qt method painting the aircrafts"""
         if self.simulation_state.aircraft_pixmap.isNull():
             return super().paintEvent(event)
         self.simulation_fps.count_frame()
         scale : float = self.simulation_state.gui_scale
         for aircraft in self.aircraft_vehicles:
-            size : float = aircraft.size * scale
-            yaw_angle : float = aircraft.yaw_angle
-            pixmap : QPixmap = self.simulation_state.aircraft_pixmap.scaled(
-                size * abs(cos(radians(aircraft.roll_angle))),
-                size * abs(cos(radians(aircraft.pitch_angle)))
-            )
-            # aircraft
-            painter = QPainter(self)
-            painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
-            painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
-            painter.translate(QPointF(
-                aircraft.position.x() * scale,
-                aircraft.position.y() * scale))
-            painter.rotate(yaw_angle)
-            painter.translate(QPointF(
-                -size / 2,
-                -size / 2))
-            painter.drawPixmap(0, 0, pixmap)
-            painter.drawEllipse(0, 0,
-                size * abs(cos(radians(aircraft.roll_angle))),
-                size * abs(cos(radians(aircraft.pitch_angle))))
-            painter.rotate(-yaw_angle)
-            painter.drawText(10, 10, f"Aircraft {aircraft.aircraft_id}")
-            painter.end()
-
-            # destinations
-            painter = QPainter(self)
-            painter.setBrush(Qt.BrushStyle.SolidPattern)
-            for idx, destination in enumerate(self.aircraft_fccs[aircraft.aircraft_id].destinations):
-                painter.drawEllipse(
-                    destination.x() * scale - 5,
-                    destination.y() * scale - 5,
-                    10, 10)
-                painter.drawText(
-                    destination.x() + 10,
-                    destination.y() + 10,
-                    f"Destination {idx} of Aircraft {aircraft.aircraft_id}")
-            painter.end()
+            self.draw_aircraft(aircraft, scale)
+            self.draw_destinations(aircraft, scale)
         return super().paintEvent(event)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
