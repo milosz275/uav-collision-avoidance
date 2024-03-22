@@ -25,7 +25,7 @@ class SimulationADSB(QThread):
         """Runs ADS-B simulation thread with precise timeout"""
         while not self.isInterruptionRequested():
             start_timestamp = QTime.currentTime()
-            if not self.simulation_state.is_paused:
+            if not self.simulation_state.is_paused and self.simulation_state.adsb_report:
                 self.adsb_cycles += 1
                 self.simulation_state.update_adsb_settings()
                 for aircraft in self.aircraft_vehicles:
