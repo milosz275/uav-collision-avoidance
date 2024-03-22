@@ -14,7 +14,7 @@ from src.aircraft.aircraft_vehicle import AircraftVehicle
 class AircraftFCC(QObject):
     """Aircraft Flight Control Computer"""
 
-    def __init__(self, aircraft_id : int, aircraft : AircraftVehicle) -> None:
+    def __init__(self, aircraft_id : int, initial_target : QVector3D, aircraft : AircraftVehicle) -> None:
         super().__init__()
         self.aircraft_id = aircraft_id
         self.aircraft = aircraft
@@ -22,25 +22,32 @@ class AircraftFCC(QObject):
         self.__safezone_occupied : bool = False
         self.__safezone_size : float = 200.0
 
-        self.target_yaw_angle : float = 90.0
+        self.target_yaw_angle : float = self.find_best_yaw_angle(aircraft.position, initial_target)
         self.target_roll_angle : float = 0.0
         self.target_pitch_angle : float = 0.0
         # self.target_speed : float = 100.0
+
+        self.__evade_maneuver : bool = False
 
         self.destinations : deque[QVector3D] = deque()
         self.destinations_history : List[QVector3D] = []
         self.visited : List[QVector3D] = []
         return
 
+    @property
     def safezone_size(self) -> float:
         """Returns safezone size"""
         return self.__safezone_size
-    
-    def safezone_occupied(self, occupied : bool = None) -> bool:
-        """Gets and/or sets safezone state"""
-        if occupied is not None:
-            self.__safezone_occupied = occupied
+
+    @property
+    def safezone_occupied(self) -> bool:
+        """Returns safezone state"""
         return self.__safezone_occupied
+
+    @safezone_occupied.setter
+    def safezone_occupied(self, occupied : bool):
+        """Sets safezone state"""
+        self.__safezone_occupied = occupied
     
     def add_last_destination(self, destination : QVector3D) -> None:
         """Appends given location to the end of destinations list"""
@@ -55,6 +62,19 @@ class AircraftFCC(QObject):
     def append_visited(self) -> None:
         """Appends current location to visited list"""
         self.visited.append(copy(self.aircraft.position))
+        return
+
+    def apply_evade_maneuver(self) -> None:
+        """Applies evade maneuver"""
+        if self.__evade_maneuver:
+            logging.warn("Another evade maneuver in progress")
+            return
+        self.__evade_maneuver = True
+        # todo: calculate turn radius, apply roll angle,
+        # add corner enter position,
+        # add maneuver end position, 
+        # check if original destination is restored,
+        # reset evade maneuver flag
         return
 
     def normalize_angle(self, angle : float) -> float:
