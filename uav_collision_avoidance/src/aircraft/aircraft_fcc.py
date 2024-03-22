@@ -71,7 +71,7 @@ class AircraftFCC(QObject):
             destination = self.destinations[0]
             distance = dist(self.aircraft.position.toTuple(), destination.toTuple())
             if distance < self.aircraft.size / 2:
-                self.destinations_history.append(self.destinations.pop())
+                self.destinations_history.append(self.destinations.popleft())
                 if self.destinations:
                     destination = self.destinations[0]
                     logging.info("Aircraft %s visited destination and took next one", self.aircraft.aircraft_id)
