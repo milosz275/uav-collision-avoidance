@@ -18,7 +18,6 @@ class SimulationSettings:
     def __init__(cls) -> None:
         """Initialises Settings using screen resolution"""
         cls.resolution = (int(cls.screen_resolution.width() * 0.6), int(cls.screen_resolution.height() * 0.75))
-        return
     
     @classmethod
     def set_resolution(cls, width, height) -> None:

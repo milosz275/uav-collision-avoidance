@@ -2,20 +2,20 @@
 
 from PySide6.QtCore import QThread, QTime, QMutex, QMutexLocker
 from PySide6.QtGui import QCloseEvent
+from PySide6.QtWidgets import QMainWindow
 
 from src.simulation.simulation_state import SimulationState
 
 class SimulationFPS(QThread):
     """Thread running frames per second counter"""
 
-    def __init__(self, parent, simulation_state : SimulationState) -> None:
+    def __init__(self, parent : QMainWindow, simulation_state : SimulationState) -> None:
         super(SimulationFPS, self).__init__(parent)
         self.__mutex : QMutex = QMutex()
         self.__counted_frames : int = 0
 
         self.simulation_state = simulation_state
         self.previous_timestamp = QTime.currentTime()
-        return
         
     def run(self) -> None:
         """Runs rendered simulation frames counter thread with precise 500ms timeout"""

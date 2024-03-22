@@ -1,6 +1,7 @@
 """Simulation rendering thread module"""
 
 from PySide6.QtCore import QThread, QTime
+from PySide6.QtWidgets import QMainWindow
 
 from src.simulation.simulation_widget import SimulationWidget
 from src.simulation.simulation_state import SimulationState
@@ -8,11 +9,10 @@ from src.simulation.simulation_state import SimulationState
 class SimulationRender(QThread):
     """Thread running simulation rendering"""
 
-    def __init__(self, parent, simulation_widget : SimulationWidget, simulation_state : SimulationState) -> None:
+    def __init__(self, parent : QMainWindow, simulation_widget : SimulationWidget, simulation_state : SimulationState) -> None:
         super(SimulationRender, self).__init__(parent)
         self.simulation_widget = simulation_widget
         self.simulation_state = simulation_state
-        return
         
     def run(self) -> None:
         """Runs simulation widget update with precise timeout"""

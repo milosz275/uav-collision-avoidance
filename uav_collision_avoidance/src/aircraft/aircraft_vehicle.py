@@ -56,7 +56,7 @@ class AircraftVehicle(QObject):
         return self.__roll_angle
 
     @roll_angle.setter
-    def roll_angle(self, roll_angle_delta : float):
+    def roll_angle(self, roll_angle_delta : float) -> None:
         """Adds roll angle delta"""
         self.__roll_angle += roll_angle_delta
     
@@ -66,7 +66,7 @@ class AircraftVehicle(QObject):
         return self.__distance_covered
 
     @distance_covered.setter
-    def distance_covered(self, distance_covered_delta : float):
+    def distance_covered(self, distance_covered_delta : float) -> None:
         """Appends delta to distance covered"""
         self.__distance_covered += distance_covered_delta
     

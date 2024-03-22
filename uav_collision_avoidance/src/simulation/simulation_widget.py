@@ -18,7 +18,7 @@ class SimulationWidget(QWidget):
     """Main widget representing the simulation"""
     stop_signal = Signal(str)
     def __init__(self, aircrafts : List[Aircraft],
-                 simulation_fps : SimulationFPS, simulation_state : SimulationSettings):
+                 simulation_fps : SimulationFPS, simulation_state : SimulationSettings) -> None:
         super().__init__()
         self.aircrafts = aircrafts
         self.aircraft_vehicles : List[AircraftVehicle] = [
@@ -42,7 +42,6 @@ class SimulationWidget(QWidget):
         self.icon = QIcon()
         self.icon.addPixmap(self.simulation_state.aircraft_pixmap, QIcon.Mode.Normal, QIcon.State.Off)
         self.setWindowIcon(self.icon)
-        return
 
     def draw_aircraft(self, aircraft : AircraftVehicle, scale : float) -> None:
         """Draws given aircraft vehicle"""
@@ -170,6 +169,7 @@ class SimulationWidget(QWidget):
             self.draw_aircraft(aircraft, scale)
             self.draw_destinations(aircraft, scale)
             self.draw_circle(aircraft.position, self.aircraft_fccs[aircraft.aircraft_id].safezone_size, scale)
+            self.draw_vector(aircraft.position, aircraft.position + aircraft.speed, scale)
         return super().paintEvent(event)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
@@ -186,18 +186,18 @@ class SimulationWidget(QWidget):
             "; y: " + "{:.2f}".format(click_y))
         if event.button() == Qt.MouseButton.LeftButton:
             self.aircraft_fccs[0].add_first_destination(QVector3D(
-                float(real_x),
-                float(real_y),
+                real_x,
+                real_y,
                 1000.0))
         elif event.button() == Qt.MouseButton.RightButton:
             self.aircraft_fccs[0].add_last_destination(QVector3D(
-                float(real_x),
-                float(real_y),
+                real_x,
+                real_y,
                 1000.0))
         elif event.button() == Qt.MouseButton.MiddleButton:
             self.aircraft_vehicles[0].teleport(
-                float(real_x),
-                float(real_y),
+                real_x,
+                real_y,
                 1000.0)
         return super().mousePressEvent(event)
     

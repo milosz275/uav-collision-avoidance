@@ -32,7 +32,6 @@ class AircraftFCC(QObject):
         self.destinations : deque[QVector3D] = deque()
         self.destinations_history : List[QVector3D] = []
         self.visited : List[QVector3D] = []
-        return
 
     @property
     def safezone_size(self) -> float:
@@ -45,7 +44,7 @@ class AircraftFCC(QObject):
         return self.__safezone_occupied
 
     @safezone_occupied.setter
-    def safezone_occupied(self, occupied : bool):
+    def safezone_occupied(self, occupied : bool) -> None:
         """Sets safezone state"""
         self.__safezone_occupied = occupied
     

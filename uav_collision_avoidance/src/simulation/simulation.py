@@ -26,8 +26,7 @@ class Simulation(QMainWindow):
     def __init__(self) -> None:
         super().__init__()
         SimulationSettings().__init__()
-        self.state : SimulationState = None
-        return
+        self.state : SimulationState | None = None
 
     def run_realtime(self) -> None:
         """Executes realtime simulation"""

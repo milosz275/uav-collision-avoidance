@@ -7,7 +7,7 @@ from typing import List
 
 from PySide6.QtCore import QThread, QTime
 from PySide6.QtGui import QVector3D
-from PySide6.QtWidgets import QApplication
+from PySide6.QtWidgets import QApplication, QMainWindow
 
 from src.aircraft.aircraft import Aircraft
 from src.aircraft.aircraft_vehicle import AircraftVehicle
@@ -17,16 +17,15 @@ from src.simulation.simulation_state import SimulationState
 class SimulationPhysics(QThread):
     """Thread running simulation's physics"""
 
-    def __init__(self, parent, aircrafts : List[Aircraft], simulation_state : SimulationState) -> None:
+    def __init__(self, parent : QMainWindow, aircrafts : List[Aircraft], simulation_state : SimulationState) -> None:
         super(SimulationPhysics, self).__init__(parent)
         self.aircrafts = aircrafts
         self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle for aircraft in self.aircrafts]
         self.aircraft_fccs : List[AircraftFCC] = [aircraft.fcc for aircraft in self.aircrafts]
         self.simulation_state = simulation_state
         self.cycles : int = 0
-        self.global_start_timestamp : QTime = None
-        self.global_stop_timestamp : QTime = None
-        return
+        self.global_start_timestamp : QTime | None = None
+        self.global_stop_timestamp : QTime | None = None
 
     def run(self) -> None:
         """Runs physics simulation thread"""

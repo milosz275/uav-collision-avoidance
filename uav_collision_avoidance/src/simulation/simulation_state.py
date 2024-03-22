@@ -18,7 +18,7 @@ class SimulationState(QSettings):
         self.is_paused : bool = False
         self.is_running : bool = True
         self.reset_demanded : bool = False
-        self.pause_start_timestamp : QTime = None
+        self.pause_start_timestamp : QTime | None = None
         self.time_paused : int = 0 # ms
         self.__adsb_report : bool = True
 
@@ -29,7 +29,6 @@ class SimulationState(QSettings):
         # assets
         self.aircraft_pixmap : QPixmap = QPixmap()
         self.aircraft_pixmap.load("src/assets/aircraft.png")
-        return
     
     @property
     def adsb_report(self) -> None:
