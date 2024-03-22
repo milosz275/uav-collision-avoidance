@@ -75,7 +75,7 @@ class SimulationWidget(QWidget):
     def draw_destinations(self, aircraft : AircraftVehicle, scale : float) -> None:
         """Draws destinations of given aircraft vehicle"""
         for idx, destination in enumerate(self.aircraft_fccs[aircraft.aircraft_id].destinations):
-            self.draw_circle(destination, scale)
+            self.draw_disk(destination, 10, scale)
             self.draw_text(destination, scale, f"Destination {idx} of Aircraft {aircraft.aircraft_id}")
         return
 
@@ -90,14 +90,26 @@ class SimulationWidget(QWidget):
         painter.end()
         return
 
-    def draw_circle(self, point : QVector3D, scale : float) -> None:
-        """Draws circle at given coordinates"""
+    def draw_circle(self, point : QVector3D, size : float, scale : float) -> None:
+        """Draws circle at given coordinates (empty)"""
+        painter = QPainter(self)
+        painter.drawEllipse(
+            point.x() * scale - (size * scale / 2),
+            point.y() * scale - (size * scale / 2),
+            size * scale,
+            size * scale)
+        painter.end()
+        return
+    
+    def draw_disk(self, point : QVector3D, size : float, scale : float) -> None:
+        """Draws disk at given coordinates (full)"""
         painter = QPainter(self)
         painter.setBrush(Qt.BrushStyle.SolidPattern)
         painter.drawEllipse(
-            point.x() * scale - 5,
-            point.y() * scale - 5,
-            10, 10)
+            point.x() * scale - (size * scale / 2),
+            point.y() * scale - (size * scale / 2),
+            size * scale,
+            size * scale)
         painter.end()
         return
 
@@ -157,26 +169,35 @@ class SimulationWidget(QWidget):
         for aircraft in self.aircraft_vehicles:
             self.draw_aircraft(aircraft, scale)
             self.draw_destinations(aircraft, scale)
+            self.draw_circle(aircraft.position, self.aircraft_fccs[aircraft.aircraft_id].safezone_size, scale)
         return super().paintEvent(event)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         """Qt method controlling single click mouse input"""
         scale : float = self.simulation_state.gui_scale
-        print("click x: " + str(event.pos().x() / scale) + "; y: " + str(event.pos().y() / scale))
+        click_x : int = event.pos().x()
+        click_y : int = event.pos().y()
+        real_x : float = click_x / scale
+        real_y : float = click_y / scale
+        print(
+            "click: physical coords: x: " + "{:.2f}".format(real_x) +
+            "; y: " + "{:.2f}".format(real_y) +
+            " | window coords: x: " + "{:.2f}".format(click_x) +
+            "; y: " + "{:.2f}".format(click_y))
         if event.button() == Qt.MouseButton.LeftButton:
             self.aircraft_fccs[0].add_first_destination(QVector3D(
-                float(event.pos().x() / scale),
-                float(event.pos().y() / scale),
+                float(real_x),
+                float(real_y),
                 1000.0))
         elif event.button() == Qt.MouseButton.RightButton:
             self.aircraft_fccs[0].add_last_destination(QVector3D(
-                float(event.pos().x() / scale),
-                float(event.pos().y() / scale),
+                float(real_x),
+                float(real_y),
                 1000.0))
         elif event.button() == Qt.MouseButton.MiddleButton:
             self.aircraft_vehicles[0].teleport(
-                float(event.pos().x() / scale),
-                float(event.pos().y() / scale),
+                float(real_x),
+                float(real_y),
                 1000.0)
         return super().mousePressEvent(event)
     
@@ -195,6 +216,8 @@ class SimulationWidget(QWidget):
             self.simulation_state.toggle_pause()
         elif event.key() == Qt.Key.Key_R:
             self.simulation_state.reset()
+        elif event.key() == Qt.Key.Key_F1:
+            self.simulation_state.toggle_adsb_report()
         if self.aircrafts[0]:
             if event.key() == Qt.Key.Key_A:
                 self.aircraft_fccs[0].target_yaw_angle = -90.0
