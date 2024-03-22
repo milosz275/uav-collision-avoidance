@@ -164,12 +164,12 @@ class SimulationWidget(QWidget):
         scale : float = self.simulation_state.gui_scale
         print("click x: " + str(event.pos().x() / scale) + "; y: " + str(event.pos().y() / scale))
         if event.button() == Qt.MouseButton.LeftButton:
-            self.aircraft_fccs[0].push_destination_top(QVector3D(
+            self.aircraft_fccs[0].add_first_destination(QVector3D(
                 float(event.pos().x() / scale),
                 float(event.pos().y() / scale),
                 1000.0))
         elif event.button() == Qt.MouseButton.RightButton:
-            self.aircraft_fccs[0].append_destination(QVector3D(
+            self.aircraft_fccs[0].add_last_destination(QVector3D(
                 float(event.pos().x() / scale),
                 float(event.pos().y() / scale),
                 1000.0))
