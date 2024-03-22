@@ -57,6 +57,7 @@ class AircraftVehicle(QObject):
 
     @roll_angle.setter
     def roll_angle(self, roll_angle_delta : float):
+        """Adds roll angle delta"""
         self.__roll_angle += roll_angle_delta
     
     @property
