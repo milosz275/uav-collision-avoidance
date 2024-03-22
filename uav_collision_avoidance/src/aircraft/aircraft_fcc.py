@@ -57,17 +57,49 @@ class AircraftFCC(QObject):
         self.visited.append(copy(self.aircraft.position))
         return
 
-    def find_best_roll_angle(self, position : QVector3D, destination : QVector3D) -> float:
-        """Finds best roll angle for the destination chase"""
-        target_roll_angle : float
-        # todo
+    def normalize_angle(self, angle : float) -> float:
+        """Normalizes -180-180 angle into 360 domain"""
+        while angle < 0:
+            angle += 360
+        while angle > 360:
+            angle -= 360
+        return angle
+
+    def format_angle(self, angle : float) -> float:
+        """Formats angle into -180-180 domain"""
+        angle = self.normalize_angle(angle)
+        if angle > 180:
+            angle = -180 + (angle - 180)
+        return angle
+
+    def find_best_roll_angle(self, current_yaw_angle : float, target_yaw_angle : float) -> float:
+        """Finds best roll angle for the targeted yaw angle"""
+        target_roll_angle : float = 0.0
+
+        difference = (target_yaw_angle - current_yaw_angle + 180) % 360 - 180
+        if abs(difference) < 0.01:
+            return target_roll_angle
+        if difference > 0:
+            target_roll_angle = 30.0
+        else:
+            target_roll_angle = -30.0
         return target_roll_angle
 
+    def find_best_yaw_angle(self, position : QVector3D, destination : QVector3D) -> float:
+        """Finds best yaw angle for the destination chase"""
+        target_yaw_angle : float  = degrees(atan2(
+            destination.y() - position.y(),
+            destination.x() - position.x()))
+        target_yaw_angle += 90
+        target_yaw_angle = self.format_angle(target_yaw_angle)
+
+        return target_yaw_angle
+
     def update(self) -> None:
-        """Updates current targetted movement angles"""
+        """Updates current targeted movement angles"""
         target_yaw_angle = self.target_yaw_angle
 
-        if self.destinations:
+        if len(self.destinations) > 0:
             destination = self.destinations[0]
             distance = dist(self.aircraft.position.toTuple(), destination.toTuple())
             if distance < self.aircraft.size / 2:
@@ -80,35 +112,21 @@ class AircraftFCC(QObject):
                     logging.info("Aircraft %s visited destination and is free now", self.aircraft.aircraft_id)
                     print(f"Aircraft {self.aircraft.aircraft_id} visited destination and is free now")
                     return
-            abs_target_yaw_angle : float  = degrees(atan2(
-                destination.y() - self.aircraft.position.y(),
-                destination.x() - self.aircraft.position.x()))
-            abs_target_yaw_angle += 90
-            if abs_target_yaw_angle < 0:
-                abs_target_yaw_angle += 360
-            elif abs_target_yaw_angle > 360:
-                abs_target_yaw_angle -= 360
-            target_yaw_angle = abs_target_yaw_angle
-            if target_yaw_angle > 180:
-                target_yaw_angle = -180 + (target_yaw_angle - 180)
-            self.target_yaw_angle = target_yaw_angle # -180 to 180
+            self.target_yaw_angle = self.find_best_yaw_angle(
+                self.aircraft.position,
+                destination)
         
-        current_yaw_angle : float = self.aircraft.yaw_angle
-        if target_yaw_angle < 0:
-            target_yaw_angle += 360
-        if current_yaw_angle < 0:
-            current_yaw_angle += 360
-        
-        difference = (target_yaw_angle - current_yaw_angle + 180) % 360 - 180
-        if abs(difference) < 0.01:
-            if len(self.destinations) > 1: # next destination
-                pass # todo
-            else:
-                self.target_roll_angle = 0.0
-                return
-        if difference > 0:
-            self.target_roll_angle = 30.0
-        else:
-            self.target_roll_angle = -30.0
+        current_yaw_angle = self.normalize_angle(self.aircraft.yaw_angle)
+        target_yaw_angle = self.normalize_angle(target_yaw_angle)
+        self.target_roll_angle = self.find_best_roll_angle(current_yaw_angle, target_yaw_angle)
 
+        if len(self.destinations) <= 1:
+            return
+        else:
+            difference = (target_yaw_angle - current_yaw_angle + 180) % 360 - 180
+            if abs(difference) < 0.01:
+                next_position = destination
+                next_destination = self.destinations[1]
+                next_target_yaw_angle : float = self.find_best_yaw_angle(next_position, next_destination)
+                self.target_roll_angle = self.find_best_roll_angle(current_yaw_angle, next_target_yaw_angle)
         return
