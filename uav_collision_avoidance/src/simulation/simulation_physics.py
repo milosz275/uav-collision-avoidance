@@ -2,7 +2,7 @@
 
 import logging
 from copy import copy
-from math import sin, cos, dist, tan, radians, degrees
+from math import sin, cos, dist, tan, radians
 from typing import List
 
 from PySide6.QtCore import QThread, QTime
@@ -53,11 +53,11 @@ class SimulationPhysics(QThread):
     def update_aircrafts_position(self, elapsed_time : float) -> bool:
         """Updates aircrafts position, returns true on collision"""
         for aircraft in self.aircraft_vehicles:
-            miss_distance : float = dist(aircraft.position.toTuple(), self.aircraft_vehicles[1 - aircraft.aircraft_id].position.toTuple())
+            relative_distance : float = dist(aircraft.position.toTuple(), self.aircraft_vehicles[1 - aircraft.aircraft_id].position.toTuple())
             fcc : AircraftFCC = self.aircraft_fccs[aircraft.aircraft_id]
             
             # safezone occupancy
-            if miss_distance <= (fcc.safezone_size() / 2):
+            if relative_distance <= (fcc.safezone_size() / 2):
                 if not fcc.safezone_occupied():
                     fcc.safezone_occupied(True)
                     print("Aircraft " + str(1 - aircraft.aircraft_id) + " entered safezone of Aircraft " + str(aircraft.aircraft_id))
@@ -67,7 +67,7 @@ class SimulationPhysics(QThread):
                     print("Aircraft " + str(1 - aircraft.aircraft_id) + " left safezone of Aircraft " + str(aircraft.aircraft_id))
 
             # collision
-            if miss_distance <= aircraft.size:
+            if relative_distance <= aircraft.size:
                 print("Collision")
                 return True
                 
