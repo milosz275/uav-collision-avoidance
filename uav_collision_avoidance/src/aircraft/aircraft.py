@@ -12,10 +12,10 @@ class Aircraft(QObject):
     
     __current_id : int = 0
 
-    def __init__(self, position : QVector3D, speed : QVector3D, state : SimulationState) -> None:
+    def __init__(self, position : QVector3D, speed : QVector3D, initial_target : QVector3D, state : SimulationState) -> None:
         self.__aircraft_id = self.__obtain_id()
         self.__vehicle = AircraftVehicle(self.__aircraft_id, position=position, speed=speed, state=state)
-        self.__fcc = AircraftFCC(self.__aircraft_id, self.__vehicle)
+        self.__fcc = AircraftFCC(self.__aircraft_id, initial_target, self.__vehicle)
     
     @property
     def vehicle(self) -> AircraftVehicle:
