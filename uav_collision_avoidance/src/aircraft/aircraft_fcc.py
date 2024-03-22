@@ -3,6 +3,7 @@
 import logging
 from copy import copy
 from typing import List
+from collections import deque
 from math import dist, atan2, degrees
 
 from PySide6.QtCore import QObject
@@ -26,7 +27,7 @@ class AircraftFCC(QObject):
         self.target_pitch_angle : float = 0.0
         # self.target_speed : float = 100.0
 
-        self.destinations : List[QVector3D] = []
+        self.destinations : deque[QVector3D] = deque()
         self.destinations_history : List[QVector3D] = []
         self.visited : List[QVector3D] = []
         return
@@ -41,17 +42,14 @@ class AircraftFCC(QObject):
             self.__safezone_occupied = occupied
         return self.__safezone_occupied
     
-    def append_destination(self, destination : QVector3D) -> None:
+    def add_last_destination(self, destination : QVector3D) -> None:
         """Appends given location to the end of destinations list"""
         self.destinations.append(destination)
         return
     
-    def push_destination_top(self, destination : QVector3D) -> None:
+    def add_first_destination(self, destination : QVector3D) -> None:
         """Pushes given location to the top of destinations list"""
-        new_list : List[QVector3D] = [destination]
-        for destination in self.destinations:
-            new_list.append(destination)
-        self.destinations = new_list
+        self.destinations.appendleft(destination)
         return
     
     def append_visited(self) -> None:
@@ -73,7 +71,7 @@ class AircraftFCC(QObject):
             destination = self.destinations[0]
             distance = dist(self.aircraft.position.toTuple(), destination.toTuple())
             if distance < self.aircraft.size / 2:
-                self.destinations_history.append(self.destinations.pop(0))
+                self.destinations_history.append(self.destinations.pop())
                 if self.destinations:
                     destination = self.destinations[0]
                     logging.info("Aircraft %s visited destination and took next one", self.aircraft.aircraft_id)
