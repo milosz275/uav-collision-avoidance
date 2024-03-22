@@ -57,13 +57,13 @@ class SimulationPhysics(QThread):
             fcc : AircraftFCC = self.aircraft_fccs[aircraft.aircraft_id]
             
             # safezone occupancy
-            if relative_distance <= (fcc.safezone_size() / 2):
-                if not fcc.safezone_occupied():
-                    fcc.safezone_occupied(True)
+            if relative_distance <= (fcc.safezone_size / 2):
+                if not fcc.safezone_occupied:
+                    fcc.safezone_occupied = True
                     print("Aircraft " + str(1 - aircraft.aircraft_id) + " entered safezone of Aircraft " + str(aircraft.aircraft_id))
             else:
-                if fcc.safezone_occupied():
-                    fcc.safezone_occupied(False)
+                if fcc.safezone_occupied:
+                    fcc.safezone_occupied = False
                     print("Aircraft " + str(1 - aircraft.aircraft_id) + " left safezone of Aircraft " + str(aircraft.aircraft_id))
 
             # collision
