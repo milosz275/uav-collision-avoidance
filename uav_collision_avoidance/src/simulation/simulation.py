@@ -38,8 +38,16 @@ class Simulation(QMainWindow):
         self.state = SimulationState(SimulationSettings(), is_realtime=True)
 
         self.aircrafts : List[Aircraft] = [
-            Aircraft(position=QVector3D(10, 10, 1000), speed=QVector3D(50, 50, 0), state=self.state),
-            Aircraft(position=QVector3D(100, 100, 1000), speed=QVector3D(100, 0, 0), state=self.state),
+            Aircraft(
+                position=QVector3D(10, 1000, 1000),
+                speed=QVector3D(50, -50, 0),
+                initial_target=QVector3D(100_000, -100_000, 1000),
+                state=self.state),
+            Aircraft(
+                position=QVector3D(1300, 1300, 1000),
+                speed=QVector3D(-80, -80, 0),
+                initial_target=QVector3D(-100_000, -100_000, 1000),
+                state=self.state),
         ]
 
         self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle for aircraft in self.aircrafts]
