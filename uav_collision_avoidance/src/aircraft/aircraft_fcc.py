@@ -59,6 +59,12 @@ class AircraftFCC(QObject):
         self.visited.append(copy(self.aircraft.position))
         return
 
+    def find_best_roll_angle(self, position : QVector3D, destination : QVector3D) -> float:
+        """Finds best roll angle for the destination chase"""
+        target_roll_angle : float
+        # todo
+        return target_roll_angle
+
     def update(self) -> None:
         """Updates current targetted movement angles"""
         target_yaw_angle = self.target_yaw_angle
@@ -88,9 +94,7 @@ class AircraftFCC(QObject):
             if target_yaw_angle > 180:
                 target_yaw_angle = -180 + (target_yaw_angle - 180)
             self.target_yaw_angle = target_yaw_angle # -180 to 180
-
-            # todo: add pre-roll for next destination
-
+        
         current_yaw_angle : float = self.aircraft.yaw_angle
         if target_yaw_angle < 0:
             target_yaw_angle += 360
@@ -98,9 +102,12 @@ class AircraftFCC(QObject):
             current_yaw_angle += 360
         
         difference = (target_yaw_angle - current_yaw_angle + 180) % 360 - 180
-        if abs(difference) < 6.0:
-            self.target_roll_angle = 0.0
-            return
+        if abs(difference) < 0.01:
+            if len(self.destinations) > 1: # next destination
+                pass # todo
+            else:
+                self.target_roll_angle = 0.0
+                return
         if difference > 0:
             self.target_roll_angle = 30.0
         else:
