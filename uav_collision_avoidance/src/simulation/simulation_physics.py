@@ -44,6 +44,8 @@ class SimulationPhysics(QThread):
                 if self.update_aircrafts_position(elapsed_time):
                     logging.info("Aircrafts collided")
                     QApplication.beep()
+                    # self.aircraft_vehicles[0].speed = QVector3D(0, 0, 0)
+                    # self.aircraft_vehicles[1].speed = QVector3D(0, 0, 0)
                     self.requestInterruption()
             self.msleep(max(0, (self.simulation_state.simulation_threshold) - start_timestamp.msecsTo(QTime.currentTime())))
         self.global_stop_timestamp = QTime.currentTime()
