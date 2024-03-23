@@ -218,6 +218,10 @@ class SimulationWidget(QWidget):
             self.simulation_state.reset()
         elif event.key() == Qt.Key.Key_F1:
             self.simulation_state.toggle_adsb_report()
+        elif event.key() == Qt.Key.Key_F2:
+            self.aircraft_fccs[0].target_speed -= 10.0
+        elif event.key() == Qt.Key.Key_F3:
+            self.aircraft_fccs[0].target_speed += 10.0
         if self.aircrafts[0]:
             if event.key() == Qt.Key.Key_A:
                 self.aircraft_fccs[0].target_yaw_angle = -90.0
