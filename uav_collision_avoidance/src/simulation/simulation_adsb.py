@@ -33,6 +33,7 @@ class SimulationADSB(QThread):
                     if aircraft.aircraft_id == 0:
                         print("Aircraft id: " + str(aircraft.aircraft_id) +
                             "; speed: " + "{:.2f}".format(aircraft.absolute_speed) +
+                            "; target speed: " + "{:.2f}".format(self.aircraft_fccs[aircraft.aircraft_id].target_speed) +
                             "; x: " + "{:.2f}".format(aircraft.position.x()) +
                             "; y: " + "{:.2f}".format(aircraft.position.y()) +
                             "; yaw angle: " + "{:.2f}".format(aircraft.yaw_angle) +
