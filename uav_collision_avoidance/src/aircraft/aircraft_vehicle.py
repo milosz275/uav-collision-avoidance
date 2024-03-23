@@ -42,6 +42,11 @@ class AircraftVehicle(QObject):
         """Returns speed"""
         return self.__speed
     
+    @speed.setter
+    def speed(self, speed : QVector3D) -> QVector3D:
+        """Sets speed"""
+        self.__speed = speed
+    
     @property
     def size(self) -> float:
         """Returns size"""
