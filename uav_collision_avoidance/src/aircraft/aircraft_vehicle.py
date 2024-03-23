@@ -115,8 +115,14 @@ class AircraftVehicle(QObject):
             return QVector3D(0, 0, self.__speed.z()).length()
 
     @property
-    def yaw_angle(self, speed : QVector3D | None = None) -> float:
+    def yaw_angle(self) -> float:
         """Returns yaw (heading) angle"""
+        with QMutexLocker(self.__mutex):
+            return degrees(atan2(self.__speed.x(), -self.__speed.y()))
+        
+    @yaw_angle.getter
+    def yaw_angle(self, speed : QVector3D | None = None) -> float:
+        """Returns yaw (heading) angle of given speed vector"""
         if speed is None:
             with QMutexLocker(self.__mutex):
                 return degrees(atan2(self.__speed.x(), -self.__speed.y()))
