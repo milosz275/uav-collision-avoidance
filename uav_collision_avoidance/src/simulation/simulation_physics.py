@@ -86,6 +86,27 @@ class SimulationPhysics(QThread):
         for aircraft in self.aircraft_vehicles:
             fcc : AircraftFCC = self.aircraft_fccs[aircraft.aircraft_id]
             
+            # speed
+            current_speed = aircraft.absolute_speed
+            target_speed = fcc.target_speed
+            speed_difference = abs(current_speed - target_speed)
+            if speed_difference > 0.001:
+                max_speed_delta = 0.1 # todo: calculate
+                if speed_difference < max_speed_delta:
+                    pass # become target
+                elif current_speed < target_speed:
+                    target_speed = current_speed + max_speed_delta
+                else:
+                    target_speed = current_speed - max_speed_delta
+                speed_scale_factor : float = target_speed / current_speed
+                current_x = aircraft.speed.x()
+                current_y = aircraft.speed.y()
+                current_z = aircraft.speed.z()
+                scaled_x = current_x * speed_scale_factor
+                scaled_y = current_y * speed_scale_factor
+                scaled_z = current_z * speed_scale_factor
+                aircraft.accelerate(scaled_x - current_x, scaled_y - current_y, scaled_z - current_z)
+
             # flight control computer
             fcc.update()
 
