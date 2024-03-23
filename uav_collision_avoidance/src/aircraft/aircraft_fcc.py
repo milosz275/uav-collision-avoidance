@@ -25,7 +25,7 @@ class AircraftFCC(QObject):
         self.target_yaw_angle : float = self.find_best_yaw_angle(aircraft.position, initial_target)
         self.target_roll_angle : float = 0.0
         self.target_pitch_angle : float = 0.0
-        # self.target_speed : float = 100.0
+        self.target_speed : float = self.aircraft.absolute_speed
 
         self.__evade_maneuver : bool = False
 
@@ -105,7 +105,7 @@ class AircraftFCC(QObject):
         return target_roll_angle
 
     def find_best_yaw_angle(self, position : QVector3D, destination : QVector3D) -> float:
-        """Finds best yaw angle for the destination chase"""
+        """Finds best yaw angle for the given destination"""
         target_yaw_angle : float  = degrees(atan2(
             destination.y() - position.y(),
             destination.x() - position.x()))
