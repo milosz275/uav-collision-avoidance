@@ -23,6 +23,8 @@ Python3[^1] project is wrapped as a PyPi package[^2]. PySide6[^3], which is PyQt
 
 ~~Use `pip install uav-collision-avoidance` to install the app~~ or build it by cloning the repo and running the following commands:
 
+[![Bash](https://skillicons.dev/icons?i=bash)](https://skillicons.dev)
+
 ```bash
 #!/bin/bash
 python3 -m venv venv
@@ -31,6 +33,8 @@ pip install -r requirements.txt
 cd uav-collision-avoidance
 python main.py
 ```
+
+[![Powershell](https://skillicons.dev/icons?i=powershell)](https://skillicons.dev)
 
 ```powershell
 python -m venv venv
