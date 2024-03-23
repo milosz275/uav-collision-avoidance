@@ -39,12 +39,12 @@ class Simulation(QMainWindow):
             Aircraft(
                 position = QVector3D(10, 1000, 1000),
                 speed = QVector3D(50, -50, 0),
-                initial_target = QVector3D(100_000, -100_000, 1000),
+                initial_target = QVector3D(1000_000, -1000_000, 1000),
                 state = self.state),
             Aircraft(
                 position = QVector3D(1300, 1300, 1000),
                 speed = QVector3D(-80, -80, 0),
-                initial_target = QVector3D(-100_000, -100_000, 1000),
+                initial_target = QVector3D(-1000_000, -1000_000, 1000),
                 state = self.state),
         ]
 
@@ -110,8 +110,9 @@ class Simulation(QMainWindow):
             print("Time elapsed: " + "{:.2f}".format(real_time) + "s")
         else:
             print("Time elapsed: " + "{:.2f}".format(real_time) + "s (" + "{:.2f}".format(real_time_pauses) + "s with pauses)")
-        print("Time efficiency: " + "{:.2f}".format(simulated_time / real_time * 100) + "%")
-        logging.info("Calculated time efficiency: " + "{:.2f}".format(simulated_time / real_time * 100) + "%")
+        if real_time != 0:
+            print("Time efficiency: " + "{:.2f}".format(simulated_time / real_time * 100) + "%")
+            logging.info("Calculated time efficiency: " + "{:.2f}".format(simulated_time / real_time * 100) + "%")
 
         self.export_visited_locations()
 
