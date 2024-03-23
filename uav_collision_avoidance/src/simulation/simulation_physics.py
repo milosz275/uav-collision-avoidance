@@ -60,10 +60,12 @@ class SimulationPhysics(QThread):
                 if not fcc.safezone_occupied:
                     fcc.safezone_occupied = True
                     print("Aircraft " + str(1 - aircraft.aircraft_id) + " entered safezone of Aircraft " + str(aircraft.aircraft_id))
+                    fcc.apply_evade_maneuver()
             else:
                 if fcc.safezone_occupied:
                     fcc.safezone_occupied = False
                     print("Aircraft " + str(1 - aircraft.aircraft_id) + " left safezone of Aircraft " + str(aircraft.aircraft_id))
+                    # revoke evade maneuver?
 
             # collision
             if relative_distance <= aircraft.size:
@@ -84,7 +86,9 @@ class SimulationPhysics(QThread):
         if elapsed_time == 0.0:
             return
         for aircraft in self.aircraft_vehicles:
+            # flight control computer
             fcc : AircraftFCC = self.aircraft_fccs[aircraft.aircraft_id]
+            fcc.update()
             
             # speed
             current_speed = aircraft.absolute_speed
@@ -106,9 +110,6 @@ class SimulationPhysics(QThread):
                 scaled_y = current_y * speed_scale_factor
                 scaled_z = current_z * speed_scale_factor
                 aircraft.accelerate(scaled_x - current_x, scaled_y - current_y, scaled_z - current_z)
-
-            # flight control computer
-            fcc.update()
 
             # roll angle
             aircraft.roll_angle = (1.0 / (aircraft.roll_dynamic_delay / elapsed_time)) * (fcc.target_roll_angle - aircraft.roll_angle)
