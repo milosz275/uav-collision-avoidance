@@ -10,7 +10,6 @@ from PySide6.QtGui import QCloseEvent, QVector3D
 from PySide6.QtWidgets import QMainWindow
 
 from src.aircraft.aircraft import Aircraft
-from src.aircraft.aircraft_vehicle import AircraftVehicle
 from src.aircraft.aircraft_fcc import AircraftFCC
 from src.simulation.simulation_settings import SimulationSettings
 from src.simulation.simulation_physics import SimulationPhysics
@@ -34,38 +33,35 @@ class Simulation(QMainWindow):
             print("Another instance already running")
             return
         logging.info("Starting realtime simulation")
-        self.state = SimulationState(SimulationSettings(), is_realtime=True)
+        self.state = SimulationState(SimulationSettings(), is_realtime = True)
 
         self.aircrafts : List[Aircraft] = [
             Aircraft(
-                position=QVector3D(10, 1000, 1000),
-                speed=QVector3D(50, -50, 0),
-                initial_target=QVector3D(100_000, -100_000, 1000),
-                state=self.state),
+                position = QVector3D(10, 1000, 1000),
+                speed = QVector3D(50, -50, 0),
+                initial_target = QVector3D(100_000, -100_000, 1000),
+                state = self.state),
             Aircraft(
-                position=QVector3D(1300, 1300, 1000),
-                speed=QVector3D(-80, -80, 0),
-                initial_target=QVector3D(-100_000, -100_000, 1000),
-                state=self.state),
+                position = QVector3D(1300, 1300, 1000),
+                speed = QVector3D(-80, -80, 0),
+                initial_target = QVector3D(-100_000, -100_000, 1000),
+                state = self.state),
         ]
 
-        self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle for aircraft in self.aircrafts]
-        self.aircraft_fccs : List[AircraftFCC] = [aircraft.fcc for aircraft in self.aircrafts]
-
         self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
-        self.simulation_physics.start(priority=QThread.Priority.TimeCriticalPriority)
+        self.simulation_physics.start(priority = QThread.Priority.TimeCriticalPriority)
 
         self.simulation_adsb = SimulationADSB(self, self.aircrafts, self.state)
-        self.simulation_adsb.start(priority=QThread.Priority.NormalPriority)
+        self.simulation_adsb.start(priority = QThread.Priority.NormalPriority)
 
         self.simulation_fps = SimulationFPS(self, self.state)
-        self.simulation_fps.start(priority=QThread.Priority.NormalPriority)
+        self.simulation_fps.start(priority = QThread.Priority.NormalPriority)
 
         self.simulation_widget = SimulationWidget(self.aircrafts, self.simulation_fps, self.state)
         self.simulation_widget.show()
 
         self.simulation_render = SimulationRender(self, self.simulation_widget, self.state)
-        self.simulation_render.start(priority=QThread.Priority.NormalPriority)
+        self.simulation_render.start(priority = QThread.Priority.NormalPriority)
 
         self.simulation_widget.stop_signal.connect(self.stop_simulation)
         return
@@ -138,7 +134,8 @@ class Simulation(QMainWindow):
     def export_visited_locations(self) -> None:
         """Exports aircrafts visited location lists"""
         export_time = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
-        for aircraft in self.aircraft_fccs:
+        aircraft_fccs : List[AircraftFCC] = [aircraft.fcc for aircraft in self.aircrafts]
+        for aircraft in aircraft_fccs:
             try:
                 file = open(f"logs/visited-aircraft-{aircraft.aircraft_id}-{export_time}.csv", "w")
             except:
