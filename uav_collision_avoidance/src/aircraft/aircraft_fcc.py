@@ -60,6 +60,16 @@ class AircraftFCC(QObject):
         """Appends current location to visited list"""
         self.visited.append(copy(self.aircraft.position))
 
+    def normalize_angle(self, angle : float) -> float:
+        """Normalizes -180-180 angle into 360 domain"""
+        angle = angle % 360
+        return angle if angle >= 0 else angle + 360
+
+    def format_angle(self, angle : float) -> float:
+        """Formats angle into -180-180 domain"""
+        angle = self.normalize_angle(angle)
+        return angle if angle <= 180 else -180 + (angle - 180)
+
     def apply_evade_maneuver(self) -> None:
         """Applies evade maneuver"""
         if self.__evade_maneuver:
@@ -71,16 +81,6 @@ class AircraftFCC(QObject):
             # add maneuver end position, 
             # check if original destination is restored,
             # reset evade maneuver flag
-
-    def normalize_angle(self, angle : float) -> float:
-        """Normalizes -180-180 angle into 360 domain"""
-        angle = angle % 360
-        return angle if angle >= 0 else angle + 360
-
-    def format_angle(self, angle : float) -> float:
-        """Formats angle into -180-180 domain"""
-        angle = self.normalize_angle(angle)
-        return angle if angle <= 180 else -180 + (angle - 180)
 
     def find_best_roll_angle(self, current_yaw_angle : float, target_yaw_angle : float) -> float:
         """Finds best roll angle for the targeted yaw angle"""
@@ -95,8 +95,8 @@ class AircraftFCC(QObject):
         target_yaw_angle += 90
         return self.format_angle(target_yaw_angle)
 
-    def update(self) -> None:
-        """Updates current targeted movement angles"""
+    def update_target_yaw_angle(self) -> None:
+        """Updates current yaw angle"""
         if self.destinations:
             destination = self.destinations[0]
             distance = dist(self.aircraft.position.toTuple(), destination.toTuple())
@@ -113,7 +113,9 @@ class AircraftFCC(QObject):
             self.target_yaw_angle = self.find_best_yaw_angle(
                 self.aircraft.position,
                 destination)
-        
+            
+    def update_target_roll_angle(self) -> None:
+        """Updates target roll angle"""
         current_yaw_angle = self.normalize_angle(self.aircraft.yaw_angle)
         target_yaw_angle = self.normalize_angle(self.target_yaw_angle)
         self.target_roll_angle = self.find_best_roll_angle(current_yaw_angle, target_yaw_angle)
@@ -121,7 +123,13 @@ class AircraftFCC(QObject):
         if len(self.destinations) > 1:
             difference = (target_yaw_angle - current_yaw_angle + 180) % 360 - 180
             if abs(difference) < 0.01:
-                next_position = destination
+                next_position = self.destinations[0]
                 next_destination = self.destinations[1]
                 next_target_yaw_angle : float = self.find_best_yaw_angle(next_position, next_destination)
                 self.target_roll_angle = self.find_best_roll_angle(current_yaw_angle, next_target_yaw_angle)
+
+    def update(self) -> None:
+        """Updates current targeted movement angles"""
+        self.update_target_yaw_angle()
+        self.update_target_roll_angle()
+        
