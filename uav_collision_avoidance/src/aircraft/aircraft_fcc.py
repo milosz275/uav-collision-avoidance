@@ -47,62 +47,45 @@ class AircraftFCC(QObject):
     def safezone_occupied(self, occupied : bool) -> None:
         """Sets safezone state"""
         self.__safezone_occupied = occupied
-    
+
     def add_last_destination(self, destination : QVector3D) -> None:
         """Appends given location to the end of destinations list"""
         self.destinations.append(destination)
-        return
-    
+
     def add_first_destination(self, destination : QVector3D) -> None:
         """Pushes given location to the top of destinations list"""
         self.destinations.appendleft(destination)
-        return
-    
+
     def append_visited(self) -> None:
         """Appends current location to visited list"""
         self.visited.append(copy(self.aircraft.position))
-        return
 
     def apply_evade_maneuver(self) -> None:
         """Applies evade maneuver"""
         if self.__evade_maneuver:
-            logging.warn("Another evade maneuver in progress")
-            return
-        self.__evade_maneuver = True
-        # todo: calculate turn radius, apply roll angle,
-        # add corner enter position,
-        # add maneuver end position, 
-        # check if original destination is restored,
-        # reset evade maneuver flag
-        return
+            logging.warning("Another evade maneuver in progress")
+        else:
+            self.__evade_maneuver = True
+            # todo: calculate turn radius, apply roll angle,
+            # add corner enter position,
+            # add maneuver end position, 
+            # check if original destination is restored,
+            # reset evade maneuver flag
 
     def normalize_angle(self, angle : float) -> float:
         """Normalizes -180-180 angle into 360 domain"""
-        while angle < 0:
-            angle += 360
-        while angle > 360:
-            angle -= 360
-        return angle
+        angle = angle % 360
+        return angle if angle >= 0 else angle + 360
 
     def format_angle(self, angle : float) -> float:
         """Formats angle into -180-180 domain"""
         angle = self.normalize_angle(angle)
-        if angle > 180:
-            angle = -180 + (angle - 180)
-        return angle
+        return angle if angle <= 180 else -180 + (angle - 180)
 
     def find_best_roll_angle(self, current_yaw_angle : float, target_yaw_angle : float) -> float:
         """Finds best roll angle for the targeted yaw angle"""
-        target_roll_angle : float = 0.0
-
         difference = (target_yaw_angle - current_yaw_angle + 180) % 360 - 180
-        if abs(difference) < 0.01:
-            return target_roll_angle
-        if difference > 0:
-            target_roll_angle = 30.0
-        else:
-            target_roll_angle = -30.0
-        return target_roll_angle
+        return 0.0 if abs(difference) < 0.01 else 30.0 if difference > 0 else -30.0
 
     def find_best_yaw_angle(self, position : QVector3D, destination : QVector3D) -> float:
         """Finds best yaw angle for the given destination"""
@@ -110,15 +93,11 @@ class AircraftFCC(QObject):
             destination.y() - position.y(),
             destination.x() - position.x()))
         target_yaw_angle += 90
-        target_yaw_angle = self.format_angle(target_yaw_angle)
-
-        return target_yaw_angle
+        return self.format_angle(target_yaw_angle)
 
     def update(self) -> None:
         """Updates current targeted movement angles"""
-        target_yaw_angle = self.target_yaw_angle
-
-        if len(self.destinations) > 0:
+        if self.destinations:
             destination = self.destinations[0]
             distance = dist(self.aircraft.position.toTuple(), destination.toTuple())
             if distance < self.aircraft.size / 2:
@@ -136,16 +115,13 @@ class AircraftFCC(QObject):
                 destination)
         
         current_yaw_angle = self.normalize_angle(self.aircraft.yaw_angle)
-        target_yaw_angle = self.normalize_angle(target_yaw_angle)
+        target_yaw_angle = self.normalize_angle(self.target_yaw_angle)
         self.target_roll_angle = self.find_best_roll_angle(current_yaw_angle, target_yaw_angle)
 
-        if len(self.destinations) <= 1:
-            return
-        else:
+        if len(self.destinations) > 1:
             difference = (target_yaw_angle - current_yaw_angle + 180) % 360 - 180
             if abs(difference) < 0.01:
                 next_position = destination
                 next_destination = self.destinations[1]
                 next_target_yaw_angle : float = self.find_best_yaw_angle(next_position, next_destination)
                 self.target_roll_angle = self.find_best_roll_angle(current_yaw_angle, next_target_yaw_angle)
-        return
