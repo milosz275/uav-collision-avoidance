@@ -13,7 +13,7 @@ class AircraftVehicle(QObject):
     roll_dynamic_delay : float = 1000 # ms
     pitch_dynamic_delay : float = 2000 # ms
 
-    def __init__(self, aircraft_id : int, position : QVector3D, speed : QVector3D, state : SimulationState) -> None:
+    def __init__(self, aircraft_id : int, position : QVector3D, speed : QVector3D) -> None:
         super().__init__()
         self.__mutex : QMutex = QMutex()
         
@@ -23,10 +23,7 @@ class AircraftVehicle(QObject):
             self.__position.setZ(0)
         self.__speed = speed
 
-        self.__state = state
-
         self.__size : float = 20.0
-        self.__course : float = self.yaw_angle
         self.__roll_angle = 0.0 # bank angle
         self.__distance_covered : float = 0.0
 
