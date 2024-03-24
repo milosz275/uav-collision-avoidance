@@ -72,13 +72,13 @@ class AircraftVehicle(QObject):
         """Appends delta to distance covered"""
         self.__distance_covered += distance_covered_delta
     
-    def teleport(self, x : float, y : float, z : float = 0.0) -> None:
+    def teleport(self, position : QVector3D) -> None:
         """Teleports the vehicle"""
         with QMutexLocker(self.__mutex):
-            self.__position.setX(x)
-            self.__position.setY(y)
-            self.__position.setZ(z)
-
+            self.__position.setX(position.x())
+            self.__position.setY(position.y())
+            self.__position.setZ(position.z())
+    
     def move(self, dx : float, dy : float, dz : float = 0.0) -> None:
         """Applies position deltas for the vehicle"""
         with QMutexLocker(self.__mutex):
