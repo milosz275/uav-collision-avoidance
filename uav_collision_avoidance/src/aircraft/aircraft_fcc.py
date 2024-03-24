@@ -20,7 +20,7 @@ class AircraftFCC(QObject):
         self.aircraft = aircraft
 
         self.__safezone_occupied : bool = False
-        self.__safezone_size : float = 200.0
+        self.__safezone_size : float = 500.0
 
         self.target_yaw_angle : float = self.find_best_yaw_angle(aircraft.position, initial_target)
         self.target_roll_angle : float = 0.0
