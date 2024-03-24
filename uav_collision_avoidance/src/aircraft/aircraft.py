@@ -1,5 +1,7 @@
 """Aircraft class module"""
 
+from copy import copy
+
 from PySide6.QtCore import QObject
 from PySide6.QtGui import QVector3D
 
@@ -12,10 +14,11 @@ class Aircraft(QObject):
     
     __current_id : int = 0
 
-    def __init__(self, position : QVector3D, speed : QVector3D, initial_target : QVector3D, state : SimulationState) -> None:
+    def __init__(self, position : QVector3D, speed : QVector3D, initial_target : QVector3D) -> None:
         self.__aircraft_id = self.__obtain_id()
         self.__vehicle = AircraftVehicle(self.__aircraft_id, position=position, speed=speed)
         self.__fcc = AircraftFCC(self.__aircraft_id, initial_target, self.__vehicle)
+        self.__initial_position = copy(position)
     
     @property
     def vehicle(self) -> AircraftVehicle:
@@ -26,6 +29,11 @@ class Aircraft(QObject):
     def fcc(self) -> AircraftFCC:
         """Returns aircraft fcc"""
         return self.__fcc
+    
+    @property
+    def initial_position(self) -> QVector3D:
+        """Returns initial position"""
+        return self.__initial_position
 
     def __obtain_id(self) -> int:
         """Gets unique id for the aircraft"""
