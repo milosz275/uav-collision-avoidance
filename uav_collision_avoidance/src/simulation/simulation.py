@@ -39,13 +39,11 @@ class Simulation(QMainWindow):
             Aircraft(
                 position = QVector3D(10, 1000, 1000),
                 speed = QVector3D(50, -50, 0),
-                initial_target = QVector3D(1000_000, -1000_000, 1000),
-                state = self.state),
+                initial_target = QVector3D(1000_000, -1000_000, 1000)),
             Aircraft(
                 position = QVector3D(1300, 1300, 1000),
                 speed = QVector3D(-80, -80, 0),
-                initial_target = QVector3D(-1000_000, -1000_000, 1000),
-                state = self.state),
+                initial_target = QVector3D(-1000_000, -1000_000, 1000)),
         ]
 
         self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
