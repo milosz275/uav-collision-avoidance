@@ -158,6 +158,11 @@ class SimulationWidget(QWidget):
         painter.drawPolygon(polygon)
         painter.end()
         return
+    
+    def draw_miss_distance_vector(self, aircraft : AircraftVehicle, scale : float) -> None:
+        """Draws miss distance vector for given aircraft vehicle"""
+        # todo
+        return
 
     def paintEvent(self, event : QPaintEvent) -> None:
         """Qt method painting the aircrafts"""
@@ -170,6 +175,7 @@ class SimulationWidget(QWidget):
             self.draw_destinations(aircraft, scale)
             self.draw_circle(aircraft.position, self.aircraft_fccs[aircraft.aircraft_id].safezone_size, scale)
             self.draw_vector(aircraft.position, aircraft.position + aircraft.speed, scale)
+            self.draw_miss_distance_vector(aircraft, scale)
         return super().paintEvent(event)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
@@ -195,10 +201,10 @@ class SimulationWidget(QWidget):
                 real_y,
                 1000.0))
         elif event.button() == Qt.MouseButton.MiddleButton:
-            self.aircraft_vehicles[0].teleport(
+            self.aircraft_vehicles[0].teleport(QVector3D(
                 real_x,
                 real_y,
-                1000.0)
+                1000.0))
         return super().mousePressEvent(event)
     
     def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
@@ -216,6 +222,10 @@ class SimulationWidget(QWidget):
             self.simulation_state.toggle_pause()
         elif event.key() == Qt.Key.Key_R:
             self.simulation_state.reset()
+        elif event.key() == Qt.Key.Key_Plus:
+            self.simulation_state.gui_scale += 0.25
+        elif event.key() == Qt.Key.Key_Minus:
+            self.simulation_state.gui_scale -= 0.25
         elif event.key() == Qt.Key.Key_F1:
             self.simulation_state.toggle_adsb_report()
         elif event.key() == Qt.Key.Key_F2:
