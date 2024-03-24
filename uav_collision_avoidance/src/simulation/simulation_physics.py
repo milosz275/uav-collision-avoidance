@@ -33,9 +33,11 @@ class SimulationPhysics(QThread):
         while not self.isInterruptionRequested():
             start_timestamp = QTime.currentTime()
             if self.simulation_state.reset_demanded:
+                self.aircraft_vehicles[0].teleport(self.aircrafts[0].initial_position)
+                self.aircraft_vehicles[1].teleport(self.aircrafts[1].initial_position)
+                self.aircraft_fccs[0].destinations.clear()
+                self.aircraft_fccs[1].destinations.clear()
                 self.simulation_state.apply_reset()
-                self.aircraft_vehicles[0].teleport(10, 10, 1000)
-                self.aircraft_vehicles[1].teleport(100, 100, 1000)
             if not self.simulation_state.is_paused:
                 self.count_cycles()
                 self.simulation_state.update_simulation_settings()
@@ -44,8 +46,6 @@ class SimulationPhysics(QThread):
                 if self.update_aircrafts_position(elapsed_time):
                     logging.info("Aircrafts collided")
                     QApplication.beep()
-                    # self.aircraft_vehicles[0].speed = QVector3D(0, 0, 0)
-                    # self.aircraft_vehicles[1].speed = QVector3D(0, 0, 0)
                     self.requestInterruption()
             self.msleep(max(0, (self.simulation_state.simulation_threshold) - start_timestamp.msecsTo(QTime.currentTime())))
         self.global_stop_timestamp = QTime.currentTime()
