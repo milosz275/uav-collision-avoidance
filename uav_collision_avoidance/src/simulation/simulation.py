@@ -37,13 +37,13 @@ class Simulation(QMainWindow):
 
         self.aircrafts : List[Aircraft] = [
             Aircraft(
-                position = QVector3D(10, 1000, 1000),
-                speed = QVector3D(50, -50, 0),
+                position = QVector3D(100, 1000, 1000),
+                speed = QVector3D(60, -70, 0),
                 initial_target = QVector3D(1000_000, -1000_000, 1000)),
             Aircraft(
-                position = QVector3D(1300, 1300, 1000),
-                speed = QVector3D(-80, -80, 0),
-                initial_target = QVector3D(-1000_000, -1000_000, 1000)),
+                position = QVector3D(900, 1300, 1000),
+                speed = QVector3D(0, -70, 0),
+                initial_target = QVector3D(0, -1000_000, 1000)),
         ]
 
         self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
@@ -80,7 +80,7 @@ class Simulation(QMainWindow):
             self.stop_realtime_simulation()
         else:
             self.stop_prerender_simulation()
-        self.state.reset_demanded = True
+        self.state.reset()
         self.state.is_running = False
         return
 
