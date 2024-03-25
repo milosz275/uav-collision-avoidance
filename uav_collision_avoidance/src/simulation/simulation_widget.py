@@ -32,6 +32,8 @@ class SimulationWidget(QWidget):
         self.bounding_box_resolution = [SimulationSettings.resolution[0], SimulationSettings.resolution[1]]
         self.window_width : float = SimulationSettings.resolution[0] + 10
         self.window_height : float = SimulationSettings.resolution[1] + 10
+        self.screen_offset_x : float = 0.0
+        self.screen_offset_y : float = 0.0
         self.setGeometry(
             SimulationSettings.screen_resolution.width() / 2 - self.window_width / 2,
             SimulationSettings.screen_resolution.height() / 2 - self.window_height / 2,
@@ -56,20 +58,22 @@ class SimulationWidget(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
+        x_offset = self.screen_offset_x * scale
+        y_offset = self.screen_offset_y * scale
         painter.translate(QPointF(
-            aircraft.position.x() * scale,
-            aircraft.position.y() * scale))
+            (aircraft.position.x() * scale) + x_offset,
+            (aircraft.position.y() * scale) + y_offset))
         painter.rotate(yaw_angle)
         painter.translate(QPointF(
-            -size / 2,
-            -size / 2))
-        painter.drawPixmap(0, 0, pixmap)
-        painter.drawEllipse(0, 0,
+            (- size / 2) - x_offset,
+            (- size / 2) - y_offset))
+        painter.drawPixmap(x_offset, y_offset, pixmap)
+        painter.drawEllipse(x_offset, y_offset,
             size * abs(cos(radians(aircraft.roll_angle))),
             size * abs(cos(radians(aircraft.pitch_angle))))
         painter.rotate(-yaw_angle)
-        painter.drawText(10, 10, f"Aircraft {aircraft.aircraft_id}")
         painter.end()
+        self.draw_text(aircraft.position, scale, f"Aircraft {aircraft.aircraft_id}")
         return
 
     def draw_destinations(self, aircraft : AircraftVehicle, scale : float) -> None:
@@ -83,10 +87,12 @@ class SimulationWidget(QWidget):
         """Draws text at given coordinates"""
         painter = QPainter(self)
         painter.setBrush(Qt.BrushStyle.SolidPattern)
+        x_offset = self.screen_offset_x * scale
+        y_offset = self.screen_offset_y * scale
         if scale != 0:
             painter.drawText(
-                point.x() * scale + 10,
-                point.y() * scale + 10,
+                ((point.x() + 10) * scale) + x_offset,
+                ((point.y() + 10) * scale) + y_offset,
                 text)
         else:
             painter.drawText(
@@ -99,9 +105,11 @@ class SimulationWidget(QWidget):
     def draw_circle(self, point : QVector3D, size : float, scale : float) -> None:
         """Draws circle at given coordinates (empty)"""
         painter = QPainter(self)
+        x_offset = self.screen_offset_x * scale
+        y_offset = self.screen_offset_y * scale
         painter.drawEllipse(
-            point.x() * scale - (size * scale / 2),
-            point.y() * scale - (size * scale / 2),
+            point.x() * scale - (size * scale / 2) + x_offset,
+            point.y() * scale - (size * scale / 2) + y_offset,
             size * scale,
             size * scale)
         painter.end()
@@ -111,9 +119,11 @@ class SimulationWidget(QWidget):
         """Draws disk at given coordinates (full)"""
         painter = QPainter(self)
         painter.setBrush(Qt.BrushStyle.SolidPattern)
+        x_offset = self.screen_offset_x * scale
+        y_offset = self.screen_offset_y * scale
         painter.drawEllipse(
-            point.x() * scale - (size * scale / 2),
-            point.y() * scale - (size * scale / 2),
+            point.x() * scale - (size * scale / 2) + x_offset,
+            point.y() * scale - (size * scale / 2) + y_offset,
             size * scale,
             size * scale)
         painter.end()
@@ -123,44 +133,47 @@ class SimulationWidget(QWidget):
         """Draws line connecting given points"""
         painter = QPainter(self)
         painter.setBrush(Qt.BrushStyle.SolidPattern)
+        x_offset = self.screen_offset_x * scale
+        y_offset = self.screen_offset_y * scale
         painter.drawLine(
-            int(point1.x() * scale),
-            int(point1.y() * scale),
-            int(point2.x() * scale),
-            int(point2.y() * scale))
+            int((point1.x() * scale) + x_offset),
+            int((point1.y() * scale) + y_offset),
+            int((point2.x() * scale) + x_offset),
+            int((point2.y() * scale) + y_offset))
         painter.end()
         return
 
     def draw_vector(self, point1 : QVector3D, point2 : QVector3D, scale : float) -> None:
         """Draws vector pointing from first to second point"""
         self.draw_line(point1, point2, scale)
-        
         painter = QPainter(self)
         painter.setBrush(Qt.BrushStyle.SolidPattern)
+        x_offset = self.screen_offset_x * scale
+        y_offset = self.screen_offset_y * scale
         angle = degrees(atan2(point1.x() - point2.x(), point1.y() - point2.y()))
         arrowhead_size = SimulationSettings.screen_resolution.width() / 400 * scale
         arrowhead_height = arrowhead_size * sqrt(3) / 2
         polygon = QPolygonF()
         polygon.append(
             QPointF(
-                point2.x() * scale -arrowhead_size / 2,
-                point2.y() * scale + arrowhead_height / 3))
+                (point2.x() * scale - arrowhead_size / 2) + x_offset,
+                (point2.y() * scale + arrowhead_height / 3) + y_offset))
         polygon.append(
             QPointF(
-                point2.x() * scale + arrowhead_size / 2,
-                point2.y() * scale + arrowhead_height / 3))
+                (point2.x() * scale + arrowhead_size / 2) + x_offset,
+                (point2.y() * scale + arrowhead_height / 3) + y_offset))
         polygon.append(
             QPointF(
-                point2.x() * scale,
-                point2.y() * scale - 2 * arrowhead_height / 3))
+                (point2.x() * scale) + x_offset,
+                (point2.y() * scale - 2 * arrowhead_height / 3) + y_offset))
         painter.translate(
-            point2.x() * scale,
-            point2.y() * scale
+            (point2.x() * scale) + x_offset,
+            (point2.y() * scale) + y_offset
         )
         painter.rotate(-angle)
         painter.translate(
-            -point2.x() * scale,
-            -point2.y() * scale
+            (- point2.x() * scale) - x_offset,
+            (- point2.y() * scale) - y_offset
         )
         painter.drawPolygon(polygon)
         painter.end()
@@ -201,8 +214,8 @@ class SimulationWidget(QWidget):
         scale : float = self.simulation_state.gui_scale
         click_x : int = event.pos().x()
         click_y : int = event.pos().y()
-        real_x : float = click_x / scale
-        real_y : float = click_y / scale
+        real_x : float = click_x / scale - (self.screen_offset_x / scale)
+        real_y : float = click_y / scale - (self.screen_offset_y / scale)
         print(
             "click: physical coords: x: " + "{:.2f}".format(real_x) +
             "; y: " + "{:.2f}".format(real_y) +
@@ -240,13 +253,15 @@ class SimulationWidget(QWidget):
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         """Qt method controlling keyboard input"""
-        if event.isAutoRepeat():
-            return super().keyPressEvent(event)
         if event.key() == Qt.Key.Key_Escape:
             self.close()
         elif event.key() == Qt.Key.Key_Slash:
+            if event.isAutoRepeat():
+                return super().keyPressEvent(event)
             self.simulation_state.toggle_pause()
         elif event.key() == Qt.Key.Key_R:
+            if event.isAutoRepeat():
+                return super().keyPressEvent(event)
             self.simulation_state.reset()
         elif event.key() == Qt.Key.Key_Plus:
             self.simulation_state.gui_scale += 0.25
@@ -258,6 +273,14 @@ class SimulationWidget(QWidget):
             self.aircraft_fccs[0].target_speed -= 10.0
         elif event.key() == Qt.Key.Key_F3:
             self.aircraft_fccs[0].target_speed += 10.0
+        elif event.key() == Qt.Key.Key_Left:
+            self.screen_offset_x -= 10.0
+        elif event.key() == Qt.Key.Key_Right:
+            self.screen_offset_x += 10.0
+        elif event.key() == Qt.Key.Key_Up:
+            self.screen_offset_y -= 10.0
+        elif event.key() == Qt.Key.Key_Down:
+            self.screen_offset_y += 10.0
         if self.aircrafts[0]:
             if event.key() == Qt.Key.Key_A:
                 self.aircraft_fccs[0].target_yaw_angle = -90.0
@@ -267,15 +290,6 @@ class SimulationWidget(QWidget):
                 self.aircraft_fccs[0].target_yaw_angle = 0.0
             elif event.key() == Qt.Key.Key_S:
                 self.aircraft_fccs[0].target_yaw_angle = 180.0
-        if self.aircrafts[1]:
-            if event.key() == Qt.Key.Key_Left:
-                self.aircraft_fccs[1].target_yaw_angle = -90.0
-            elif event.key() == Qt.Key.Key_Right:
-                self.aircraft_fccs[1].target_yaw_angle = 90.0
-            elif event.key() == Qt.Key.Key_Up:
-                self.aircraft_fccs[1].target_yaw_angle = 0.0
-            elif event.key() == Qt.Key.Key_Down:
-                self.aircraft_fccs[1].target_yaw_angle = 180.0
         return super().keyPressEvent(event)
     
     def keyReleaseEvent(self, event: QKeyEvent) -> None:
