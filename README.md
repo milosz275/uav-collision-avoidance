@@ -9,7 +9,7 @@ UAV Collision Avoidance is my bachelor's thesis project meeting problem of UAVs 
 
 ## Premises
 
-3-dimensional space defined in XYZ coordinate system, where X and Y describe flat horizontal plane and Z is height above the sea level. In scope of this project, UAVs are considered HTOL drones (Horizontal Take-off and Landing). The space is shared by two/three UAVs. There is no other objects or gusts of wind assumpted. The default distance unit is meters [m] and speed is meters per second [m/s]. There is no aerodynamic lift force assumed at this moment.
+3-dimensional space defined in XYZ coordinate system, where X and Y describe flat horizontal plane and Z is height above the sea level. In scope of this project, UAVs are considered HTOL drones (Horizontal Take-off and Landing). The space is shared by two/three UAVs. There is no other objects or gusts of wind assumpted. The default distance unit is meters [m] and speed is meters per second [m/s]. No aerodynamic lift force assumed at this moment. Aircrafts are considered only to move in direction of their speed vectors. No drifting implemented.
 
 ## Technologies
 
