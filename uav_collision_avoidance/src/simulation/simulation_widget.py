@@ -1,11 +1,12 @@
 """Simulation widget for the main window of the simulation app"""
 
+from copy import copy
 from math import cos, radians, sqrt, degrees, atan2
 from typing import List
 
 from PySide6.QtCore import Qt, QPointF, Signal
 from PySide6.QtGui import QPaintEvent, QPainter, QKeyEvent, \
-    QMouseEvent, QIcon, QPixmap, QCloseEvent, QVector3D, QPolygonF
+    QMouseEvent, QIcon, QPixmap, QCloseEvent, QVector3D, QPolygonF, QWheelEvent
 from PySide6.QtWidgets import QWidget, QApplication
 
 from src.aircraft.aircraft import Aircraft
@@ -29,13 +30,13 @@ class SimulationWidget(QWidget):
         self.simulation_state = simulation_state
 
         self.bounding_box_resolution = [SimulationSettings.resolution[0], SimulationSettings.resolution[1]]
-        window_width : float = SimulationSettings.resolution[0] + 10
-        window_height : float = SimulationSettings.resolution[1] + 10
+        self.window_width : float = SimulationSettings.resolution[0] + 10
+        self.window_height : float = SimulationSettings.resolution[1] + 10
         self.setGeometry(
-            SimulationSettings.screen_resolution.width() / 2 - window_width / 2,
-            SimulationSettings.screen_resolution.height() / 2 - window_height / 2,
-            window_width,
-            window_height)
+            SimulationSettings.screen_resolution.width() / 2 - self.window_width / 2,
+            SimulationSettings.screen_resolution.height() / 2 - self.window_height / 2,
+            self.window_width,
+            self.window_height)
         self.setStyleSheet("background-color: white;")
         self.setWindowTitle(QApplication.applicationName() + " " + QApplication.applicationVersion())
 
@@ -82,10 +83,16 @@ class SimulationWidget(QWidget):
         """Draws text at given coordinates"""
         painter = QPainter(self)
         painter.setBrush(Qt.BrushStyle.SolidPattern)
-        painter.drawText(
-            point.x() * scale + 10,
-            point.y() * scale + 10,
-            text)
+        if scale != 0:
+            painter.drawText(
+                point.x() * scale + 10,
+                point.y() * scale + 10,
+                text)
+        else:
+            painter.drawText(
+                point.x(),
+                point.y(),
+                text)
         painter.end()
         return
 
@@ -158,8 +165,8 @@ class SimulationWidget(QWidget):
         painter.drawPolygon(polygon)
         painter.end()
         return
-    
-    def draw_miss_distance_vector(self, aircraft : AircraftVehicle, scale : float) -> None:
+
+    def draw_miss_distance_vector(self, aircraft: AircraftVehicle, other_aircraft: AircraftVehicle, scale: float) -> None:
         """Draws miss distance vector for given aircraft vehicle"""
         # todo
         return
@@ -170,12 +177,23 @@ class SimulationWidget(QWidget):
             return super().paintEvent(event)
         self.simulation_fps.count_frame()
         scale : float = self.simulation_state.gui_scale
+        if self.simulation_state.draw_fps:
+            self.draw_text(QVector3D(10, 10, 0), 0, "FPS: " + "{:.2f}".format(self.simulation_state.fps))
+        if self.simulation_state.draw_grid:
+            for x in range(0, int(self.window_width / scale), 100):
+                self.draw_line(QVector3D(x, 0, 0), QVector3D(x, self.window_height / scale, 0), scale)
+            for y in range(0, int(self.window_height / scale), 100):
+                self.draw_line(QVector3D(0, y, 0), QVector3D(self.window_width / scale, y, 0), scale)
         for aircraft in self.aircraft_vehicles:
-            self.draw_aircraft(aircraft, scale)
-            self.draw_destinations(aircraft, scale)
-            self.draw_circle(aircraft.position, self.aircraft_fccs[aircraft.aircraft_id].safezone_size, scale)
-            self.draw_vector(aircraft.position, aircraft.position + aircraft.speed, scale)
-            self.draw_miss_distance_vector(aircraft, scale)
+            if self.simulation_state.draw_aircraft:
+                self.draw_aircraft(aircraft, scale)
+                self.draw_destinations(aircraft, scale)
+            if self.simulation_state.draw_speed_vectors:
+                self.draw_vector(aircraft.position, aircraft.position + aircraft.speed, scale)
+            if self.simulation_state.draw_safezones:
+                self.draw_circle(aircraft.position, self.aircraft_fccs[aircraft.aircraft_id].safezone_size, scale)
+            if self.simulation_state.draw_miss_distance and aircraft.aircraft_id == 0:
+                self.draw_miss_distance_vector(aircraft, self.aircraft_vehicles[1 - aircraft.aircraft_id], scale)
         return super().paintEvent(event)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
@@ -201,11 +219,19 @@ class SimulationWidget(QWidget):
                 real_y,
                 1000.0))
         elif event.button() == Qt.MouseButton.MiddleButton:
-            self.aircraft_vehicles[0].teleport(QVector3D(
+            self.aircraft_vehicles[0].position = QVector3D(
                 real_x,
                 real_y,
-                1000.0))
+                1000.0)
         return super().mousePressEvent(event)
+    
+    def wheelEvent(self, event: QWheelEvent) -> None:
+        """Qt method controlling mouse wheel input"""
+        if event.angleDelta().y() > 0:
+            self.simulation_state.gui_scale += 0.125
+        else:
+            self.simulation_state.gui_scale -= 0.125
+        return super().wheelEvent(event)
     
     def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
         """Qt method controlling double click mouse input"""
