@@ -1,6 +1,6 @@
 """Simulation state module"""
 
-from PySide6.QtCore import QSettings, QTime
+from PySide6.QtCore import QSettings, QTime, QMutex, QMutexLocker
 from PySide6.QtGui import QPixmap
 
 from src.simulation.simulation_settings import SimulationSettings
@@ -9,6 +9,9 @@ class SimulationState(QSettings):
     """Class defining simulation's traits"""
 
     def __init__(self, simulation_settings : SimulationSettings, is_realtime : bool = True) -> None:
+        super(SimulationState, self).__init__()
+        self.__mutex : QMutex = QMutex()
+
         # simulation state
         self.simulation_settings = simulation_settings
         self.update_settings()
@@ -17,7 +20,7 @@ class SimulationState(QSettings):
         self.physics_cycles : int = 0
         self.is_paused : bool = False
         self.is_running : bool = True
-        self.reset_demanded : bool = False
+        self.__reset_demanded : bool = False
         self.pause_start_timestamp : QTime | None = None
         self.time_paused : int = 0 # ms
         self.__adsb_report : bool = True
@@ -25,6 +28,13 @@ class SimulationState(QSettings):
         # render state
         self.gui_scale : float = 0.75 # define gui scaling
         self.fps : float = 0.0
+        self.draw_fps : bool = True
+        self.draw_aircraft : bool = True
+        self.draw_grid : bool = False
+        self.draw_path : bool = True
+        self.draw_speed_vectors : bool = True
+        self.draw_safezones : bool = False
+        self.draw_miss_distance : bool = True
 
         # assets
         self.aircraft_pixmap : QPixmap = QPixmap()
@@ -79,13 +89,21 @@ class SimulationState(QSettings):
             self.pause_start_timestamp = QTime.currentTime()
             self.is_paused = True
         return
+    
+    @property
+    def reset_demanded(self) -> bool:
+        """Returns simulation reset state"""
+        with QMutexLocker(self.__mutex):
+            return self.__reset_demanded
 
     def reset(self) -> None:
         """Resets simulation to its start state"""
-        self.reset_demanded = True
+        with QMutexLocker(self.__mutex):
+            self.__reset_demanded = True
         return
 
     def apply_reset(self) -> None:
         """Sets back simulation reset state"""
-        self.reset_demanded = False
+        with QMutexLocker(self.__mutex):
+            self.__reset_demanded = False
         return
