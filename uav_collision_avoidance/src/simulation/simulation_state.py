@@ -24,6 +24,7 @@ class SimulationState(QSettings):
         self.pause_start_timestamp : QTime | None = None
         self.time_paused : int = 0 # ms
         self.__adsb_report : bool = True
+        self.__collision : bool = False
 
         # render state
         self.gui_scale : float = 0.75 # define gui scaling
@@ -88,6 +89,16 @@ class SimulationState(QSettings):
                 return
             self.pause_start_timestamp = QTime.currentTime()
             self.is_paused = True
+        return
+    
+    @property
+    def collision(self) -> bool:
+        """Returns collision state"""
+        return self.__collision
+
+    def register_collision(self) -> None:
+        """Registers collision"""
+        self.__collision = True
         return
     
     @property
