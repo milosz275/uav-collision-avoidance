@@ -23,7 +23,7 @@ class SimulationState(QSettings):
         self.__reset_demanded : bool = False
         self.pause_start_timestamp : QTime | None = None
         self.time_paused : int = 0 # ms
-        self.__adsb_report : bool = True
+        self.__adsb_report : bool = False
         self.__collision : bool = False
 
         # render state
