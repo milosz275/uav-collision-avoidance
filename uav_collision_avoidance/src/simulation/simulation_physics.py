@@ -33,8 +33,8 @@ class SimulationPhysics(QThread):
         while not self.isInterruptionRequested():
             start_timestamp = QTime.currentTime()
             if self.simulation_state.reset_demanded:
-                self.aircraft_vehicles[0].teleport(self.aircrafts[0].initial_position)
-                self.aircraft_vehicles[1].teleport(self.aircrafts[1].initial_position)
+                self.aircrafts[0].reset()
+                self.aircrafts[1].reset()
                 self.aircraft_fccs[0].destinations.clear()
                 self.aircraft_fccs[1].destinations.clear()
                 self.simulation_state.apply_reset()
@@ -97,7 +97,7 @@ class SimulationPhysics(QThread):
             target_speed = fcc.target_speed
             speed_difference = abs(current_speed - target_speed)
             if speed_difference > 0.001:
-                max_speed_delta = 0.1 # todo: calculate
+                max_speed_delta = 0.5 # todo: calculate
                 if speed_difference < max_speed_delta:
                     pass # become target
                 elif current_speed < target_speed:
