@@ -5,8 +5,6 @@ from math import atan2, degrees, sqrt
 from PySide6.QtCore import QObject, QMutex, QMutexLocker
 from PySide6.QtGui import QVector3D
 
-from src.simulation.simulation_state import SimulationState
-
 class AircraftVehicle(QObject):
     """Aircraft physical UAV"""
 
@@ -37,14 +35,21 @@ class AircraftVehicle(QObject):
         """Returns position"""
         return self.__position
     
+    @position.setter
+    def position(self, position : QVector3D) -> None:
+        """Sets position"""
+        del self.__position
+        self.__position = position
+    
     @property
     def speed(self) -> QVector3D:
         """Returns speed"""
         return self.__speed
     
     @speed.setter
-    def speed(self, speed : QVector3D) -> QVector3D:
+    def speed(self, speed : QVector3D) -> None:
         """Sets speed"""
+        del self.__speed
         self.__speed = speed
     
     @property
@@ -71,13 +76,6 @@ class AircraftVehicle(QObject):
     def distance_covered(self, distance_covered_delta : float) -> None:
         """Appends delta to distance covered"""
         self.__distance_covered += distance_covered_delta
-    
-    def teleport(self, position : QVector3D) -> None:
-        """Teleports the vehicle"""
-        with QMutexLocker(self.__mutex):
-            self.__position.setX(position.x())
-            self.__position.setY(position.y())
-            self.__position.setZ(position.z())
     
     def move(self, dx : float, dy : float, dz : float = 0.0) -> None:
         """Applies position deltas for the vehicle"""
