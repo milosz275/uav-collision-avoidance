@@ -187,14 +187,14 @@ class SimulationWidget(QWidget):
     def draw_grid(self, x_offset : float, y_offset : float, scale : float) -> None:
         """Draws grid on the screen"""
         # todo: use offsets
-        for x in range(0, int(self.window_width / scale), 100):
+        for x in range(0, int(self.window_width / scale - x_offset / 100), 100):
             self.draw_line(
-                QVector3D(x, 0, 0),
-                QVector3D(x, self.window_height / scale, 0), scale)
+                QVector3D(x - x_offset / 100, -y_offset / 100, 0),
+                QVector3D(x - x_offset / 100, self.window_height / scale - y_offset / 100, 0), scale)
         for y in range(0, int(self.window_height / scale), 100):
             self.draw_line(
-                QVector3D(0, y, 0),
-                QVector3D(self.window_width / scale, y, 0), scale)
+                QVector3D(-x_offset, y - y_offset, 0),
+                QVector3D(self.window_width / scale - x_offset, y - y_offset, 0), scale)
 
     def update_offsets(self) -> None:
         """Updates screen offsets based on current input"""
@@ -214,13 +214,11 @@ class SimulationWidget(QWidget):
             return super().paintEvent(event)
         self.simulation_fps.count_frame()
         scale : float = self.simulation_state.gui_scale
-        x_offset = self.screen_offset_x * scale
-        y_offset = self.screen_offset_y * scale
         self.update_offsets()
         if self.simulation_state.draw_fps:
             self.draw_text(QVector3D(10, 10, 0), 0, "FPS: " + "{:.2f}".format(self.simulation_state.fps))
         if self.simulation_state.draw_grid:
-            self.draw_grid(x_offset, y_offset, scale)
+            self.draw_grid(self.screen_offset_x, self.screen_offset_y, scale)
         for aircraft in self.aircraft_vehicles:
             if self.simulation_state.draw_aircraft:
                 self.draw_aircraft(aircraft, scale)
@@ -236,8 +234,8 @@ class SimulationWidget(QWidget):
         scale : float = self.simulation_state.gui_scale
         click_x : int = event.pos().x()
         click_y : int = event.pos().y()
-        real_x : float = click_x / scale - (self.screen_offset_x / scale)
-        real_y : float = click_y / scale - (self.screen_offset_y / scale)
+        real_x : float = click_x / scale - self.screen_offset_x
+        real_y : float = click_y / scale - self.screen_offset_y
         print(
             "click: physical coords: x: " + "{:.2f}".format(real_x) +
             "; y: " + "{:.2f}".format(real_y) +
@@ -299,6 +297,10 @@ class SimulationWidget(QWidget):
             self.aircraft_fccs[0].target_speed -= 10.0
         elif event.key() == Qt.Key.Key_F3:
             self.aircraft_fccs[0].target_speed += 10.0
+        elif event.key() == Qt.Key.Key_O:
+            self.simulation_state.toggle_first_causing_collision()
+        elif event.key() == Qt.Key.Key_P:
+            self.simulation_state.toggle_second_causing_collision()
         elif event.key() == Qt.Key.Key_Left:
             self.__moving_view_left = True
         elif event.key() == Qt.Key.Key_Right:
