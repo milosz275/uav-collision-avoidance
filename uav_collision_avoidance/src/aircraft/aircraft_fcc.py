@@ -20,7 +20,7 @@ class AircraftFCC(QObject):
         self.aircraft = aircraft
 
         self.__safezone_occupied : bool = False
-        self.__safezone_size : float = 500.0
+        self.__safezone_size : float = 1000.0
 
         self.target_yaw_angle : float = self.find_best_yaw_angle(aircraft.position, initial_target)
         self.target_roll_angle : float = 0.0
@@ -132,4 +132,8 @@ class AircraftFCC(QObject):
         """Updates current targeted movement angles"""
         self.update_target_yaw_angle()
         self.update_target_roll_angle()
-        
+
+    def update_target(self, target : QVector3D) -> None:
+        """Updates target position"""
+        self.target_yaw_angle = self.find_best_yaw_angle(self.aircraft.position, target)
+        self.update_target_roll_angle()    
