@@ -90,8 +90,10 @@ class SimulationPhysics(QThread):
             return
         for aircraft in self.aircraft_vehicles:
             # flight control computer
-            fcc : AircraftFCC = self.aircraft_fccs[aircraft.aircraft_id]
-            fcc.update()
+            id : int = aircraft.aircraft_id
+            fcc : AircraftFCC = self.aircraft_fccs[id]
+            cause_collision = self.simulation_state.first_cause_collision if id == 0 else self.simulation_state.second_cause_collision
+            fcc.update() if not cause_collision else fcc.update_target(self.aircraft_vehicles[1 - id].position + self.aircraft_vehicles[1 - id].speed)
             
             # speed
             current_speed = aircraft.absolute_speed
