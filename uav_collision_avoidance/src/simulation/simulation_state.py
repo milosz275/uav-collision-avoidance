@@ -25,6 +25,8 @@ class SimulationState(QSettings):
         self.time_paused : int = 0 # ms
         self.__adsb_report : bool = False
         self.__collision : bool = False
+        self.__first_cause_collision : bool = False
+        self.__second_cause_collision : bool = False
 
         # render state
         self.__gui_scale : float = 0.75 # define gui scaling
@@ -34,7 +36,7 @@ class SimulationState(QSettings):
         self.draw_grid : bool = False
         self.draw_path : bool = True
         self.draw_speed_vectors : bool = True
-        self.draw_safezones : bool = False
+        self.draw_safezones : bool = True
         self.draw_miss_distance : bool = True
 
         # assets
@@ -99,6 +101,26 @@ class SimulationState(QSettings):
     def register_collision(self) -> None:
         """Registers collision"""
         self.__collision = True
+        return
+    
+    @property
+    def first_cause_collision(self) -> bool:
+        """Returns causing collision state"""
+        return self.__first_cause_collision
+    
+    def toggle_first_causing_collision(self) -> None:
+        """Toggles causing collision state"""
+        self.__first_cause_collision = not self.__first_cause_collision
+        return
+    
+    @property
+    def second_cause_collision(self) -> bool:
+        """Returns causing collision state"""
+        return self.__second_cause_collision
+    
+    def toggle_second_causing_collision(self) -> None:
+        """Toggles causing collision state"""
+        self.__second_cause_collision = not self.__second_cause_collision
         return
     
     @property
