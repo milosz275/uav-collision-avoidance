@@ -46,6 +46,11 @@ class SimulationWidget(QWidget):
         self.icon.addPixmap(self.simulation_state.aircraft_pixmap, QIcon.Mode.Normal, QIcon.State.Off)
         self.setWindowIcon(self.icon)
 
+        self.__moving_view_up = False
+        self.__moving_view_down = False
+        self.__moving_view_left = False
+        self.__moving_view_right = False
+
     def draw_aircraft(self, aircraft : AircraftVehicle, scale : float) -> None:
         """Draws given aircraft vehicle"""
         yaw_angle : float = aircraft.yaw_angle
@@ -178,10 +183,29 @@ class SimulationWidget(QWidget):
         painter.drawPolygon(polygon)
         painter.end()
         return
+    
+    def draw_grid(self, x_offset : float, y_offset : float, scale : float) -> None:
+        """Draws grid on the screen"""
+        # todo: use offsets
+        for x in range(0, int(self.window_width / scale), 100):
+            self.draw_line(
+                QVector3D(x, 0, 0),
+                QVector3D(x, self.window_height / scale, 0), scale)
+        for y in range(0, int(self.window_height / scale), 100):
+            self.draw_line(
+                QVector3D(0, y, 0),
+                QVector3D(self.window_width / scale, y, 0), scale)
 
-    def draw_miss_distance_vector(self, aircraft: AircraftVehicle, other_aircraft: AircraftVehicle, scale: float) -> None:
-        """Draws miss distance vector for given aircraft vehicle"""
-        # todo
+    def update_offsets(self) -> None:
+        """Updates screen offsets based on current input"""
+        if self.__moving_view_up:
+            self.screen_offset_y += 10.0
+        if self.__moving_view_down:
+            self.screen_offset_y -= 10.0
+        if self.__moving_view_left:
+            self.screen_offset_x += 10.0
+        if self.__moving_view_right:
+            self.screen_offset_x -= 10.0
         return
 
     def paintEvent(self, event : QPaintEvent) -> None:
@@ -190,13 +214,13 @@ class SimulationWidget(QWidget):
             return super().paintEvent(event)
         self.simulation_fps.count_frame()
         scale : float = self.simulation_state.gui_scale
+        x_offset = self.screen_offset_x * scale
+        y_offset = self.screen_offset_y * scale
+        self.update_offsets()
         if self.simulation_state.draw_fps:
             self.draw_text(QVector3D(10, 10, 0), 0, "FPS: " + "{:.2f}".format(self.simulation_state.fps))
         if self.simulation_state.draw_grid:
-            for x in range(0, int(self.window_width / scale), 100):
-                self.draw_line(QVector3D(x, 0, 0), QVector3D(x, self.window_height / scale, 0), scale)
-            for y in range(0, int(self.window_height / scale), 100):
-                self.draw_line(QVector3D(0, y, 0), QVector3D(self.window_width / scale, y, 0), scale)
+            self.draw_grid(x_offset, y_offset, scale)
         for aircraft in self.aircraft_vehicles:
             if self.simulation_state.draw_aircraft:
                 self.draw_aircraft(aircraft, scale)
@@ -205,8 +229,6 @@ class SimulationWidget(QWidget):
                 self.draw_vector(aircraft.position, aircraft.position + aircraft.speed, scale)
             if self.simulation_state.draw_safezones:
                 self.draw_circle(aircraft.position, self.aircraft_fccs[aircraft.aircraft_id].safezone_size, scale)
-            if self.simulation_state.draw_miss_distance and aircraft.aircraft_id == 0:
-                self.draw_miss_distance_vector(aircraft, self.aircraft_vehicles[1 - aircraft.aircraft_id], scale)
         return super().paintEvent(event)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
@@ -238,6 +260,15 @@ class SimulationWidget(QWidget):
                 1000.0)
         return super().mousePressEvent(event)
     
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+        """Qt method controlling mouse release input"""
+        return super().mouseReleaseEvent(event)
+    
+    def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
+        """Qt method controlling double click mouse input"""
+        QApplication.beep()
+        return super().mouseDoubleClickEvent(event)
+    
     def wheelEvent(self, event: QWheelEvent) -> None:
         """Qt method controlling mouse wheel input"""
         if event.angleDelta().y() > 0:
@@ -245,11 +276,6 @@ class SimulationWidget(QWidget):
         else:
             self.simulation_state.gui_scale -= 0.125
         return super().wheelEvent(event)
-    
-    def mouseDoubleClickEvent(self, event: QMouseEvent) -> None:
-        """Qt method controlling double click mouse input"""
-        QApplication.beep()
-        return super().mouseDoubleClickEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         """Qt method controlling keyboard input"""
@@ -274,13 +300,13 @@ class SimulationWidget(QWidget):
         elif event.key() == Qt.Key.Key_F3:
             self.aircraft_fccs[0].target_speed += 10.0
         elif event.key() == Qt.Key.Key_Left:
-            self.screen_offset_x -= 10.0
+            self.__moving_view_left = True
         elif event.key() == Qt.Key.Key_Right:
-            self.screen_offset_x += 10.0
+            self.__moving_view_right = True
         elif event.key() == Qt.Key.Key_Up:
-            self.screen_offset_y -= 10.0
+            self.__moving_view_up = True
         elif event.key() == Qt.Key.Key_Down:
-            self.screen_offset_y += 10.0
+            self.__moving_view_down = True
         if self.aircrafts[0]:
             if event.key() == Qt.Key.Key_A:
                 self.aircraft_fccs[0].target_yaw_angle = -90.0
@@ -296,6 +322,14 @@ class SimulationWidget(QWidget):
         """Qt method controlling keyboard input"""
         if event.key() == Qt.Key.Key_Slash and event.isAutoRepeat() and self.simulation_state.is_paused:
             self.simulation_state.toggle_pause()
+        elif event.key() == Qt.Key.Key_Left:
+            self.__moving_view_left = False
+        elif event.key() == Qt.Key.Key_Right:
+            self.__moving_view_right = False
+        elif event.key() == Qt.Key.Key_Up:
+            self.__moving_view_up = False
+        elif event.key() == Qt.Key.Key_Down:
+            self.__moving_view_down = False
         return super().keyReleaseEvent(event)
 
     def closeEvent(self, event: QCloseEvent) -> None:
