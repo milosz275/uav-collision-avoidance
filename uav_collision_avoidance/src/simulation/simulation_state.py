@@ -27,7 +27,7 @@ class SimulationState(QSettings):
         self.__collision : bool = False
 
         # render state
-        self.gui_scale : float = 0.75 # define gui scaling
+        self.__gui_scale : float = 0.75 # define gui scaling
         self.fps : float = 0.0
         self.draw_fps : bool = True
         self.draw_aircraft : bool = True
@@ -117,4 +117,16 @@ class SimulationState(QSettings):
         """Sets back simulation reset state"""
         with QMutexLocker(self.__mutex):
             self.__reset_demanded = False
+        return
+
+    @property
+    def gui_scale(self) -> float:
+        """Returns GUI scaling factor"""
+        return self.__gui_scale
+    
+    @gui_scale.setter
+    def gui_scale(self, value : float) -> None:
+        """Sets GUI scaling factor"""
+        if value > 0.0:
+            self.__gui_scale = value
         return
