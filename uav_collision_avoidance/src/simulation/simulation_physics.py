@@ -32,25 +32,29 @@ class SimulationPhysics(QThread):
         self.global_start_timestamp = QTime.currentTime()
         while not self.isInterruptionRequested():
             start_timestamp = QTime.currentTime()
-            if self.simulation_state.reset_demanded:
-                self.aircrafts[0].reset()
-                self.aircrafts[1].reset()
-                self.aircraft_fccs[0].destinations.clear()
-                self.aircraft_fccs[1].destinations.clear()
-                self.simulation_state.apply_reset()
-            if not self.simulation_state.is_paused:
-                self.count_cycles()
-                self.simulation_state.update_simulation_settings()
-                elapsed_time : float = self.simulation_state.simulation_threshold # * self.simulation_state.time_scale
-                self.update_aircrafts_speed_angles(elapsed_time)
-                if self.update_aircrafts_position(elapsed_time):
-                    logging.info("Aircrafts collided")
-                    QApplication.beep()
-                    self.simulation_state.register_collision()
-                    self.requestInterruption()
+            self.cycle(self.simulation_state.simulation_threshold)
             self.msleep(max(0, (self.simulation_state.simulation_threshold) - start_timestamp.msecsTo(QTime.currentTime())))
         self.global_stop_timestamp = QTime.currentTime()
         return super().run()
+    
+    def cycle(self, elapsed_time : float) -> None:
+        """Executes physics simulation cycle"""
+        if self.simulation_state.reset_demanded:
+            self.aircrafts[0].reset()
+            self.aircrafts[1].reset()
+            self.aircraft_fccs[0].destinations.clear()
+            self.aircraft_fccs[1].destinations.clear()
+            self.simulation_state.apply_reset()
+        if not self.simulation_state.is_paused:
+            self.count_cycles()
+            self.simulation_state.update_simulation_settings()
+            self.update_aircrafts_speed_angles(elapsed_time)
+            if self.update_aircrafts_position(elapsed_time):
+                logging.warn("Aircrafts collided")
+                QApplication.beep()
+                self.simulation_state.register_collision()
+                if self.isRunning():
+                    self.requestInterruption()
 
     def update_aircrafts_position(self, elapsed_time : float) -> bool:
         """Updates aircrafts position, returns true on collision"""
@@ -63,7 +67,7 @@ class SimulationPhysics(QThread):
                 if not fcc.safezone_occupied:
                     fcc.safezone_occupied = True
                     print("Aircraft " + str(1 - aircraft.aircraft_id) + " entered safezone of Aircraft " + str(aircraft.aircraft_id))
-                    fcc.apply_evade_maneuver()
+                    #fcc.apply_evade_maneuver()
             else:
                 if fcc.safezone_occupied:
                     fcc.safezone_occupied = False
