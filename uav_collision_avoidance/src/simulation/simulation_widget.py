@@ -6,7 +6,7 @@ from typing import List
 
 from PySide6.QtCore import Qt, QPointF, Signal
 from PySide6.QtGui import QPaintEvent, QPainter, QKeyEvent, \
-    QMouseEvent, QIcon, QPixmap, QCloseEvent, QVector3D, QPolygonF, QWheelEvent
+    QMouseEvent, QIcon, QPixmap, QCloseEvent, QVector3D, QPolygonF, QWheelEvent, QColor
 from PySide6.QtWidgets import QWidget, QApplication
 
 from src.aircraft.aircraft import Aircraft
@@ -134,10 +134,11 @@ class SimulationWidget(QWidget):
         painter.end()
         return
 
-    def draw_line(self, point1 : QVector3D, point2 : QVector3D, scale : float) -> None:
+    def draw_line(self, point1 : QVector3D, point2 : QVector3D, scale : float, color : QColor = QColor(0, 0, 0)) -> None:
         """Draws line connecting given points"""
         painter = QPainter(self)
         painter.setBrush(Qt.BrushStyle.SolidPattern)
+        painter.setPen(color)
         x_offset = self.screen_offset_x * scale
         y_offset = self.screen_offset_y * scale
         painter.drawLine(
@@ -148,11 +149,12 @@ class SimulationWidget(QWidget):
         painter.end()
         return
 
-    def draw_vector(self, point1 : QVector3D, point2 : QVector3D, scale : float) -> None:
+    def draw_vector(self, point1 : QVector3D, point2 : QVector3D, scale : float, color : QColor = QColor(0, 0, 0)) -> None:
         """Draws vector pointing from first to second point"""
-        self.draw_line(point1, point2, scale)
+        self.draw_line(point1, point2, scale, color)
         painter = QPainter(self)
         painter.setBrush(Qt.BrushStyle.SolidPattern)
+        painter.setPen(color)
         x_offset = self.screen_offset_x * scale
         y_offset = self.screen_offset_y * scale
         angle = degrees(atan2(point1.x() - point2.x(), point1.y() - point2.y()))
@@ -184,17 +186,40 @@ class SimulationWidget(QWidget):
         painter.end()
         return
     
+    def draw_miss_distance_vector(self, scale : float) -> None:
+        """Draws miss distance vector for the aircrafts"""
+        for aircraft in self.aircraft_vehicles:
+            relative_position = aircraft.position - self.aircraft_vehicles[1 - aircraft.aircraft_id].position
+            speed_difference = aircraft.speed - self.aircraft_vehicles[1 - aircraft.aircraft_id].speed
+            time_to_closest_approach = -(QVector3D.dotProduct(relative_position, speed_difference) / QVector3D.dotProduct(speed_difference, speed_difference))
+            if time_to_closest_approach > 0:
+                # miss distance at closest approach
+                speed_difference_unit = speed_difference.normalized()
+                miss_distance_vector : QVector3D = QVector3D.crossProduct(
+                    speed_difference_unit,
+                    QVector3D.crossProduct(relative_position, speed_difference_unit))
+                self.draw_vector(
+                    self.aircraft_vehicles[1 - aircraft.aircraft_id].position,
+                    self.aircraft_vehicles[1 - aircraft.aircraft_id].position + miss_distance_vector,
+                    scale,
+                    QColor(0, 0, 255))
+        return
+    
     def draw_grid(self, x_offset : float, y_offset : float, scale : float) -> None:
         """Draws grid on the screen"""
         # todo: use offsets
-        for x in range(0, int(self.window_width / scale - x_offset / 100), 100):
+        for x in range(0, int(self.window_width / scale - x_offset / 100), 100): # vertical lines
             self.draw_line(
-                QVector3D(x - x_offset / 100, -y_offset / 100, 0),
-                QVector3D(x - x_offset / 100, self.window_height / scale - y_offset / 100, 0), scale)
-        for y in range(0, int(self.window_height / scale), 100):
+                QVector3D(x - x_offset / 100, 0 - y_offset, 0),
+                QVector3D(x - x_offset / 100, self.window_height / scale - y_offset, 0),
+                scale,
+                QColor(40, 40, 40))
+        for y in range(0, int(self.window_height / scale), 100): # horizontal lines
             self.draw_line(
-                QVector3D(-x_offset, y - y_offset, 0),
-                QVector3D(self.window_width / scale - x_offset, y - y_offset, 0), scale)
+                QVector3D(- x_offset, y - y_offset / 100, 0),
+                QVector3D(self.window_width / scale - x_offset, y - y_offset / 100, 0),
+                scale,
+                QColor(40, 40, 40))
 
     def update_offsets(self) -> None:
         """Updates screen offsets based on current input"""
@@ -219,6 +244,8 @@ class SimulationWidget(QWidget):
             self.draw_text(QVector3D(10, 10, 0), 0, "FPS: " + "{:.2f}".format(self.simulation_state.fps))
         if self.simulation_state.draw_grid:
             self.draw_grid(self.screen_offset_x, self.screen_offset_y, scale)
+        if self.simulation_state.draw_miss_distance_vector:
+            self.draw_miss_distance_vector(scale)
         for aircraft in self.aircraft_vehicles:
             if self.simulation_state.draw_aircraft:
                 self.draw_aircraft(aircraft, scale)
