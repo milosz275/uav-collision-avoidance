@@ -25,11 +25,14 @@ except:
         format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
         handlers=[logging.StreamHandler()])
 
+logging.info("-" * 80)
 if platform.system() == "Windows":
     import ctypes
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
         f"io.github.mldxo.uav-collision-avoidance.{version}")
 logging.info("Detected platform: %s", platform.system())
+
+realtime : bool = True
 
 def main(args):
     """Executes main function"""
@@ -39,8 +42,12 @@ def main(args):
     SimulationSettings.screen_resolution = app.primaryScreen().size()
     logging.info("%s %s", app.applicationName(), app.applicationVersion())
     sim = Simulation()
-    sim.run_realtime()
-    sys.exit(app.exec())
+    if realtime:
+        sim.run_realtime()
+        sys.exit(app.exec())
+    else:
+        sim.run_prerender()
+        sys.exit()
 
 if __name__ == "__main__":
     main(sys.argv[1:])
