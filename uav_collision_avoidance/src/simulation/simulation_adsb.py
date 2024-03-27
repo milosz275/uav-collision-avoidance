@@ -47,10 +47,16 @@ class SimulationADSB(QThread):
                     print("Miss distance at closest approach: " + "{:.2f}".format(miss_distance_vector.length()) + "m")
 
                     # resolve confict condition
-                    minimum_separation = aircraft1.size / 2 + aircraft2.size / 2
+                    minimum_separation = 200
                     unresolved_region = minimum_separation - miss_distance_vector.length()
                     if unresolved_region > 0:
-                        print("Conflict condition found")
+                        print("Conflict condition detected")
+                    
+                    # probable collision
+                    collision_distance = aircraft1.size / 2 + aircraft2.size / 2
+                    collision_region = collision_distance - miss_distance_vector.length()
+                    if collision_region > 0:
+                        print("Probable collision detected")
 
                 for aircraft in self.aircraft_vehicles:
                     # path
