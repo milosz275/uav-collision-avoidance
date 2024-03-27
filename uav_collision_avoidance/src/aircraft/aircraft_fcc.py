@@ -69,12 +69,18 @@ class AircraftFCC(QObject):
         """Formats angle into -180-180 domain"""
         angle = self.normalize_angle(angle)
         return angle if angle <= 180 else -180 + (angle - 180)
+    
+    @property
+    def evade_maneuver(self) -> bool:
+        """Returns evade maneuver state"""
+        return self.__evade_maneuver
 
     def apply_evade_maneuver(self) -> None:
         """Applies evade maneuver"""
         if self.__evade_maneuver:
             logging.warning("Another evade maneuver in progress")
         else:
+            logging.info("Aircraft %s applying evade maneuver", self.aircraft.aircraft_id)
             self.__evade_maneuver = True
             # todo: calculate turn radius, apply roll angle,
             # add corner enter position,
