@@ -37,7 +37,7 @@ class SimulationState(QSettings):
         self.draw_path : bool = True
         self.draw_speed_vectors : bool = True
         self.draw_safezones : bool = True
-        self.draw_miss_distance : bool = True
+        self.draw_miss_distance_vector : bool = True
 
         # assets
         self.aircraft_pixmap : QPixmap = QPixmap()
