@@ -29,9 +29,8 @@ class SimulationWidget(QWidget):
         self.simulation_fps = simulation_fps
         self.simulation_state = simulation_state
 
-        self.bounding_box_resolution = [SimulationSettings.resolution[0], SimulationSettings.resolution[1]]
-        self.window_width : float = SimulationSettings.resolution[0] + 10
-        self.window_height : float = SimulationSettings.resolution[1] + 10
+        self.window_width : float = SimulationSettings.resolution[0]
+        self.window_height : float = SimulationSettings.resolution[1]
         self.screen_offset_x : float = 0.0
         self.screen_offset_y : float = 0.0
         self.setGeometry(
@@ -79,19 +78,18 @@ class SimulationWidget(QWidget):
         painter.rotate(-yaw_angle)
         painter.end()
         self.draw_text(aircraft.position, scale, f"Aircraft {aircraft.aircraft_id}")
-        return
 
     def draw_destinations(self, aircraft : AircraftVehicle, scale : float) -> None:
         """Draws destinations of given aircraft vehicle"""
         for idx, destination in enumerate(self.aircraft_fccs[aircraft.aircraft_id].destinations):
             self.draw_disk(destination, 10, scale)
             self.draw_text(destination, scale, f"Destination {idx} of Aircraft {aircraft.aircraft_id}")
-        return
 
-    def draw_text(self, point : QVector3D, scale : float, text : str) -> None:
+    def draw_text(self, point : QVector3D, scale : float, text : str, color : QColor = QColor(0, 0, 0)) -> None:
         """Draws text at given coordinates"""
         painter = QPainter(self)
         painter.setBrush(Qt.BrushStyle.SolidPattern)
+        painter.setPen(color)
         x_offset = self.screen_offset_x * scale
         y_offset = self.screen_offset_y * scale
         if scale != 0:
@@ -105,11 +103,11 @@ class SimulationWidget(QWidget):
                 point.y(),
                 text)
         painter.end()
-        return
 
-    def draw_circle(self, point : QVector3D, size : float, scale : float) -> None:
+    def draw_circle(self, point : QVector3D, size : float, scale : float, color : QColor = QColor(0, 0, 0)) -> None:
         """Draws circle at given coordinates (empty)"""
         painter = QPainter(self)
+        painter.setPen(color)
         x_offset = self.screen_offset_x * scale
         y_offset = self.screen_offset_y * scale
         painter.drawEllipse(
@@ -118,12 +116,12 @@ class SimulationWidget(QWidget):
             size * scale,
             size * scale)
         painter.end()
-        return
     
-    def draw_disk(self, point : QVector3D, size : float, scale : float) -> None:
+    def draw_disk(self, point : QVector3D, size : float, scale : float, color : QColor = QColor(0, 0, 0)) -> None:
         """Draws disk at given coordinates (full)"""
         painter = QPainter(self)
         painter.setBrush(Qt.BrushStyle.SolidPattern)
+        painter.setPen(color)
         x_offset = self.screen_offset_x * scale
         y_offset = self.screen_offset_y * scale
         painter.drawEllipse(
@@ -132,7 +130,6 @@ class SimulationWidget(QWidget):
             size * scale,
             size * scale)
         painter.end()
-        return
 
     def draw_line(self, point1 : QVector3D, point2 : QVector3D, scale : float, color : QColor = QColor(0, 0, 0)) -> None:
         """Draws line connecting given points"""
@@ -147,7 +144,6 @@ class SimulationWidget(QWidget):
             int((point2.x() * scale) + x_offset),
             int((point2.y() * scale) + y_offset))
         painter.end()
-        return
 
     def draw_vector(self, point1 : QVector3D, point2 : QVector3D, scale : float, color : QColor = QColor(0, 0, 0)) -> None:
         """Draws vector pointing from first to second point"""
@@ -184,26 +180,45 @@ class SimulationWidget(QWidget):
         )
         painter.drawPolygon(polygon)
         painter.end()
-        return
     
-    def draw_miss_distance_vector(self, scale : float) -> None:
-        """Draws miss distance vector for the aircrafts"""
+    def draw_collision_detection(self, scale : float) -> None:
+        """Draws collision detection elements for the aircrafts"""
+        draw_collision_location : bool = False
+        time_to_closest_approach : float = 0.0
+        if self.simulation_state.collision:
+            self.draw_text(QVector3D(self.window_width - 70, 10, 0), 0, "COLLISION", QColor(255, 0, 0))
+            return
         for aircraft in self.aircraft_vehicles:
             relative_position = aircraft.position - self.aircraft_vehicles[1 - aircraft.aircraft_id].position
             speed_difference = aircraft.speed - self.aircraft_vehicles[1 - aircraft.aircraft_id].speed
             time_to_closest_approach = -(QVector3D.dotProduct(relative_position, speed_difference) / QVector3D.dotProduct(speed_difference, speed_difference))
             if time_to_closest_approach > 0:
-                # miss distance at closest approach
                 speed_difference_unit = speed_difference.normalized()
                 miss_distance_vector : QVector3D = QVector3D.crossProduct(
                     speed_difference_unit,
                     QVector3D.crossProduct(relative_position, speed_difference_unit))
-                self.draw_vector(
-                    self.aircraft_vehicles[1 - aircraft.aircraft_id].position,
-                    self.aircraft_vehicles[1 - aircraft.aircraft_id].position + miss_distance_vector,
-                    scale,
-                    QColor(0, 0, 255))
-        return
+                minimum_separation = 100
+                collision_distance = aircraft.size / 2 + self.aircraft_vehicles[1 - aircraft.aircraft_id].size / 2
+                unresolved_region = minimum_separation - miss_distance_vector.length()
+                collision_region = collision_distance - miss_distance_vector.length()
+                if miss_distance_vector.length() == 0:
+                    self.draw_text(QVector3D(self.window_width - 200, 10, 0), 0, "DETECTED HEAD-ON COLLISION", QColor(255, 0, 0))
+                    draw_collision_location = True
+                elif collision_region > 0:
+                    self.draw_text(QVector3D(self.window_width - 140, 10, 0), 0, "DETECTED COLLISION", QColor(255, 0, 0))
+                    draw_collision_location = True
+                    draw_collision_location = True
+                elif unresolved_region > 0:
+                    self.draw_text(QVector3D(self.window_width - 140, 10, 0), 0, "DETECTED CONFLICT")
+                    self.draw_vector(
+                        self.aircraft_vehicles[1 - aircraft.aircraft_id].position,
+                        self.aircraft_vehicles[1 - aircraft.aircraft_id].position + miss_distance_vector,
+                        scale,
+                        QColor(0, 0, 255))
+        if draw_collision_location:
+            aircraft = self.aircraft_vehicles[0]
+            collision_location = aircraft.position + aircraft.speed * time_to_closest_approach
+            self.draw_circle(collision_location, 10, scale, QColor(255, 0, 0))
     
     def draw_grid(self, x_offset : float, y_offset : float, scale : float) -> None:
         """Draws grid on the screen"""
@@ -231,7 +246,11 @@ class SimulationWidget(QWidget):
             self.screen_offset_x += 10.0
         if self.__moving_view_right:
             self.screen_offset_x -= 10.0
-        return
+
+    def update_resolutions(self) -> None:
+        """Updates bounding box resolution"""
+        self.window_width = self.width()
+        self.window_height = self.height()
 
     def paintEvent(self, event : QPaintEvent) -> None:
         """Qt method painting the aircrafts"""
@@ -244,16 +263,14 @@ class SimulationWidget(QWidget):
             self.draw_text(QVector3D(10, 10, 0), 0, "FPS: " + "{:.2f}".format(self.simulation_state.fps))
         if self.simulation_state.draw_grid:
             self.draw_grid(self.screen_offset_x, self.screen_offset_y, scale)
-        if self.simulation_state.draw_miss_distance_vector:
-            self.draw_miss_distance_vector(scale)
+        if self.simulation_state.draw_collision_detection:
+            self.draw_collision_detection(scale)
         for aircraft in self.aircraft_vehicles:
             if self.simulation_state.draw_aircraft:
                 self.draw_aircraft(aircraft, scale)
                 self.draw_destinations(aircraft, scale)
             if self.simulation_state.draw_speed_vectors:
                 self.draw_vector(aircraft.position, aircraft.position + aircraft.speed, scale)
-            if self.simulation_state.draw_safezones:
-                self.draw_circle(aircraft.position, self.aircraft_fccs[aircraft.aircraft_id].safezone_size, scale)
         return super().paintEvent(event)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
@@ -360,6 +377,11 @@ class SimulationWidget(QWidget):
         elif event.key() == Qt.Key.Key_Down:
             self.__moving_view_down = False
         return super().keyReleaseEvent(event)
+    
+    def resizeEvent(self, event: QPaintEvent) -> None:
+        """Qt method controlling window resize event"""
+        self.update_resolutions()
+        return super().resizeEvent(event)
 
     def closeEvent(self, event: QCloseEvent) -> None:
         """Qt method performed on the main window close event"""
