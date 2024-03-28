@@ -1,6 +1,5 @@
 """Main module for UAV Collision Avoidance application"""
 
-import sys
 import logging
 import platform
 import datetime
@@ -8,8 +7,8 @@ import signal
 from pathlib import Path
 
 from PySide6.QtWidgets import QApplication
-from version import __version__ as version
-from src.simulation.simulation import Simulation, SimulationSettings
+from .version import __version__ as version
+from .src.simulation.simulation import Simulation, SimulationSettings
 
 signal.signal(signal.SIGINT, signal.SIG_DFL)
 try:
@@ -32,8 +31,10 @@ if platform.system() == "Windows":
         f"io.github.mldxo.uav-collision-avoidance.{version}")
 logging.info("Detected platform: %s", platform.system())
 
-def main(args):
+def main():
     """Executes main function"""
+    import sys
+    args = sys.argv[1:]
     realtime : bool = True
     run_tests : bool = False
     if len(args) > 0:
@@ -67,4 +68,4 @@ def main(args):
         sys.exit()
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    main()
