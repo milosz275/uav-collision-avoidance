@@ -1,5 +1,7 @@
 """Simulation state module"""
 
+from urllib.request import urlopen
+
 from PySide6.QtCore import QSettings, QTime, QMutex, QMutexLocker
 from PySide6.QtGui import QPixmap
 
@@ -39,9 +41,12 @@ class SimulationState(QSettings):
         self.draw_collision_detection : bool = True
 
         # assets
+        url = "https://raw.githubusercontent.com/mldxo/uav-collision-avoidance/main/uav_collision_avoidance/src/assets/aircraft.png" 
+        data = urlopen(url).read()
         self.aircraft_pixmap : QPixmap = QPixmap()
-        if not self.aircraft_pixmap.load("src/assets/aircraft.png"):
-            self.aircraft_pixmap.load("uav_collision_avoidance/src/assets/aircraft.png")
+        self.image_loaded : bool = False
+        if self.aircraft_pixmap.loadFromData(data):
+            self.image_loaded = True
     
     @property
     def adsb_report(self) -> None:
