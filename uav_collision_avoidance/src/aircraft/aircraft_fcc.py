@@ -14,39 +14,35 @@ from src.aircraft.aircraft_vehicle import AircraftVehicle
 class AircraftFCC(QObject):
     """Aircraft Flight Control Computer"""
 
-    def __init__(self, aircraft_id : int, initial_target : QVector3D, aircraft : AircraftVehicle) -> None:
+    def __init__(self, aircraft_id : int, initial_target : QVector3D | None, aircraft : AircraftVehicle) -> None:
         super().__init__()
         self.aircraft_id = aircraft_id
         self.aircraft = aircraft
-
-        self.__safezone_occupied : bool = False
-        self.__safezone_size : float = 1000.0
-
-        self.target_yaw_angle : float = self.find_best_yaw_angle(aircraft.position, initial_target)
+        if initial_target is None:
+            self.target_yaw_angle : float = aircraft.yaw_angle
+        else:
+            self.target_yaw_angle : float = self.find_best_yaw_angle(aircraft.position, initial_target)
+        self.initial_course : float = copy(self.target_yaw_angle)
         self.target_roll_angle : float = 0.0
         self.target_pitch_angle : float = 0.0
-        self.target_speed : float = self.aircraft.absolute_speed
+        self.__target_speed : float = self.aircraft.absolute_speed
 
         self.__evade_maneuver : bool = False
 
         self.destinations : deque[QVector3D] = deque()
         self.destinations_history : List[QVector3D] = []
         self.visited : List[QVector3D] = []
-
+    
     @property
-    def safezone_size(self) -> float:
-        """Returns safezone size"""
-        return self.__safezone_size
-
-    @property
-    def safezone_occupied(self) -> bool:
-        """Returns safezone state"""
-        return self.__safezone_occupied
-
-    @safezone_occupied.setter
-    def safezone_occupied(self, occupied : bool) -> None:
-        """Sets safezone state"""
-        self.__safezone_occupied = occupied
+    def target_speed(self) -> float:
+        """Returns target speed"""
+        return self.__target_speed
+    
+    @target_speed.setter
+    def target_speed(self, speed : float) -> None:
+        """Sets target speed"""
+        if speed > 0:
+            self.__target_speed = speed
 
     def add_last_destination(self, destination : QVector3D) -> None:
         """Appends given location to the end of destinations list"""
@@ -75,13 +71,15 @@ class AircraftFCC(QObject):
         """Returns evade maneuver state"""
         return self.__evade_maneuver
 
-    def apply_evade_maneuver(self) -> None:
+    def apply_evade_maneuver(self, opponent_speed : QVector3D, miss_distance_vector : QVector3D, unresolved_region : float, time_to_closest_approach : float) -> None:
         """Applies evade maneuver"""
         if self.__evade_maneuver:
             logging.warning("Another evade maneuver in progress")
         else:
             logging.info("Aircraft %s applying evade maneuver", self.aircraft.aircraft_id)
             self.__evade_maneuver = True
+            # vector_sharing_resolution : QVector3D
+
             # todo: calculate turn radius, apply roll angle,
             # add corner enter position,
             # add maneuver end position, 
@@ -143,3 +141,13 @@ class AircraftFCC(QObject):
         """Updates target position"""
         self.target_yaw_angle = self.find_best_yaw_angle(self.aircraft.position, target)
         self.update_target_roll_angle()    
+
+    def reset(self) -> None:
+        """Resets aircraft flight control computer"""
+        self.destinations.clear()
+        self.destinations_history.clear()
+        self.visited.clear()
+        self.target_yaw_angle = self.initial_course
+        self.target_roll_angle = 0.0
+        self.target_pitch_angle = 0.0
+        self.__evade_maneuver = False
