@@ -60,7 +60,7 @@ class SimulationADSB(QThread):
 
                 # resolve confict condition
                 minimum_separation : float = 100.0
-                unresolved_region : float = minimum_separation - miss_distance_vector.length()
+                unresolved_region : float = minimum_separation - abs(miss_distance_vector.length())
                 if unresolved_region > 0.0:
                     print("Conflict condition detected")
                     for aircraft in self.aircraft_fccs:
@@ -69,8 +69,8 @@ class SimulationADSB(QThread):
                                 opponent_speed = self.aircraft_vehicles[1 - aircraft.aircraft_id].speed,
                                 miss_distance_vector = miss_distance_vector,
                                 unresolved_region = unresolved_region,
-                                time_to_closest_approach = time_to_closest_approach
-                            )
+                                time_to_closest_approach = time_to_closest_approach)
+                    print("Sum of vector sharing resolutions: ", self.aircraft_fccs[0].vector_sharing_resolution.length() + self.aircraft_fccs[1].vector_sharing_resolution.length() + miss_distance_vector.length())
                 
                 # probable collision
                 collision_distance = aircraft_vehicle_1.size / 2 + aircraft_vehicle_2.size / 2
