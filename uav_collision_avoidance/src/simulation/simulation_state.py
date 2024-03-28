@@ -42,16 +42,17 @@ class SimulationState(QSettings):
         self.draw_collision_detection : bool = True
 
         # assets
-        self.aircraft_pixmap : QPixmap = QPixmap()
-        if not self.aircraft_pixmap.load("assets/aircraft.png"):
-            try:
-                Path("assets").mkdir(parents=True, exist_ok=True)
-                urlretrieve(
-                    "https://raw.githubusercontent.com/mldxo/uav-collision-avoidance/main/assets/aircraft.png",
-                    "assets/aircraft.png")
-                self.aircraft_pixmap.load("assets/aircraft.png")
-            except:
-                pass
+        if is_realtime:
+            self.aircraft_pixmap : QPixmap = QPixmap()
+            if not self.aircraft_pixmap.load("assets/aircraft.png"):
+                try:
+                    Path("assets").mkdir(parents=True, exist_ok=True)
+                    urlretrieve(
+                        "https://raw.githubusercontent.com/mldxo/uav-collision-avoidance/main/assets/aircraft.png",
+                        "assets/aircraft.png")
+                    self.aircraft_pixmap.load("assets/aircraft.png")
+                except:
+                    pass
     
     @property
     def adsb_report(self) -> None:
