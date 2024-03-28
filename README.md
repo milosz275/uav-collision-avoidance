@@ -25,6 +25,7 @@ There are three possible arguments at the moment:
 - realtime - runs GUI application with realtime simulation
 - prerender - runs physical simulation
 - tests - runs full tests with comparison of using and not using collision avoidance algorithm
+
 App defaults to realtime simulation.
 
 ## Usage
@@ -46,7 +47,6 @@ Build it by cloning the repo and running the following commands:
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-cd uav-collision-avoidance
 python main.py [argument]
 ```
 
@@ -56,7 +56,6 @@ python main.py [argument]
 python -m venv venv
 .\venv\Scripts\activate
 pip install -r requirements.txt
-cd uav-collision-avoidance
 python main.py [argument]
 ```
 
