@@ -55,20 +55,28 @@ class SimulationADSB(QThread):
 
                 if miss_distance_vector.length() == 0:
                     print("Head-on collision detected")
+                    # todo: height change maneuver
+                    # else other evade maneuver
 
                 # resolve confict condition
-                minimum_separation = 100
-                unresolved_region = minimum_separation - miss_distance_vector.length()
-                if unresolved_region > 0:
+                minimum_separation : float = 100.0
+                unresolved_region : float = minimum_separation - miss_distance_vector.length()
+                if unresolved_region > 0.0:
                     print("Conflict condition detected")
-                    if not self.aircraft_fccs[0].evade_maneuver:
-                        self.aircraft_fccs[0].apply_evade_maneuver()
+                    for aircraft in self.aircraft_fccs:
+                        if not aircraft.evade_maneuver:
+                            aircraft.apply_evade_maneuver(
+                                opponent_speed = self.aircraft_vehicles[1 - aircraft.aircraft_id].speed,
+                                miss_distance_vector = miss_distance_vector,
+                                unresolved_region = unresolved_region,
+                                time_to_closest_approach = time_to_closest_approach
+                            )
                 
                 # probable collision
                 collision_distance = aircraft_vehicle_1.size / 2 + aircraft_vehicle_2.size / 2
                 collision_region = collision_distance - miss_distance_vector.length()
                 if collision_region > 0:
-                    print("Probable collision detected")
+                    print("Collision detected")
 
             for aircraft in self.aircraft_vehicles:
                 # path
