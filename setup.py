@@ -16,6 +16,9 @@ setup(
     entry_points = {
         "console_scripts" : [
             "uav-collision-avoidance = uav_collision_avoidance:main",
+            "uav-collision-avoidance-realtime = uav_collision_avoidance:main realtime",
+            "uav-collision-avoidance-prerender = uav_collision_avoidance:main prerender",
+            "uav-collision-avoidance-test = uav_collision_avoidance:main tests",
         ],
     },
     long_description = description,
