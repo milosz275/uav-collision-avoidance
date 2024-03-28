@@ -19,6 +19,14 @@ Python3[^1] project is wrapped as a PyPi package[^2]. PySide6[^3], which is PyQt
 
 ## Algorithms
 
+## App arguments
+
+There are three possible arguments at the moment:
+- realtime - runs GUI application with realtime simulation
+- prerender - runs physical simulation
+- tests - runs full tests with comparison of using and not using collision avoidance algorithm
+App defaults to realtime simulation.
+
 ## Usage
 
 Use `pip install uav-collision-avoidance` to install the app and run one of the following:
@@ -27,7 +35,9 @@ Use `pip install uav-collision-avoidance` to install the app and run one of the 
 - uav-collision-avoidance-prerender
 - uav-collision-avoidance-tests
 
-## Build it by cloning the repo and running the following commands:
+## Build
+
+Build it by cloning the repo and running the following commands:
 
 [![Bash](https://skillicons.dev/icons?i=bash)](https://skillicons.dev)
 
@@ -49,12 +59,6 @@ pip install -r requirements.txt
 cd uav-collision-avoidance
 python main.py [argument]
 ```
-
-There are three possible arguments at the moment:
-- realtime - runs GUI application with realtime simulation
-- prerender - runs physical simulation
-- tests - runs full tests with comparison of using and not using collision avoidance algorithm
-App defaults to realtime simulation.
 
 ## Remarks
 
