@@ -50,9 +50,7 @@ class AircraftVehicle(QObject):
     @speed.setter
     def speed(self, speed : QVector3D) -> None:
         """Sets speed"""
-        if speed.length() > 10:
-            del self.__speed
-            self.__speed = speed
+        self.__speed = speed
     
     @property
     def size(self) -> float:
@@ -85,16 +83,6 @@ class AircraftVehicle(QObject):
             self.__position.setX(self.__position.x() + dx)
             self.__position.setY(self.__position.y() + dy)
             self.__position.setZ(self.__position.z() + dz)
-    
-    def accelerate(self, dx : float, dy : float, dz : float) -> None:
-        """Applies speed deltas to the speed"""
-        with QMutexLocker(self.__mutex):
-            if self.__speed.x() + dx >= 0:
-                self.__speed.setX(self.__speed.x() + dx)
-            if self.__speed.y() + dy >= 0:
-                self.__speed.setY(self.__speed.y() + dy)
-            if self.__speed.z() + dz >= 0:
-                self.__speed.setZ(self.__speed.z() + dz)
     
     def roll(self, dy) -> None:
         """Applies roll angle delta of the aircraft"""
