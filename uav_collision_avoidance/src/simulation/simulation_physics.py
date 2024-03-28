@@ -29,57 +29,52 @@ class SimulationPhysics(QThread):
 
     def run(self) -> None:
         """Runs physics simulation thread"""
-        self.global_start_timestamp = QTime.currentTime()
+        self.mark_start_time()
         while not self.isInterruptionRequested():
             start_timestamp = QTime.currentTime()
             self.cycle(self.simulation_state.simulation_threshold)
             self.msleep(max(0, (self.simulation_state.simulation_threshold) - start_timestamp.msecsTo(QTime.currentTime())))
-        self.global_stop_timestamp = QTime.currentTime()
+        self.mark_stop_time()
         return super().run()
+    
+    def mark_start_time(self) -> None:
+        """Marks start time of the simulation"""
+        self.global_start_timestamp = QTime.currentTime()
+
+    def mark_stop_time(self) -> None:
+        """Marks stop time of the simulation"""
+        self.global_stop_timestamp = QTime.currentTime()
     
     def cycle(self, elapsed_time : float) -> None:
         """Executes physics simulation cycle"""
         if self.simulation_state.reset_demanded:
-            self.aircrafts[0].reset()
-            self.aircrafts[1].reset()
-            self.aircraft_fccs[0].destinations.clear()
-            self.aircraft_fccs[1].destinations.clear()
-            self.simulation_state.apply_reset()
+            self.reset_aircrafts()
         if not self.simulation_state.is_paused:
             self.count_cycles()
             self.simulation_state.update_simulation_settings()
             self.update_aircrafts_speed_angles(elapsed_time)
             if self.update_aircrafts_position(elapsed_time):
-                logging.warn("Aircrafts collided")
+                logging.warn("Aircrafts collided at coordinates: " + str(self.aircraft_vehicles[0].position.toTuple()) + " and " + str(self.aircraft_vehicles[1].position.toTuple()))
                 QApplication.beep()
                 self.simulation_state.register_collision()
                 if self.isRunning():
                     self.requestInterruption()
 
+    def reset_aircrafts(self) -> None:
+        """Resets aircrafts to initial state"""
+        self.aircrafts[0].reset()
+        self.aircrafts[1].reset()
+        self.aircraft_fccs[0].reset()
+        self.aircraft_fccs[1].reset()
+        self.simulation_state.apply_reset()
+
     def update_aircrafts_position(self, elapsed_time : float) -> bool:
         """Updates aircrafts position, returns true on collision"""
         for aircraft in self.aircraft_vehicles:
             relative_distance : float = dist(aircraft.position.toTuple(), self.aircraft_vehicles[1 - aircraft.aircraft_id].position.toTuple())
-            fcc : AircraftFCC = self.aircraft_fccs[aircraft.aircraft_id]
-            
-            # safezone occupancy
-            if relative_distance <= (fcc.safezone_size / 2):
-                if not fcc.safezone_occupied:
-                    fcc.safezone_occupied = True
-                    print("Aircraft " + str(1 - aircraft.aircraft_id) + " entered safezone of Aircraft " + str(aircraft.aircraft_id))
-                    #fcc.apply_evade_maneuver()
-            else:
-                if fcc.safezone_occupied:
-                    fcc.safezone_occupied = False
-                    print("Aircraft " + str(1 - aircraft.aircraft_id) + " left safezone of Aircraft " + str(aircraft.aircraft_id))
-                    # revoke evade maneuver?
-
-            # collision
             if relative_distance <= aircraft.size:
                 print("Collision")
                 return True
-                
-            # covered distance and position
             old_pos : QVector3D = copy(aircraft.position)
             aircraft.move(
                 aircraft.speed.x() * elapsed_time / 1000.0,
@@ -153,10 +148,8 @@ class SimulationPhysics(QThread):
 
             aircraft.speed.setX(sin(radians(new_yaw_angle)) * current_horizontal_speed)
             aircraft.speed.setY(-cos(radians(new_yaw_angle)) * current_horizontal_speed)
-        return
 
     def count_cycles(self) -> None:
         """Increments physics cycle counter"""
         self.cycles += 1
         self.simulation_state.physics_cycles = self.cycles
-        return
