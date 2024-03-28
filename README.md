@@ -21,7 +21,13 @@ Python3[^1] project is wrapped as a PyPi package[^2]. PySide6[^3], which is PyQt
 
 ## Usage
 
-~~Use `pip install uav-collision-avoidance` to install the app~~ or build it by cloning the repo and running the following commands:
+Use `pip install uav-collision-avoidance` to install the app and run one of the following:
+- uav-collision-avoidance
+- uav-collision-avoidance-realtime
+- uav-collision-avoidance-prerender
+- uav-collision-avoidance-tests
+
+## Build it by cloning the repo and running the following commands:
 
 [![Bash](https://skillicons.dev/icons?i=bash)](https://skillicons.dev)
 
@@ -31,7 +37,7 @@ python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 cd uav-collision-avoidance
-python main.py
+python main.py [argument]
 ```
 
 [![Powershell](https://skillicons.dev/icons?i=powershell)](https://skillicons.dev)
@@ -41,8 +47,14 @@ python -m venv venv
 .\venv\Scripts\activate
 pip install -r requirements.txt
 cd uav-collision-avoidance
-python main.py
+python main.py [argument]
 ```
+
+There are three possible arguments at the moment:
+- realtime - runs GUI application with realtime simulation
+- prerender - runs physical simulation
+- tests - runs full tests with comparison of using and not using collision avoidance algorithm
+App defaults to realtime simulation.
 
 ## Remarks
 
