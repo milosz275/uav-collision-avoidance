@@ -23,6 +23,7 @@ class AircraftVehicle(QObject):
 
         self.__size : float = 20.0
         self.__roll_angle = 0.0 # bank angle
+        self.initial_roll_angle = self.__roll_angle
         self.__distance_covered : float = 0.0
 
     @property
@@ -49,8 +50,9 @@ class AircraftVehicle(QObject):
     @speed.setter
     def speed(self, speed : QVector3D) -> None:
         """Sets speed"""
-        del self.__speed
-        self.__speed = speed
+        if speed.length() > 10:
+            del self.__speed
+            self.__speed = speed
     
     @property
     def size(self) -> float:
