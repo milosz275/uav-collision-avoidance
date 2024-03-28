@@ -9,7 +9,7 @@ from math import dist, atan2, degrees
 from PySide6.QtCore import QObject
 from PySide6.QtGui import QVector3D
 
-from src.aircraft.aircraft_vehicle import AircraftVehicle
+from .aircraft_vehicle import AircraftVehicle
 
 class AircraftFCC(QObject):
     """Aircraft Flight Control Computer"""

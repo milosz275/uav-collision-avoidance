@@ -4,7 +4,7 @@ from PySide6.QtCore import QThread, QTime, QMutex, QMutexLocker
 from PySide6.QtGui import QCloseEvent
 from PySide6.QtWidgets import QMainWindow
 
-from src.simulation.simulation_state import SimulationState
+from .simulation_state import SimulationState
 
 class SimulationFPS(QThread):
     """Thread running frames per second counter"""

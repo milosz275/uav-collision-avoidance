@@ -3,8 +3,8 @@
 from PySide6.QtCore import QThread, QTime
 from PySide6.QtWidgets import QMainWindow
 
-from src.simulation.simulation_widget import SimulationWidget
-from src.simulation.simulation_state import SimulationState
+from .simulation_widget import SimulationWidget
+from .simulation_state import SimulationState
 
 class SimulationRender(QThread):
     """Thread running simulation rendering"""

@@ -10,15 +10,15 @@ from PySide6.QtCore import QThread, QTime
 from PySide6.QtGui import QCloseEvent, QVector3D
 from PySide6.QtWidgets import QMainWindow
 
-from src.aircraft.aircraft import Aircraft
-from src.aircraft.aircraft_fcc import AircraftFCC
-from src.simulation.simulation_settings import SimulationSettings
-from src.simulation.simulation_physics import SimulationPhysics
-from src.simulation.simulation_state import SimulationState
-from src.simulation.simulation_render import SimulationRender
-from src.simulation.simulation_widget import SimulationWidget
-from src.simulation.simulation_adsb import SimulationADSB
-from src.simulation.simulation_fps import SimulationFPS
+from ..aircraft.aircraft import Aircraft
+from ..aircraft.aircraft_fcc import AircraftFCC
+from ..simulation.simulation_settings import SimulationSettings
+from ..simulation.simulation_physics import SimulationPhysics
+from ..simulation.simulation_state import SimulationState
+from ..simulation.simulation_render import SimulationRender
+from ..simulation.simulation_widget import SimulationWidget
+from ..simulation.simulation_adsb import SimulationADSB
+from ..simulation.simulation_fps import SimulationFPS
 
 class Simulation(QMainWindow):
     """Main simulation App"""

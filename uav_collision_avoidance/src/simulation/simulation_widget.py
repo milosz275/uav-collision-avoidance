@@ -9,11 +9,11 @@ from PySide6.QtGui import QPaintEvent, QPainter, QKeyEvent, \
     QMouseEvent, QIcon, QPixmap, QCloseEvent, QVector3D, QPolygonF, QWheelEvent, QColor
 from PySide6.QtWidgets import QWidget, QApplication
 
-from src.aircraft.aircraft import Aircraft
-from src.aircraft.aircraft_fcc import AircraftFCC
-from src.aircraft.aircraft_vehicle import AircraftVehicle
-from src.simulation.simulation_fps import SimulationFPS
-from src.simulation.simulation_settings import SimulationSettings
+from ..aircraft.aircraft import Aircraft
+from ..aircraft.aircraft_fcc import AircraftFCC
+from ..aircraft.aircraft_vehicle import AircraftVehicle
+from .simulation_fps import SimulationFPS
+from .simulation_settings import SimulationSettings
 
 class SimulationWidget(QWidget):
     """Main widget representing the simulation"""

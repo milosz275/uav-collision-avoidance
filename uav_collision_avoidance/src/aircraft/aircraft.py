@@ -5,8 +5,8 @@ from copy import copy
 from PySide6.QtCore import QObject
 from PySide6.QtGui import QVector3D
 
-from src.aircraft.aircraft_vehicle import AircraftVehicle
-from src.aircraft.aircraft_fcc import AircraftFCC
+from .aircraft_vehicle import AircraftVehicle
+from .aircraft_fcc import AircraftFCC
 
 class Aircraft(QObject):
     """Main aircraft class"""

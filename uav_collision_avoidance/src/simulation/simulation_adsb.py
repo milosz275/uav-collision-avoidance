@@ -7,10 +7,10 @@ from PySide6.QtCore import QThread, QTime
 from PySide6.QtGui import QVector3D
 from PySide6.QtWidgets import QMainWindow
 
-from src.aircraft.aircraft import Aircraft
-from src.aircraft.aircraft_vehicle import AircraftVehicle
-from src.aircraft.aircraft_fcc import AircraftFCC
-from src.simulation.simulation_state import SimulationState
+from ..aircraft.aircraft import Aircraft
+from ..aircraft.aircraft_vehicle import AircraftVehicle
+from ..aircraft.aircraft_fcc import AircraftFCC
+from .simulation_state import SimulationState
 
 class SimulationADSB(QThread):
     """Thread running ADS-B system for collision detection and avoidance"""
