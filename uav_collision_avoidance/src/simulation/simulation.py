@@ -6,9 +6,9 @@ import datetime
 from typing import List
 from pathlib import Path
 
-from PySide6.QtCore import QThread
+from PySide6.QtCore import QThread, QTime
 from PySide6.QtGui import QCloseEvent, QVector3D
-from PySide6.QtWidgets import QMainWindow, QApplication
+from PySide6.QtWidgets import QMainWindow
 
 from src.aircraft.aircraft import Aircraft
 from src.aircraft.aircraft_fcc import AircraftFCC
@@ -28,14 +28,20 @@ class Simulation(QMainWindow):
         SimulationSettings().__init__()
         if aircrafts is None:
             self.aircrafts : List[Aircraft] = [
+                # Aircraft(
+                #     position = QVector3D(100, 1000, 1000),
+                #     speed = QVector3D(50, -50, 0),
+                #     initial_target = QVector3D(1_000_100, -1_001_000, 1000)),
+                # Aircraft(
+                #     position = QVector3D(900, 1300, 1000),
+                #     speed = QVector3D(0, -70, 0),
+                #     initial_target = QVector3D(900, -1_001_300, 1000)),
                 Aircraft(
-                    position = QVector3D(100, 1000, 1000),
-                    speed = QVector3D(60, -70, 0),
-                    initial_target = QVector3D(1000_000, -1000_000, 1000)),
+                    position = QVector3D(100, 500, 1000),
+                    speed = QVector3D(70, 0, 0)),
                 Aircraft(
-                    position = QVector3D(900, 1300, 1000),
-                    speed = QVector3D(0, -70, 0),
-                    initial_target = QVector3D(0, -1000_000, 1000)),
+                    position = QVector3D(900, 500, 1000),
+                    speed = QVector3D(-50, 0, 0)),
             ]
         else:
             self.aircrafts = aircrafts
@@ -66,7 +72,6 @@ class Simulation(QMainWindow):
         self.simulation_render.start(priority = QThread.Priority.NormalPriority)
 
         self.simulation_widget.stop_signal.connect(self.stop_simulation)
-        return
     
     def run_prerender(self) -> None:
         """Executes prerender simulation"""
@@ -75,22 +80,35 @@ class Simulation(QMainWindow):
             return
         logging.info("Starting prerendered simulation")
         self.state = SimulationState(SimulationSettings(), is_realtime = False)
-        simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
-        simulation_adsb = SimulationADSB(self, self.aircrafts, self.state)
+        self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
+        self.simulation_adsb = SimulationADSB(self, self.aircrafts, self.state)
         time_step : int = int(self.state.simulation_threshold)
         adsb_step : int = int(self.state.adsb_threshold)
         partial_time_counter : int = adsb_step
         for time in range(0, self.simulation_time, time_step):
             print(time)
-            simulation_physics.cycle(time_step)
+            self.simulation_physics.cycle(time_step)
             if partial_time_counter >= adsb_step:
-                simulation_adsb.cycle()
+                self.simulation_adsb.cycle()
                 partial_time_counter = 0
             partial_time_counter += time_step
             if self.state.collision:
                 break
         self.stop_simulation()
-        return
+    
+    def run_tests(self, test_number : int = 10) -> None:
+        """Runs simulation tests"""
+        if test_number < 1:
+            test_number = 10
+        logging.info("Running simulation tests")
+        start_timestamp = QTime.currentTime()
+        for i in range(0, test_number, 1):
+            logging.info("Test %d", i)
+            self.run_prerender()
+            self.state = None
+        real_time : float = start_timestamp.msecsTo(QTime.currentTime()) / 1000
+        print("Total time elapsed: " + "{:.2f}".format(real_time) + "s")
+        logging.info("Total time elapsed: %ss", "{:.2f}".format(real_time))
     
     def stop_simulation(self) -> None:
         """Stops simulation"""
@@ -100,7 +118,6 @@ class Simulation(QMainWindow):
             self.stop_prerender_simulation()
         self.state.reset()
         self.state.is_running = False
-        return
 
     def stop_realtime_simulation(self) -> None:
         """Finishes all active realtime simulation threads"""
@@ -138,15 +155,14 @@ class Simulation(QMainWindow):
         self.simulation_render.wait()
         self.simulation_fps.quit()
         self.simulation_fps.wait()
-        return
     
     def stop_prerender_simulation(self) -> None:
         """Finishes all active prerender simulation threads"""
         if not self.state.is_running:
             return
-        logging.info("Stopping prerender simulation")
-        # todo
-        return
+        logging.info("Stopping prerendered simulation")
+        self.simulation_physics.reset_aircrafts()
+        self.state.reset()
     
     def export_visited_locations(self) -> None:
         """Exports aircrafts visited location lists"""
@@ -162,7 +178,6 @@ class Simulation(QMainWindow):
             writer.writerow(["x","y","z"])
             for position in aircraft.visited:
                 writer.writerow([("{:.2f}".format(position.x())),("{:.2f}".format(position.y())),("{:.2f}".format(position.z()))])
-        return
     
     def closeEvent(self, event: QCloseEvent) -> None:
         """Qt method performed on the main window close event"""
