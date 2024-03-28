@@ -25,24 +25,41 @@ except:
         format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
         handlers=[logging.StreamHandler()])
 
-logging.info("-" * 80)
+logging.info("-" * 120)
 if platform.system() == "Windows":
     import ctypes
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
         f"io.github.mldxo.uav-collision-avoidance.{version}")
 logging.info("Detected platform: %s", platform.system())
 
-realtime : bool = True
-
 def main(args):
     """Executes main function"""
+    realtime : bool = True
+    run_tests : bool = False
+    if len(args) > 0:
+        if args[0] == "realtime":
+            realtime = True
+        elif args[0] == "prerender":
+            realtime = False
+        elif args[0] == "tests":
+            run_tests = True
+        elif len(args) > 1:
+            logging.error("Invalid arguments: %s", args)
+            sys.exit(1)
+        else:
+            logging.error("Invalid argument: %s", args[0])
+            sys.exit(1)
     app = QApplication(args)
     app.setApplicationName("UAV Collsion Avoidance")
     app.setApplicationVersion(version)
     SimulationSettings.screen_resolution = app.primaryScreen().size()
     logging.info("%s %s", app.applicationName(), app.applicationVersion())
     sim = Simulation()
-    if realtime:
+    if run_tests:
+        realtime = False
+        sim.run_tests(20)
+        sys.exit()
+    elif realtime:
         sim.run_realtime()
         sys.exit(app.exec())
     else:
