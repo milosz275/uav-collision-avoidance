@@ -78,8 +78,12 @@ class AircraftFCC(QObject):
         else:
             logging.info("Aircraft %s applying evade maneuver", self.aircraft.aircraft_id)
             self.__evade_maneuver = True
-            # vector_sharing_resolution : QVector3D
-
+            vector_sharing_resolution : QVector3D
+            if self.aircraft_id == 0:
+                vector_sharing_resolution = (opponent_speed.length() * unresolved_region * -(miss_distance_vector)) / (self.aircraft.speed.length() + opponent_speed.length() * miss_distance_vector.length())
+            else:
+                vector_sharing_resolution = (opponent_speed.length() * unresolved_region * miss_distance_vector) / (opponent_speed.length() + self.aircraft.speed.length() * miss_distance_vector.length())
+            #print("Vector sharing resolution: ", vector_sharing_resolution)
             # todo: calculate turn radius, apply roll angle,
             # add corner enter position,
             # add maneuver end position, 
