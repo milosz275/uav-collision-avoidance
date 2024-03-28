@@ -54,11 +54,17 @@ class SimulationWidget(QWidget):
         """Draws given aircraft vehicle"""
         yaw_angle : float = aircraft.yaw_angle
         size : float = aircraft.size * scale
-        pixmap : QPixmap = self.simulation_state.aircraft_pixmap.scaled(
-            size * abs(cos(radians(aircraft.roll_angle))),
-            size * abs(cos(radians(aircraft.pitch_angle)))
-        )
-
+        pixmap : QPixmap
+        if not self.simulation_state.aircraft_pixmap.isNull():
+            pixmap = self.simulation_state.aircraft_pixmap.scaled(
+                size * abs(cos(radians(aircraft.roll_angle))),
+                size * abs(cos(radians(aircraft.pitch_angle)))
+            )
+        else:
+            pixmap = QPixmap(
+                size * abs(cos(radians(aircraft.roll_angle))),
+                size * abs(cos(radians(aircraft.pitch_angle))))
+            pixmap.fill(Qt.GlobalColor.black)
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
@@ -254,8 +260,6 @@ class SimulationWidget(QWidget):
 
     def paintEvent(self, event : QPaintEvent) -> None:
         """Qt method painting the aircrafts"""
-        if self.simulation_state.aircraft_pixmap.isNull():
-            return super().paintEvent(event)
         self.simulation_fps.count_frame()
         scale : float = self.simulation_state.gui_scale
         self.update_offsets()
