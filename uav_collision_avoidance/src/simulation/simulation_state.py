@@ -36,8 +36,7 @@ class SimulationState(QSettings):
         self.draw_grid : bool = False
         self.draw_path : bool = True
         self.draw_speed_vectors : bool = True
-        self.draw_safezones : bool = True
-        self.draw_miss_distance_vector : bool = True
+        self.draw_collision_detection : bool = True
 
         # assets
         self.aircraft_pixmap : QPixmap = QPixmap()
@@ -53,28 +52,23 @@ class SimulationState(QSettings):
         self.update_render_settings()
         self.update_simulation_settings()
         self.update_adsb_settings()
-        return
 
     def toggle_adsb_report(self) -> None:
         """Toggles ADS-B commandline info report"""
         self.__adsb_report = not self.__adsb_report
-        return
     
     def update_render_settings(self) -> None:
         """Updates simulation render state settings"""
         self.gui_render_threshold = self.simulation_settings.gui_render_threshold
-        return
     
     def update_simulation_settings(self) -> None:
         """Updates simulation physics state settings"""
         self.simulation_threshold = self.simulation_settings.simulation_threshold
         self.g_acceleration = self.simulation_settings.g_acceleration
-        return
     
     def update_adsb_settings(self) -> None:
         """Updates simulation ADS-B state settings"""
         self.adsb_threshold = self.simulation_settings.adsb_threshold
-        return
 
     def append_paused_time(self) -> None:
         """Appends time elapsed during recent pause"""
@@ -91,7 +85,6 @@ class SimulationState(QSettings):
                 return
             self.pause_start_timestamp = QTime.currentTime()
             self.is_paused = True
-        return
     
     @property
     def collision(self) -> bool:
@@ -101,7 +94,6 @@ class SimulationState(QSettings):
     def register_collision(self) -> None:
         """Registers collision"""
         self.__collision = True
-        return
     
     @property
     def first_cause_collision(self) -> bool:
@@ -111,7 +103,6 @@ class SimulationState(QSettings):
     def toggle_first_causing_collision(self) -> None:
         """Toggles causing collision state"""
         self.__first_cause_collision = not self.__first_cause_collision
-        return
     
     @property
     def second_cause_collision(self) -> bool:
@@ -121,7 +112,6 @@ class SimulationState(QSettings):
     def toggle_second_causing_collision(self) -> None:
         """Toggles causing collision state"""
         self.__second_cause_collision = not self.__second_cause_collision
-        return
     
     @property
     def reset_demanded(self) -> bool:
@@ -133,13 +123,11 @@ class SimulationState(QSettings):
         """Resets simulation to its start state"""
         with QMutexLocker(self.__mutex):
             self.__reset_demanded = True
-        return
 
     def apply_reset(self) -> None:
         """Sets back simulation reset state"""
         with QMutexLocker(self.__mutex):
             self.__reset_demanded = False
-        return
 
     @property
     def gui_scale(self) -> float:
@@ -151,4 +139,3 @@ class SimulationState(QSettings):
         """Sets GUI scaling factor"""
         if value > 0.0:
             self.__gui_scale = value
-        return
