@@ -28,20 +28,20 @@ class Simulation(QMainWindow):
         SimulationSettings().__init__()
         if aircrafts is None:
             self.aircrafts : List[Aircraft] = [
-                # Aircraft(
-                #     position = QVector3D(100, 1000, 1000),
-                #     speed = QVector3D(50, -50, 0),
-                #     initial_target = QVector3D(1_000_100, -1_001_000, 1000)),
-                # Aircraft(
-                #     position = QVector3D(900, 1300, 1000),
-                #     speed = QVector3D(0, -70, 0),
-                #     initial_target = QVector3D(900, -1_001_300, 1000)),
                 Aircraft(
-                    position = QVector3D(100, 500, 1000),
-                    speed = QVector3D(70, 0, 0)),
+                    position = QVector3D(100, 1000, 1000),
+                    speed = QVector3D(50, -50, 0),
+                    initial_target = QVector3D(1_000_100, -1_001_000, 1000)),
                 Aircraft(
-                    position = QVector3D(900, 500, 1000),
-                    speed = QVector3D(-50, 0, 0)),
+                    position = QVector3D(900, 1300, 1000),
+                    speed = QVector3D(0, -70, 0),
+                    initial_target = QVector3D(900, -1_001_300, 1000)),
+                # Aircraft(
+                #     position = QVector3D(100, 500, 1000),
+                #     speed = QVector3D(70, 0, 0)),
+                # Aircraft(
+                #     position = QVector3D(900, 500, 1000),
+                #     speed = QVector3D(-50, 0, 0)),
             ]
         else:
             self.aircrafts = aircrafts
