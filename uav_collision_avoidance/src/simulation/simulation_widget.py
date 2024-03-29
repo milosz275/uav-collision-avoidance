@@ -212,6 +212,11 @@ class SimulationWidget(QWidget):
                     draw_collision_location = True
                 elif collision_region > 0:
                     self.draw_text(QVector3D(self.window_width - 140, 10, 0), 0, "DETECTED COLLISION", QColor(255, 0, 0))
+                    self.draw_vector(
+                        self.aircraft_vehicles[1 - aircraft.aircraft_id].position,
+                        self.aircraft_vehicles[1 - aircraft.aircraft_id].position + miss_distance_vector,
+                        scale,
+                        QColor(0, 0, 255))
                     draw_collision_location = True
                 elif unresolved_region > 0:
                     self.draw_text(QVector3D(self.window_width - 140, 10, 0), 0, "DETECTED CONFLICT")
