@@ -79,17 +79,24 @@ class AircraftFCC(QObject):
         else:
             logging.info("Aircraft %s applying evade maneuver", self.aircraft.aircraft_id)
             self.__evade_maneuver = True
+            self.vector_sharing_resolution : QVector3D = QVector3D()
             if self.aircraft_id == 0:
                 self.vector_sharing_resolution = (opponent_speed.length() * unresolved_region * -(miss_distance_vector)) / ((self.aircraft.speed.length() + opponent_speed.length()) * miss_distance_vector.length())
             else:
                 self.vector_sharing_resolution = (opponent_speed.length() * unresolved_region * miss_distance_vector) / ((opponent_speed.length() + self.aircraft.speed.length()) * miss_distance_vector.length())
             print("Vector sharing resolution: ", self.vector_sharing_resolution)
-            
+
+            unit_vector : QVector3D = self.aircraft.speed * time_to_closest_approach
+            unit_vector += self.vector_sharing_resolution
+            unit_vector.normalize()
+            print("Unit vector: ", unit_vector)
+
             # todo: calculate turn radius, apply roll angle,
             # add corner enter position,
             # add maneuver end position, 
             # check if original destination is restored,
             # reset evade maneuver flag
+            self.__evade_maneuver = False
 
     def find_best_roll_angle(self, current_yaw_angle : float, target_yaw_angle : float) -> float:
         """Finds best roll angle for the targeted yaw angle"""
