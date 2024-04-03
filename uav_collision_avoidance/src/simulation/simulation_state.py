@@ -31,18 +31,24 @@ class SimulationState(QSettings):
         self.__first_cause_collision : bool = False
         self.__second_cause_collision : bool = False
 
-        # render state
-        self.__gui_scale : float = 0.75 # define gui scaling
-        self.fps : float = 0.0
-        self.draw_fps : bool = True
-        self.draw_aircraft : bool = True
-        self.draw_grid : bool = False
-        self.draw_path : bool = True
-        self.draw_speed_vectors : bool = True
-        self.draw_collision_detection : bool = True
-
-        # assets
         if is_realtime:
+            # render state
+            self.__gui_scale : float = 1.0 # define gui scaling
+            if SimulationSettings.screen_resolution.height() < 1440:
+                self.gui_scale = 0.75
+            elif SimulationSettings.screen_resolution.height() < 1080:
+                self.gui_scale = 0.5
+            elif SimulationSettings.screen_resolution.height() < 480:
+                self.gui_scale = 0.25
+            self.fps : float = 0.0
+            self.draw_fps : bool = True
+            self.draw_aircraft : bool = True
+            self.draw_grid : bool = False
+            self.draw_path : bool = True
+            self.draw_speed_vectors : bool = True
+            self.draw_collision_detection : bool = True
+
+            # assets
             self.aircraft_pixmap : QPixmap = QPixmap()
             if not self.aircraft_pixmap.load("assets/aircraft.png"):
                 try:
