@@ -40,7 +40,9 @@ Use `pip install uav-collision-avoidance` to install the app and run one of the 
 
 Build it by cloning the repo and running the following commands:
 
-[![Bash](https://skillicons.dev/icons?i=bash)](https://skillicons.dev)
+<p align="left">
+    <img width="30px" alt="Bash" style="padding-right:10px;" src="https://skillicons.dev/icons?i=bash" />
+</p>
 
 ```bash
 #!/bin/bash
@@ -50,7 +52,9 @@ pip install -r requirements.txt
 python main.py [argument]
 ```
 
-[![Powershell](https://skillicons.dev/icons?i=powershell)](https://skillicons.dev)
+<p align="left">
+    <img width="30px" alt="Powershell" style="padding-right:10px;" src="https://skillicons.dev/icons?i=powershell" />
+</p>
 
 ```powershell
 python -m venv venv
