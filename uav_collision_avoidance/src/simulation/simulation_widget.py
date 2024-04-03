@@ -281,13 +281,20 @@ class SimulationWidget(QWidget):
             self.draw_grid(self.screen_offset_x, self.screen_offset_y, scale)
 
         anything_to_draw : bool = False
-        for aircraft in self.aircraft_vehicles:
-            if aircraft.position.x() * scale + self.screen_offset_x + 250 >= 0 and \
-                aircraft.position.y() * scale + self.screen_offset_y + 250 >= 0 and \
-                aircraft.position.x() * scale + self.screen_offset_x - 250 <= self.window_width and \
-                aircraft.position.y() * scale + self.screen_offset_y - 250 <= self.window_height:
-                anything_to_draw = True
-                break
+        geometric_center : QVector3D = self.aircraft_vehicles[0].position + self.aircraft_vehicles[1].position / 2
+        if (geometric_center.x() * scale + 300) + self.screen_offset_x * scale >= 0 and \
+            (geometric_center.y() * scale + 200) + self.screen_offset_y * scale >= 0 and \
+            (geometric_center.x() * scale - 300) + self.screen_offset_x * scale <= self.window_width and \
+            (geometric_center.y() * scale - 200) + self.screen_offset_y * scale <= self.window_height:
+            anything_to_draw = True
+        if not anything_to_draw:
+            for aircraft in self.aircraft_vehicles:
+                if (aircraft.position.x() * scale) + self.screen_offset_x * scale >= 0 and \
+                    (aircraft.position.y() * scale) + self.screen_offset_y * scale >= 0 and \
+                    (aircraft.position.x() * scale) + self.screen_offset_x * scale <= self.window_width and \
+                    (aircraft.position.y() * scale) + self.screen_offset_y * scale <= self.window_height:
+                    anything_to_draw = True
+                    break
         if not anything_to_draw:
             return super().paintEvent(event)
 
