@@ -11,7 +11,7 @@ setup(
     version = version,
     packages = find_packages(),
     install_requires = [
-        "pyside6"
+        "pyside6",
     ],
     entry_points = {
         "console_scripts" : [
