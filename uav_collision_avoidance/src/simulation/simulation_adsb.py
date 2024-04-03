@@ -59,7 +59,7 @@ class SimulationADSB(QThread):
                     # else other evade maneuver
 
                 # resolve confict condition
-                minimum_separation : float = 100.0
+                minimum_separation : float = 9260.0 # 5nmi
                 unresolved_region : float = minimum_separation - abs(miss_distance_vector.length())
                 if unresolved_region > 0.0:
                     print("Conflict condition detected")
@@ -77,6 +77,10 @@ class SimulationADSB(QThread):
                 collision_region = collision_distance - miss_distance_vector.length()
                 if collision_region > 0:
                     print("Collision detected")
+            else:
+                for aircraft in self.aircraft_fccs:
+                    if aircraft.evade_maneuver:
+                        aircraft.reset_evade_maneuver()
 
             for aircraft in self.aircraft_vehicles:
                 # path
