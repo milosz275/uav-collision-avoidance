@@ -18,10 +18,15 @@ class AircraftFCC(QObject):
         super().__init__()
         self.aircraft_id = aircraft_id
         self.aircraft = aircraft
+
+        self.destinations : deque[QVector3D] = deque()
+
         if initial_target is None:
             self.target_yaw_angle : float = aircraft.yaw_angle
         else:
             self.target_yaw_angle : float = self.find_best_yaw_angle(aircraft.position, initial_target)
+            self.add_first_destination(initial_target)
+
         self.initial_course : float = copy(self.target_yaw_angle)
         self.target_roll_angle : float = 0.0
         self.target_pitch_angle : float = 0.0
@@ -30,7 +35,6 @@ class AircraftFCC(QObject):
         self.__evade_maneuver : bool = False
         self.vector_sharing_resolution : QVector3D | None = None
 
-        self.destinations : deque[QVector3D] = deque()
         self.destinations_history : List[QVector3D] = []
         self.visited : List[QVector3D] = []
     
@@ -51,7 +55,13 @@ class AircraftFCC(QObject):
 
     def add_first_destination(self, destination : QVector3D) -> None:
         """Pushes given location to the top of destinations list"""
+        if len(self.destinations) > 0 and dist(destination.toTuple(), self.destinations[0].toTuple()) < 1:
+            print("Attempted to stack same destination")
+            logging.warning("Attempted to stack same destination")
+            return
+
         self.destinations.appendleft(destination)
+        logging.info("Aircraft %s added new first destination: %s", self.aircraft.aircraft_id, destination.toTuple())
 
     def append_visited(self) -> None:
         """Appends current location to visited list"""
@@ -79,24 +89,27 @@ class AircraftFCC(QObject):
         else:
             logging.info("Aircraft %s applying evade maneuver", self.aircraft.aircraft_id)
             self.__evade_maneuver = True
-            self.vector_sharing_resolution : QVector3D = QVector3D()
+            self.vector_sharing_resolution : QVector3D | None = None
             if self.aircraft_id == 0:
                 self.vector_sharing_resolution = (opponent_speed.length() * unresolved_region * -(miss_distance_vector)) / ((self.aircraft.speed.length() + opponent_speed.length()) * miss_distance_vector.length())
             else:
                 self.vector_sharing_resolution = (opponent_speed.length() * unresolved_region * miss_distance_vector) / ((opponent_speed.length() + self.aircraft.speed.length()) * miss_distance_vector.length())
             print("Vector sharing resolution: ", self.vector_sharing_resolution)
+            # unit_vector : QVector3D = self.aircraft.speed * time_to_closest_approach
+            # unit_vector += self.vector_sharing_resolution
+            # unit_vector.normalize()
+                
+            self.vector_sharing_resolution *= self.aircraft.size # default not working
 
-            unit_vector : QVector3D = self.aircraft.speed * time_to_closest_approach
-            unit_vector += self.vector_sharing_resolution
-            unit_vector.normalize()
-            print("Unit vector: ", unit_vector)
+            target_avoiding : QVector3D = self.aircraft.position + (self.aircraft.speed * time_to_closest_approach + self.vector_sharing_resolution)
+            #self.add_first_destination(target_avoiding)
 
-            # todo: calculate turn radius, apply roll angle,
-            # add corner enter position,
-            # add maneuver end position, 
-            # check if original destination is restored,
-            # reset evade maneuver flag
+    def reset_evade_maneuver(self) -> None:
+        """Resets evade maneuver"""
+        if self.__evade_maneuver:
+            logging.info("Aircraft %s reset evade maneuver", self.aircraft.aircraft_id)
             self.__evade_maneuver = False
+            #self.vector_sharing_resolution = None
 
     def find_best_roll_angle(self, current_yaw_angle : float, target_yaw_angle : float) -> float:
         """Finds best roll angle for the targeted yaw angle"""
@@ -136,7 +149,7 @@ class AircraftFCC(QObject):
         target_yaw_angle = self.normalize_angle(self.target_yaw_angle)
         self.target_roll_angle = self.find_best_roll_angle(current_yaw_angle, target_yaw_angle)
 
-        if len(self.destinations) > 1:
+        if len(self.destinations) > 1 and dist(self.aircraft.position.toTuple(), self.destinations[0].toTuple()) < self.aircraft.speed.length():
             difference = (target_yaw_angle - current_yaw_angle + 180) % 360 - 180
             if abs(difference) < 0.01:
                 next_position = self.destinations[0]
