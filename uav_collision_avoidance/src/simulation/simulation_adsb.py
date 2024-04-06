@@ -45,6 +45,9 @@ class SimulationADSB(QThread):
             time_to_closest_approach = -(QVector3D.dotProduct(relative_position, speed_difference) / QVector3D.dotProduct(speed_difference, speed_difference))
             print("Time to closest approach: " + "{:.2f}".format(time_to_closest_approach) + "s")
 
+            if not self.simulation_state.avoid_collisions:
+                return
+
             if time_to_closest_approach > 0:
                 # miss distance at closest approach
                 speed_difference_unit = speed_difference.normalized()
@@ -59,8 +62,7 @@ class SimulationADSB(QThread):
                     # else other evade maneuver
 
                 # resolve confict condition
-                minimum_separation : float = 9260.0 # 5nmi
-                unresolved_region : float = minimum_separation - abs(miss_distance_vector.length())
+                unresolved_region : float = self.simulation_state.minimum_separation - abs(miss_distance_vector.length())
                 if unresolved_region > 0.0:
                     print("Conflict condition detected")
                     for aircraft in self.aircraft_fccs:
