@@ -18,6 +18,7 @@ setup(
             "uav-collision-avoidance = uav_collision_avoidance:main",
         ],
     },
+    description = "UAV collision avoidance simulation",
     long_description = description,
     long_description_content_type = "text/markdown",
 )
