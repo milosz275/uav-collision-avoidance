@@ -85,8 +85,7 @@ class SimulationPhysics(QThread):
     
     def update_aircrafts_speed_angles(self, elapsed_time : float) -> None:
         """Updates aircrafts movement speed and angles"""
-        if elapsed_time == 0.0:
-            return
+        assert elapsed_time > 0.0
         for aircraft in self.aircraft_vehicles:
             # flight control computer
             id : int = aircraft.aircraft_id
@@ -99,7 +98,7 @@ class SimulationPhysics(QThread):
             target_speed = fcc.target_speed
             speed_difference = abs(current_speed - target_speed)
             if speed_difference > 0.001 and target_speed > 20.0:
-                max_speed_delta = 0.5 # todo: calculate
+                max_speed_delta = aircraft.max_acceleration / elapsed_time
                 if speed_difference < max_speed_delta:
                     pass # become target
                 elif current_speed < target_speed:
