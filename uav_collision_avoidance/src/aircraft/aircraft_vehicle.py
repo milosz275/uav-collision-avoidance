@@ -10,6 +10,7 @@ class AircraftVehicle(QObject):
 
     roll_dynamic_delay : float = 1000 # ms
     pitch_dynamic_delay : float = 2000 # ms
+    max_acceleration : float = 2.0 # m/s^2
 
     def __init__(self, aircraft_id : int, position : QVector3D, speed : QVector3D) -> None:
         super().__init__()
