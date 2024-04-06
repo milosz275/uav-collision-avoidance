@@ -1,7 +1,9 @@
 # UAV Collision Avoidance
 
 Python project regarding implementation of UAV physics and collision detection/avoidance algorithms.
-[Archived version](https://github.com/mldxo/uav-collision-avoidance-2)
+- [Current version](https://github.com/mldxo/uav-collision-avoidance)
+- [Archived version](https://github.com/mldxo/uav-collision-avoidance-2)
+- [Pypi project](https://pypi.org/project/uav-collision-avoidance)
 
 ## Introduction
 
@@ -9,7 +11,7 @@ UAV Collision Avoidance is my bachelor's thesis project meeting problem of UAVs 
 
 ## Premises
 
-3-dimensional space defined in XYZ coordinate system, where X and Y describe flat horizontal plane and Z is height above the sea level. In scope of this project, UAVs are considered HTOL drones (Horizontal Take-off and Landing). The space is shared by two/three UAVs. There is no other objects or gusts of wind assumpted. The default distance unit is meters [m] and speed is meters per second [m/s]. No aerodynamic lift force assumed at this moment. Aircrafts are considered only to move in direction of their speed vectors. No drifting implemented.
+3-dimensional space defined in XYZ coordinate system, where X and Y describe flat horizontal plane and Z is height above the sea level. Physics is simulated using differentiation between parts of the second according to adequate formula. In scope of this project, UAVs are considered HTOL drones (Horizontal Take-off and Landing). The space is shared by two/three UAVs. There is no other objects or gusts of wind assumpted. The default distance unit is meters [m] and speed is meters per second [m/s]. No aerodynamic lift force assumed at this moment. Aircrafts are considered only to move in direction of their speed vectors. No drifting implemented.
 
 ## Technologies
 
