@@ -11,7 +11,7 @@ from .simulation_settings import SimulationSettings
 class SimulationState(QSettings):
     """Class defining simulation's traits"""
 
-    def __init__(self, simulation_settings : SimulationSettings, is_realtime : bool = True) -> None:
+    def __init__(self, simulation_settings : SimulationSettings, is_realtime : bool = True, avoid_collisions : bool = False) -> None:
         super(SimulationState, self).__init__()
         self.__mutex : QMutex = QMutex()
 
@@ -19,6 +19,8 @@ class SimulationState(QSettings):
         self.simulation_settings = simulation_settings
         self.update_settings()
         self.is_realtime : bool = is_realtime
+        self.avoid_collisions : bool = avoid_collisions
+        self.minimum_separation : float = 9260.0 # 5nmi
         # self.time_scale : float = 1.0 # define slow motion or fast forward
         self.physics_cycles : int = 0
         self.is_paused : bool = False
