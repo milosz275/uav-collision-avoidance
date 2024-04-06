@@ -95,14 +95,9 @@ class AircraftFCC(QObject):
             else:
                 self.vector_sharing_resolution = (opponent_speed.length() * unresolved_region * miss_distance_vector) / ((opponent_speed.length() + self.aircraft.speed.length()) * miss_distance_vector.length())
             print("Vector sharing resolution: ", self.vector_sharing_resolution)
-            # unit_vector : QVector3D = self.aircraft.speed * time_to_closest_approach
-            # unit_vector += self.vector_sharing_resolution
-            # unit_vector.normalize()
-                
-            self.vector_sharing_resolution *= self.aircraft.size # default not working
-
+            
             target_avoiding : QVector3D = self.aircraft.position + (self.aircraft.speed * time_to_closest_approach + self.vector_sharing_resolution)
-            #self.add_first_destination(target_avoiding)
+            self.add_first_destination(target_avoiding)
 
     def reset_evade_maneuver(self) -> None:
         """Resets evade maneuver"""
