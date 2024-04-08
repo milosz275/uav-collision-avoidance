@@ -21,7 +21,6 @@ class SimulationState(QSettings):
         self.is_realtime : bool = is_realtime
         self.avoid_collisions : bool = avoid_collisions
         self.minimum_separation : float = 9260.0 # 5nmi
-        # self.time_scale : float = 1.0 # define slow motion or fast forward
         self.physics_cycles : int = 0
         self.is_paused : bool = False
         self.is_running : bool = True
