@@ -17,13 +17,13 @@ UAV Collision Avoidance is my Bachelor's thesis project meeting problem of UAVs 
 
 Python3[^1] project is wrapped as a PyPi package[^2]. PySide6[^3] (Qt's Python Qt6 library) was used for GUI implementation.
 
-## Structures
-
-Application is built based on two main object types, simulation and aircraft. Simulation is created up to initial settings, allowing for concurrent realtime variant and linear prerendering. Aircraft consists of two elements, physical representation of the UAV and Flight Control Computer, which is controlled by the physics thread.
-
 ## Algorithms
 
 Both collision detection and avoidance algorithms rely on geometrical approach. They were presented in referenced paper[^4].
+
+## Structures
+
+Application is built based on two main object types, simulation and aircraft. Simulation is created up to initial settings, allowing for concurrent realtime variant and linear prerendering. Aircraft consists of two elements, physical representation of the UAV and Flight Control Computer, which is controlled by the physics thread. Research among the UAV systems was possible thanks to second paper[^5].
 
 ## App arguments
 
