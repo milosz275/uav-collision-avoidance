@@ -11,7 +11,7 @@ UAV Collision Avoidance is my Bachelor's thesis project meeting problem of UAVs 
 
 ## Premises
 
-3-dimensional (3D) space defined in XYZ coordinate system, where X and Y describe flat horizontal plane and Z is height above the sea level. Physics is simulated differentiating between parts of the second according to adequate formulas. In scope of this project, UAVs' physics are considered relative to the Earth frame and the aeroplanes are considered HTOL drones (Horizontal Take-off and Landing) that can only move in direction of their speed vectors. The space is shared by two or three UAVs. There is no other objects or gusts of wind assumpted. No aerodynamic lift force assumed at this moment. The default distance units are meters [m] and speed is meters per second [m/s], frame times are represented in miliseconds [ms].
+3-dimensional (3D) space defined in XYZ coordinate system, where X and Y describe flat horizontal plane and Z is height above the sea level. Physics is simulated differentiating between parts of the second according to adequate formulas. In scope of this project, UAVs' physics are considered relative to the Earth frame and the aeroplanes are considered HTOL drones (Horizontal Take-off and Landing) that can only move in direction of their speed vectors. Aircrafts' form are approaximated to simple solid sphere. The space is shared by two or three UAVs. There is no other objects or gusts of wind assumpted. No aerodynamic lift force assumed at this moment. The default distance units are meters [m] and speed is meters per second [m/s], frame times are represented in miliseconds [ms].
 
 ## Technologies
 
@@ -19,7 +19,7 @@ Python3[^1] project is wrapped as a PyPi package[^2]. PySide6[^3] (Qt's Python Q
 
 ## Algorithms
 
-Both collision detection and avoidance algorithms rely on geometrical approach. They were presented in referenced paper[^4].
+Both collision detection and avoidance algorithms rely on geometrical approach. They were presented in referenced paper[^4]. Collision detection differentiates between collision and head-on collision. The second one applies when UAVs have no distance between their projected center of masses collision, and the first one when it is every other type of contact.
 
 ## Structures
 
@@ -34,7 +34,7 @@ There are three possible arguments at the moment:
 
 App defaults to realtime simulation.
 
-## Usage
+## Install
 
 Use `pip install uav-collision-avoidance` to install the app and run one of the following:
 - uav-collision-avoidance
