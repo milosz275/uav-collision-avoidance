@@ -212,7 +212,7 @@ class SimulationWidget(QWidget):
                 unresolved_region = minimum_separation - miss_distance_vector.length()
                 collision_region = collision_distance - miss_distance_vector.length()
                 if miss_distance_vector.length() == 0:
-                    self.draw_text(QVector3D(self.window_width - 200, 10, 0), 0, "DETECTED HEAD-ON COLLISION", QColor(255, 0, 0))
+                    self.draw_text(QVector3D(self.window_width - 200, 10, 0), 0, "DETECTED HEAD-ON COLLISION", QColor(255, 0, 255))
                     draw_collision_location = True
                 elif collision_region > 0:
                     self.draw_text(QVector3D(self.window_width - 140, 10, 0), 0, "DETECTED COLLISION", QColor(255, 0, 0))
@@ -255,14 +255,15 @@ class SimulationWidget(QWidget):
 
     def update_offsets(self) -> None:
         """Updates screen offsets based on current input"""
+        scale : float = self.simulation_state.gui_scale
         if self.__moving_view_up:
-            self.screen_offset_y += 10.0
+            self.screen_offset_y += 10.0 / scale
         if self.__moving_view_down:
-            self.screen_offset_y -= 10.0
+            self.screen_offset_y -= 10.0 / scale
         if self.__moving_view_left:
-            self.screen_offset_x += 10.0
+            self.screen_offset_x += 10.0 / scale
         if self.__moving_view_right:
-            self.screen_offset_x -= 10.0
+            self.screen_offset_x -= 10.0 / scale
 
     def update_resolutions(self) -> None:
         """Updates bounding box resolution"""
@@ -349,9 +350,9 @@ class SimulationWidget(QWidget):
     def wheelEvent(self, event: QWheelEvent) -> None:
         """Qt method controlling mouse wheel input"""
         if event.angleDelta().y() > 0:
-            self.simulation_state.gui_scale += 0.0625
+            self.simulation_state.gui_scale += 0.03125
         else:
-            self.simulation_state.gui_scale -= 0.0625
+            self.simulation_state.gui_scale -= 0.03125
         return super().wheelEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
