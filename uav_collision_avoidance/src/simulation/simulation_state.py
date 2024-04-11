@@ -48,6 +48,9 @@ class SimulationState(QSettings):
             self.draw_path : bool = True
             self.draw_speed_vectors : bool = True
             self.draw_collision_detection : bool = True
+            self.optimize_drawing : bool = False
+            self.follow_aircraft : bool = False
+            self.focus_aircraft_id : int = 0
 
             # assets
             self.aircraft_pixmap : QPixmap = QPixmap()
