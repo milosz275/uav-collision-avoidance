@@ -3,5 +3,8 @@ setuptools
 wheel
 twine
 
+# Build tools
+pyinstaller
+
 # UAV Collision Avoidance
 pyside6
