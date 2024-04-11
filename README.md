@@ -34,6 +34,29 @@ There are three possible arguments at the moment:
 
 App defaults to realtime simulation.
 
+# Key shortcuts
+
+> [!NOTE]
+> Aircraft 0 is the first one, Aircraft 1 is the second one.
+
+There are several key shortcuts for realtime version of the app that allow full-scale testing.
+
+- Left mouse click - appends click location to the top of destination list of Aircraft 0
+- Right mouse click - adds click location to the end of destination list of Aircraft 0
+- Middle mouse click (scroll click) - teleports Aircraft 0 to the click location
+- Mouse wheel - zooms in/out the simulation render smoothly
+- Plus/minus keys (+/-) - zooms in/out the simulation render quickly
+- Arrow keys (↑ ↓ → ←) - moves the view
+- N key - toggles Aircraft 0/1 view following (default off)
+- M key - switches between Aircraft 0/1 view following (default 0)
+- O key - toggles Aircraft 0 targeting Aircraft 1's speed vector (default off)
+- P key - toggles Aircraft 1 targeting Aircraft 0's speed vector (default off)
+- T key - toggles collision avoidance maneuvering (default off)
+- WSAD keys - sets course for Aircraft 0 - 0, 180, 270, 90 degrees respectively
+- R - resets simulation to start state
+- Slash key (/) - pauses physics simulation
+- Escape key (Esc) - closes and ends simulation
+
 ## Install
 
 Use `pip install uav-collision-avoidance` to install the app and run one of the following:
