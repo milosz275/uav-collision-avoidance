@@ -34,7 +34,7 @@ There are three possible arguments at the moment:
 
 App defaults to realtime simulation.
 
-# Key shortcuts
+## Key shortcuts
 
 > [!NOTE]
 > Aircraft 0 is the first one, Aircraft 1 is the second one.
