@@ -50,6 +50,8 @@ class SimulationWidget(QWidget):
         self.__moving_view_left = False
         self.__moving_view_right = False
 
+        self.center_offsets()
+
     def draw_aircraft(self, aircraft : AircraftVehicle, scale : float) -> None:
         """Draws given aircraft vehicle"""
         yaw_angle : float = aircraft.yaw_angle
@@ -262,22 +264,24 @@ class SimulationWidget(QWidget):
                 scale,
                 QColor(40, 40, 40))
 
-    def update_offsets(self) -> None:
+    def update_moving_offsets(self) -> None:
         """Updates screen offsets based on current input"""
         scale : float = self.simulation_state.gui_scale
-        if not self.simulation_state.follow_aircraft:
-            if self.__moving_view_up:
-                self.screen_offset_y += 10.0 / scale
-            if self.__moving_view_down:
-                self.screen_offset_y -= 10.0 / scale
-            if self.__moving_view_left:
-                self.screen_offset_x += 10.0 / scale
-            if self.__moving_view_right:
-                self.screen_offset_x -= 10.0 / scale
-        else:
-            id = self.simulation_state.focus_aircraft_id
-            self.screen_offset_x = - self.aircraft_vehicles[id].position.x() + self.window_width / 2 / scale
-            self.screen_offset_y = - self.aircraft_vehicles[id].position.y() + self.window_height / 2 / scale
+        if self.__moving_view_up:
+            self.screen_offset_y += 10.0 / scale
+        if self.__moving_view_down:
+            self.screen_offset_y -= 10.0 / scale
+        if self.__moving_view_left:
+            self.screen_offset_x += 10.0 / scale
+        if self.__moving_view_right:
+            self.screen_offset_x -= 10.0 / scale
+
+    def center_offsets(self) -> None:
+        """Updates screen offsets centering on selected aircraft"""
+        scale : float = self.simulation_state.gui_scale
+        id = self.simulation_state.focus_aircraft_id
+        self.screen_offset_x = - self.aircraft_vehicles[id].position.x() + self.window_width / 2 / scale
+        self.screen_offset_y = - self.aircraft_vehicles[id].position.y() + self.window_height / 2 / scale
 
     def update_resolutions(self) -> None:
         """Updates bounding box resolution"""
@@ -298,7 +302,10 @@ class SimulationWidget(QWidget):
         """Qt method painting the aircrafts"""
         self.simulation_fps.count_frame()
         scale : float = self.simulation_state.gui_scale
-        self.update_offsets()
+        if not self.simulation_state.follow_aircraft:
+            self.update_moving_offsets()
+        else:
+            self.center_offsets()
 
         if self.simulation_state.draw_fps:
             self.draw_text(QVector3D(10, 10, 0), 0, "FPS: " + "{:.2f}".format(self.simulation_state.fps))
