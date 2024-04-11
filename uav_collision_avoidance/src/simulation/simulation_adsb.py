@@ -72,8 +72,9 @@ class SimulationADSB(QThread):
                                 miss_distance_vector = miss_distance_vector,
                                 unresolved_region = unresolved_region,
                                 time_to_closest_approach = time_to_closest_approach)
-                    print("Sum of vector sharing resolutions: ", self.aircraft_fccs[0].vector_sharing_resolution.length() + self.aircraft_fccs[1].vector_sharing_resolution.length() + miss_distance_vector.length())
-                
+                    # print("Sum of vector sharing resolutions: ", self.aircraft_fccs[0].vector_sharing_resolution.length() + self.aircraft_fccs[1].vector_sharing_resolution.length() + miss_distance_vector.length())
+                    print("Relative distance: "+ "{:.2f}".format(relative_position.length()) + "m")
+
                 # probable collision
                 collision_distance = aircraft_vehicle_1.size / 2 + aircraft_vehicle_2.size / 2
                 collision_region = collision_distance - miss_distance_vector.length()
