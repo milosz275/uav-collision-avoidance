@@ -1,7 +1,7 @@
 """Simulation widget for the main window of the simulation app"""
 
 from copy import copy
-from math import cos, radians, sqrt, degrees, atan2
+from math import cos, radians, sqrt, degrees, atan2, dist
 from typing import List
 
 from PySide6.QtCore import Qt, QPointF, Signal
@@ -35,7 +35,7 @@ class SimulationWidget(QWidget):
         self.screen_offset_y : float = 0.0
         self.setGeometry(
             SimulationSettings.screen_resolution.width() / 2 - self.window_width / 2,
-            SimulationSettings.screen_resolution.height() / 2 - self.window_height / 2,
+            SimulationSettings.screen_resolution.height() / 2 - self.window_height / 2 - 30,
             self.window_width,
             self.window_height)
         self.setStyleSheet("background-color: white;")
@@ -88,7 +88,7 @@ class SimulationWidget(QWidget):
     def draw_destinations(self, aircraft : AircraftVehicle, scale : float) -> None:
         """Draws destinations of given aircraft vehicle"""
         for idx, destination in enumerate(self.aircraft_fccs[aircraft.aircraft_id].destinations):
-            self.draw_disk(destination, 5, scale)
+            self.draw_disk(destination, 2.5 / scale, scale)
             self.draw_text(destination, scale, f"Destination {idx} of Aircraft {aircraft.aircraft_id}")
 
     def draw_text(self, point : QVector3D, scale : float, text : str, color : QColor = QColor(0, 0, 0)) -> None:
@@ -193,7 +193,8 @@ class SimulationWidget(QWidget):
     
     def draw_collision_detection(self, scale : float) -> None:
         """Draws collision detection elements for the aircrafts"""
-        draw_collision_location : bool = False
+        detected_conflict : bool = False
+        predicted_collision : bool = False
         time_to_closest_approach : float = 0.0
         if self.simulation_state.collision:
             self.draw_text(QVector3D(self.window_width - 70, 10, 0), 0, "COLLISION", QColor(255, 0, 0))
@@ -207,13 +208,13 @@ class SimulationWidget(QWidget):
                 miss_distance_vector : QVector3D = QVector3D.crossProduct(
                     speed_difference_unit,
                     QVector3D.crossProduct(relative_position, speed_difference_unit))
-                minimum_separation : float = 9260.0 # 5nmi
                 collision_distance = aircraft.size / 2 + self.aircraft_vehicles[1 - aircraft.aircraft_id].size / 2
-                unresolved_region = minimum_separation - miss_distance_vector.length()
+                unresolved_region = self.simulation_state.minimum_separation - miss_distance_vector.length()
                 collision_region = collision_distance - miss_distance_vector.length()
                 if miss_distance_vector.length() == 0:
                     self.draw_text(QVector3D(self.window_width - 200, 10, 0), 0, "DETECTED HEAD-ON COLLISION", QColor(255, 0, 255))
-                    draw_collision_location = True
+                    predicted_collision = True
+                    detected_conflict = True
                 elif collision_region > 0:
                     self.draw_text(QVector3D(self.window_width - 140, 10, 0), 0, "DETECTED COLLISION", QColor(255, 0, 0))
                     self.draw_vector(
@@ -221,7 +222,8 @@ class SimulationWidget(QWidget):
                         self.aircraft_vehicles[1 - aircraft.aircraft_id].position + miss_distance_vector,
                         scale,
                         QColor(0, 0, 255))
-                    draw_collision_location = True
+                    predicted_collision = True
+                    detected_conflict = True
                 elif unresolved_region > 0:
                     self.draw_text(QVector3D(self.window_width - 140, 10, 0), 0, "DETECTED CONFLICT")
                     self.draw_vector(
@@ -229,13 +231,20 @@ class SimulationWidget(QWidget):
                         self.aircraft_vehicles[1 - aircraft.aircraft_id].position + miss_distance_vector,
                         scale,
                         QColor(0, 0, 255))
-                # if self.aircraft_fccs[aircraft.aircraft_id].vector_sharing_resolution is not None:
-                #     self.draw_vector(aircraft.position, aircraft.position + aircraft.speed * time_to_closest_approach, scale)
-                #     self.draw_vector(aircraft.position, aircraft.position + aircraft.speed * time_to_closest_approach + self.aircraft_fccs[aircraft.aircraft_id].vector_sharing_resolution, scale, QColor(30, 255, 30))
-        if draw_collision_location:
+                    detected_conflict = True
+                if self.aircraft_fccs[aircraft.aircraft_id].vector_sharing_resolution is not None:
+                    self.draw_vector(aircraft.position, aircraft.position + aircraft.speed * time_to_closest_approach, scale)
+                    self.draw_vector(aircraft.position, aircraft.position + aircraft.speed * time_to_closest_approach + self.aircraft_fccs[aircraft.aircraft_id].vector_sharing_resolution, scale, QColor(30, 255, 30))
+        if predicted_collision:
             aircraft = self.aircraft_vehicles[0]
             collision_location = aircraft.position + aircraft.speed * time_to_closest_approach
-            self.draw_circle(collision_location, 5, scale, QColor(255, 0, 0))
+            self.draw_circle(collision_location, 2.5 / scale, scale, QColor(255, 0, 0))
+        relative_distance = dist(self.aircraft_vehicles[0].position.toTuple(), self.aircraft_vehicles[1].position.toTuple())
+        if relative_distance < self.simulation_state.minimum_separation:
+            if detected_conflict:
+                self.draw_text(QVector3D(self.window_width - 260, 30, 0), 0, f"MINIMUM SEPARATION EXCEEDED BY {int(self.simulation_state.minimum_separation - relative_distance)}", QColor(255, 0, 0))
+            else:
+                self.draw_text(QVector3D(self.window_width - 260, 10, 0), 0, f"MINIMUM SEPARATION EXCEEDED BY {int(self.simulation_state.minimum_separation - relative_distance)}", QColor(255, 0, 0))
     
     def draw_grid(self, x_offset : float, y_offset : float, scale : float) -> None:
         """Draws grid on the screen"""
@@ -256,19 +265,34 @@ class SimulationWidget(QWidget):
     def update_offsets(self) -> None:
         """Updates screen offsets based on current input"""
         scale : float = self.simulation_state.gui_scale
-        if self.__moving_view_up:
-            self.screen_offset_y += 10.0 / scale
-        if self.__moving_view_down:
-            self.screen_offset_y -= 10.0 / scale
-        if self.__moving_view_left:
-            self.screen_offset_x += 10.0 / scale
-        if self.__moving_view_right:
-            self.screen_offset_x -= 10.0 / scale
+        if not self.simulation_state.follow_aircraft:
+            if self.__moving_view_up:
+                self.screen_offset_y += 10.0 / scale
+            if self.__moving_view_down:
+                self.screen_offset_y -= 10.0 / scale
+            if self.__moving_view_left:
+                self.screen_offset_x += 10.0 / scale
+            if self.__moving_view_right:
+                self.screen_offset_x -= 10.0 / scale
+        else:
+            id = self.simulation_state.focus_aircraft_id
+            self.screen_offset_x = - self.aircraft_vehicles[id].position.x() + self.window_width / 2 / scale
+            self.screen_offset_y = - self.aircraft_vehicles[id].position.y() + self.window_height / 2 / scale
 
     def update_resolutions(self) -> None:
         """Updates bounding box resolution"""
         self.window_width = self.width()
         self.window_height = self.height()
+
+    def zoom(self, factor : float) -> None:
+        """Zooms in/out the simulation render"""
+        if self.simulation_state.gui_scale + factor <= 0:
+            return
+        old_scale : float = self.simulation_state.gui_scale
+        self.simulation_state.gui_scale += factor
+        scale : float = self.simulation_state.gui_scale
+        self.screen_offset_x = self.screen_offset_x * old_scale / scale
+        self.screen_offset_y = self.screen_offset_y * old_scale / scale
 
     def paintEvent(self, event : QPaintEvent) -> None:
         """Qt method painting the aircrafts"""
@@ -281,23 +305,24 @@ class SimulationWidget(QWidget):
         if self.simulation_state.draw_grid:
             self.draw_grid(self.screen_offset_x, self.screen_offset_y, scale)
 
-        anything_to_draw : bool = False
-        geometric_center : QVector3D = self.aircraft_vehicles[0].position + self.aircraft_vehicles[1].position / 2
-        if (geometric_center.x() * scale + 300) + self.screen_offset_x * scale >= 0 and \
-            (geometric_center.y() * scale + 200) + self.screen_offset_y * scale >= 0 and \
-            (geometric_center.x() * scale - 300) + self.screen_offset_x * scale <= self.window_width and \
-            (geometric_center.y() * scale - 200) + self.screen_offset_y * scale <= self.window_height:
-            anything_to_draw = True
-        if not anything_to_draw:
-            for aircraft in self.aircraft_vehicles:
-                if (aircraft.position.x() * scale) + self.screen_offset_x * scale >= 0 and \
-                    (aircraft.position.y() * scale) + self.screen_offset_y * scale >= 0 and \
-                    (aircraft.position.x() * scale) + self.screen_offset_x * scale <= self.window_width and \
-                    (aircraft.position.y() * scale) + self.screen_offset_y * scale <= self.window_height:
-                    anything_to_draw = True
-                    break
-        if not anything_to_draw:
-            return super().paintEvent(event)
+        if self.simulation_state.optimize_drawing:
+            anything_to_draw : bool = False
+            geometric_center : QVector3D = self.aircraft_vehicles[0].position + self.aircraft_vehicles[1].position / 2
+            if (geometric_center.x() * scale + 300) + self.screen_offset_x * scale >= 0 and \
+                (geometric_center.y() * scale + 200) + self.screen_offset_y * scale >= 0 and \
+                (geometric_center.x() * scale - 300) + self.screen_offset_x * scale <= self.window_width and \
+                (geometric_center.y() * scale - 200) + self.screen_offset_y * scale <= self.window_height:
+                anything_to_draw = True
+            if not anything_to_draw:
+                for aircraft in self.aircraft_vehicles:
+                    if (aircraft.position.x() * scale) + self.screen_offset_x * scale >= 0 and \
+                        (aircraft.position.y() * scale) + self.screen_offset_y * scale >= 0 and \
+                        (aircraft.position.x() * scale) + self.screen_offset_x * scale <= self.window_width and \
+                        (aircraft.position.y() * scale) + self.screen_offset_y * scale <= self.window_height:
+                        anything_to_draw = True
+                        break
+            if not anything_to_draw:
+                return super().paintEvent(event)
 
         if self.simulation_state.draw_collision_detection:
             self.draw_collision_detection(scale)
@@ -350,9 +375,9 @@ class SimulationWidget(QWidget):
     def wheelEvent(self, event: QWheelEvent) -> None:
         """Qt method controlling mouse wheel input"""
         if event.angleDelta().y() > 0:
-            self.simulation_state.gui_scale += 0.03125
+            self.zoom(0.03125)
         else:
-            self.simulation_state.gui_scale -= 0.03125
+            self.zoom(-0.03125)
         return super().wheelEvent(event)
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
@@ -368,9 +393,9 @@ class SimulationWidget(QWidget):
                 return super().keyPressEvent(event)
             self.simulation_state.reset()
         elif event.key() == Qt.Key.Key_Plus:
-            self.simulation_state.gui_scale += 0.25
+            self.zoom(0.25)
         elif event.key() == Qt.Key.Key_Minus:
-            self.simulation_state.gui_scale -= 0.25
+            self.zoom(-0.25)
         elif event.key() == Qt.Key.Key_F1:
             self.simulation_state.toggle_adsb_report()
         elif event.key() == Qt.Key.Key_F2:
@@ -381,6 +406,12 @@ class SimulationWidget(QWidget):
             self.simulation_state.toggle_first_causing_collision()
         elif event.key() == Qt.Key.Key_P:
             self.simulation_state.toggle_second_causing_collision()
+        elif event.key() == Qt.Key.Key_T:
+            self.simulation_state.avoid_collisions = not self.simulation_state.avoid_collisions
+        elif event.key() == Qt.Key.Key_N:
+            self.simulation_state.follow_aircraft = not self.simulation_state.follow_aircraft
+        elif event.key() == Qt.Key.Key_M:
+            self.simulation_state.focus_aircraft_id = int(not self.simulation_state.focus_aircraft_id)
         elif event.key() == Qt.Key.Key_Left:
             self.__moving_view_left = True
         elif event.key() == Qt.Key.Key_Right:
