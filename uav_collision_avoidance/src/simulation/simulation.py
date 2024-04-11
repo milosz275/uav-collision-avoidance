@@ -44,11 +44,11 @@ class Simulation(QMainWindow):
                 #     speed = QVector3D(-50, 0, 0)),
                 Aircraft( # avoidance test
                     position = QVector3D(10, -10, 0),
-                    speed = QVector3D(1500, -1500, 0),
+                    speed = QVector3D(300, -300, 0),
                     initial_target = QVector3D(75000, -75000, 0)), # 75 km, -75 km
                 Aircraft(
                     position = QVector3D(0, -100_000, 0),
-                    speed = QVector3D(1500, 1450, 0),
+                    speed = QVector3D(300, 290, 0),
                     initial_target = QVector3D(75000, -27500, 0)), # 75 km, -27.5 km
             ]
         else:
