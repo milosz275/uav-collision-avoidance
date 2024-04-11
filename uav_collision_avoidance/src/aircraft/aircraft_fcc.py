@@ -51,10 +51,18 @@ class AircraftFCC(QObject):
 
     def add_last_destination(self, destination : QVector3D) -> None:
         """Appends given location to the end of destinations list"""
+        assert isinstance(destination.x(), (int, float))
+        assert isinstance(destination.y(), (int, float))
+        assert isinstance(destination.z(), (int, float))
+
         self.destinations.append(destination)
 
     def add_first_destination(self, destination : QVector3D) -> None:
         """Pushes given location to the top of destinations list"""
+        assert isinstance(destination.x(), (int, float))
+        assert isinstance(destination.y(), (int, float))
+        assert isinstance(destination.z(), (int, float))
+
         if len(self.destinations) > 0 and dist(destination.toTuple(), self.destinations[0].toTuple()) < 1:
             print("Attempted to stack same destination")
             logging.warning("Attempted to stack same destination")
@@ -84,9 +92,18 @@ class AircraftFCC(QObject):
 
     def apply_evade_maneuver(self, opponent_speed : QVector3D, miss_distance_vector : QVector3D, unresolved_region : float, time_to_closest_approach : float) -> None:
         """Applies evade maneuver"""
+        print(str(self.aircraft.aircraft_id) + ": opponent speed: " + "{:.2f}".format(opponent_speed.x()) + " " + "{:.2f}".format(opponent_speed.y()) + " " + "{:.2f}".format(opponent_speed.z()))
+        print(str(self.aircraft.aircraft_id) + ": miss distance vector: " + "{:.2f}".format(miss_distance_vector.x()) + " " + "{:.2f}".format(miss_distance_vector.y()) + " " + "{:.2f}".format(miss_distance_vector.z()))
+        print(str(self.aircraft.aircraft_id) + ": unresolved region: " + "{:.2f}".format(unresolved_region))
+        print(str(self.aircraft.aircraft_id) + ": time to closest approach: " + "{:.2f}".format(time_to_closest_approach))
+        
+        if (miss_distance_vector.x() == 0 and miss_distance_vector.y() == 0 and miss_distance_vector.z() == 0):
+            return
+
         if self.__evade_maneuver:
             logging.warning("Another evade maneuver in progress")
         else:
+            print(f"Aircraft {self.aircraft.aircraft_id} applying evade maneuver")
             logging.info("Aircraft %s applying evade maneuver", self.aircraft.aircraft_id)
             self.__evade_maneuver = True
             self.vector_sharing_resolution : QVector3D | None = None
@@ -94,7 +111,7 @@ class AircraftFCC(QObject):
                 self.vector_sharing_resolution = (opponent_speed.length() * unresolved_region * -(miss_distance_vector)) / ((self.aircraft.speed.length() + opponent_speed.length()) * miss_distance_vector.length())
             else:
                 self.vector_sharing_resolution = (opponent_speed.length() * unresolved_region * miss_distance_vector) / ((opponent_speed.length() + self.aircraft.speed.length()) * miss_distance_vector.length())
-            print("Vector sharing resolution: ", self.vector_sharing_resolution)
+            print("Vector sharing resolution: " + "{:.2f}".format(self.vector_sharing_resolution.x()) + " " + "{:.2f}".format(self.vector_sharing_resolution.y()) + " " + "{:.2f}".format(self.vector_sharing_resolution.z()))
             
             target_avoiding : QVector3D = self.aircraft.position + (self.aircraft.speed * time_to_closest_approach + self.vector_sharing_resolution)
             self.add_first_destination(target_avoiding)
