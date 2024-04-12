@@ -47,6 +47,8 @@ There are several key shortcuts for realtime version of the app that allow full-
 - Mouse wheel - zooms in/out the simulation render smoothly
 - Plus/minus keys (+/-) - zooms in/out the simulation render quickly
 - Arrow keys (↑ ↓ → ←) - moves the view
+- F1 key - toggles ADS-B Aircraft 0 info reporting
+- F2/F3 keys - speed up/down target speed of Aircraft 0
 - N key - toggles Aircraft 0/1 view following (default off)
 - M key - switches between Aircraft 0/1 view following (default 0)
 - O key - toggles Aircraft 0 targeting Aircraft 1's speed vector (default off)
