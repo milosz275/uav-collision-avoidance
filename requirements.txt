@@ -2,6 +2,7 @@
 setuptools
 wheel
 twine
+toml
 
 # Build tools
 build
