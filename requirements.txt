@@ -8,6 +8,3 @@ pyinstaller
 
 # UAV Collision Avoidance
 pyside6
-
-# Testing
-pytest
