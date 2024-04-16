@@ -28,28 +28,28 @@ class Simulation(QMainWindow):
         SimulationSettings().__init__()
         if aircrafts is None:
             self.aircrafts : List[Aircraft] = [
-                # Aircraft( # detection test
-                #     position = QVector3D(100, 1000, 1000),
-                #     speed = QVector3D(50, -50, 0),
-                #     initial_target = QVector3D(1_000_100, -1_001_000, 1000)),
-                # Aircraft(
-                #     position = QVector3D(900, 1300, 1000),
-                #     speed = QVector3D(0, -70, 0),
-                #     initial_target = QVector3D(900, -1_001_300, 1000)),
+                Aircraft( # detection test
+                    position = QVector3D(100, 1000, 1000),
+                    speed = QVector3D(50, -50, 0),
+                    initial_target = QVector3D(1_000_100, -1_001_000, 1000)),
+                Aircraft(
+                    position = QVector3D(900, 1300, 1000),
+                    speed = QVector3D(0, -70, 0),
+                    initial_target = QVector3D(900, -1_001_300, 1000)),
                 # Aircraft( # head on
                 #     position = QVector3D(100, 500, 1000),
                 #     speed = QVector3D(70, 0, 0)),
                 # Aircraft(
                 #     position = QVector3D(900, 500, 1000),
                 #     speed = QVector3D(-50, 0, 0)),
-                Aircraft( # avoidance test
-                    position = QVector3D(10, -10, 0),
-                    speed = QVector3D(300, -300, 0),
-                    initial_target = QVector3D(75000, -75000, 0)), # 75 km, -75 km
-                Aircraft(
-                    position = QVector3D(0, -100_000, 0),
-                    speed = QVector3D(300, 290, 0),
-                    initial_target = QVector3D(75000, -27500, 0)), # 75 km, -27.5 km
+                # Aircraft( # avoidance test
+                #     position = QVector3D(10, -10, 0),
+                #     speed = QVector3D(300, -300, 0),
+                #     initial_target = QVector3D(75000, -75000, 0)), # 75 km, -75 km
+                # Aircraft(
+                #     position = QVector3D(0, -100_000, 0),
+                #     speed = QVector3D(300, 290, 0),
+                #     initial_target = QVector3D(75000, -27500, 0)), # 75 km, -27.5 km
             ]
         else:
             self.aircrafts = aircrafts
