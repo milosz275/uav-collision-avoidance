@@ -4,6 +4,7 @@ wheel
 twine
 
 # Build tools
+build
 pyinstaller
 
 # UAV Collision Avoidance
