@@ -34,13 +34,13 @@ class SimulationState(QSettings):
 
         if is_realtime:
             # render state
-            self.__gui_scale : float = 1.0 # define gui scaling
+            self.__gui_scale : float = 0.5 # define gui scaling
             if SimulationSettings.screen_resolution.height() < 1440:
-                self.gui_scale = 0.75
+                self.gui_scale = 0.375
             elif SimulationSettings.screen_resolution.height() < 1080:
-                self.gui_scale = 0.5
-            elif SimulationSettings.screen_resolution.height() < 480:
                 self.gui_scale = 0.25
+            elif SimulationSettings.screen_resolution.height() < 480:
+                self.gui_scale = 0.125
             self.fps : float = 0.0
             self.draw_fps : bool = True
             self.draw_aircraft : bool = True
