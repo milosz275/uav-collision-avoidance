@@ -27,30 +27,38 @@ class Simulation(QMainWindow):
         super().__init__()
         SimulationSettings().__init__()
         if aircrafts is None:
-            self.aircrafts : List[Aircraft] = [
-                Aircraft( # detection test
-                    position = QVector3D(100, 1000, 1000),
-                    speed = QVector3D(50, -50, 0),
-                    initial_target = QVector3D(1_000_100, -1_001_000, 1000)),
-                Aircraft(
-                    position = QVector3D(900, 1300, 1000),
-                    speed = QVector3D(0, -70, 0),
-                    initial_target = QVector3D(900, -1_001_300, 1000)),
-                # Aircraft( # head on
-                #     position = QVector3D(100, 500, 1000),
-                #     speed = QVector3D(70, 0, 0)),
-                # Aircraft(
-                #     position = QVector3D(900, 500, 1000),
-                #     speed = QVector3D(-50, 0, 0)),
-                # Aircraft( # avoidance test
-                #     position = QVector3D(10, -10, 0),
-                #     speed = QVector3D(300, -300, 0),
-                #     initial_target = QVector3D(75000, -75000, 0)), # 75 km, -75 km
-                # Aircraft(
-                #     position = QVector3D(0, -100_000, 0),
-                #     speed = QVector3D(300, 290, 0),
-                #     initial_target = QVector3D(75000, -27500, 0)), # 75 km, -27.5 km
-            ]
+            test_case : int = 0
+            if test_case == 0:
+                self.aircrafts : List[Aircraft] = [
+                    Aircraft( # detection test
+                        position = QVector3D(-800, 4000, 1000),
+                        speed = QVector3D(50, -50, 0),
+                        initial_target = QVector3D(1_000_100, -1_001_000, 1000)),
+                    Aircraft(
+                        position = QVector3D(4000, 5900, 1000),
+                        speed = QVector3D(0, -70, 0),
+                        initial_target = QVector3D(900, -1_001_300, 1000)),
+                ]
+            elif test_case == 1:
+                self.aircrafts : List[Aircraft] = [
+                    Aircraft( # almost head on
+                        position = QVector3D(-3000, 500, 1000),
+                        speed = QVector3D(70, 0.1, 0)),
+                    Aircraft(
+                        position = QVector3D(5000, 500, 1000),
+                        speed = QVector3D(-50, 0, 0)),
+                ]
+            elif test_case == 2:
+                self.aircrafts : List[Aircraft] = [
+                    Aircraft( # avoidance test
+                        position = QVector3D(10, -10, 1000),
+                        speed = QVector3D(300, -300, 0),
+                        initial_target = QVector3D(75000, -75000, 0)), # 75 km, -75 km
+                    Aircraft(
+                        position = QVector3D(0, -100_000, 1000),
+                        speed = QVector3D(300, 290, 0),
+                        initial_target = QVector3D(75000, -27500, 0)), # 75 km, -27.5 km
+                ]
         else:
             self.aircrafts = aircrafts
         self.simulation_time : int = simulation_time
