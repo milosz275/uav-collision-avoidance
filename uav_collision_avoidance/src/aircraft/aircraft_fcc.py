@@ -31,6 +31,9 @@ class AircraftFCC(QObject):
         self.target_roll_angle : float = 0.0
         self.target_pitch_angle : float = 0.0
         self.__target_speed : float = self.aircraft.absolute_speed
+        self.__is_turning_right : bool = False
+        self.__is_turning_left : bool = False
+        self.previous_yaw_angle_difference : float = 0.0
 
         self.__evade_maneuver : bool = False
         self.vector_sharing_resolution : QVector3D | None = None
@@ -48,28 +51,54 @@ class AircraftFCC(QObject):
         """Sets target speed"""
         if speed > 0:
             self.__target_speed = speed
+    
+    @property
+    def is_turning_right(self) -> bool:
+        """Returns turning right state"""
+        return self.__is_turning_right
+    
+    @is_turning_right.setter
+    def is_turning_right(self, value : bool) -> None:
+        """Sets turning right state"""
+        self.__is_turning_right = value
+
+    @property
+    def is_turning_left(self) -> bool:
+        """Returns turning left state"""
+        return self.__is_turning_left
+    
+    @is_turning_left.setter
+    def is_turning_left(self, value : bool) -> None:
+        """Sets turning left state"""
+        self.__is_turning_left = value
 
     def add_last_destination(self, destination : QVector3D) -> None:
-        """Appends given location to the end of destinations list"""
-        assert isinstance(destination.x(), (int, float))
-        assert isinstance(destination.y(), (int, float))
-        assert isinstance(destination.z(), (int, float))
+        """Appends the given location (QVector3D) to the end of the destinations list."""
+        if not all(isinstance(coord, (int, float)) for coord in (destination.x(), destination.y(), destination.z())):
+            raise TypeError("Destination coordinates must be int or float.")
 
         self.destinations.append(destination)
 
     def add_first_destination(self, destination : QVector3D) -> None:
         """Pushes given location to the top of destinations list"""
-        assert isinstance(destination.x(), (int, float))
-        assert isinstance(destination.y(), (int, float))
-        assert isinstance(destination.z(), (int, float))
+        if not all(isinstance(coord, (int, float)) for coord in (destination.x(), destination.y(), destination.z())):
+            raise TypeError("Destination coordinates must be int or float.")
 
-        if len(self.destinations) > 0 and dist(destination.toTuple(), self.destinations[0].toTuple()) < 1:
+        if len(self.destinations) > 0 and dist(destination.toTuple(), self.destinations[0].toTuple()) < 1.0:
             print("Attempted to stack same destination")
-            logging.warning("Attempted to stack same destination")
+            logging.warning(f"Attempted to stack same destination: {destination}")
             return
 
         self.destinations.appendleft(destination)
         logging.info("Aircraft %s added new first destination: %s", self.aircraft.aircraft_id, destination.toTuple())
+
+    @property
+    def destination(self) -> QVector3D | None:
+        """Returns current destination"""
+        if len(self.destinations) > 0:
+            return self.destinations[0]
+        else:
+            return None
 
     def append_visited(self) -> None:
         """Appends current location to visited list"""
@@ -125,11 +154,42 @@ class AircraftFCC(QObject):
             self.__evade_maneuver = False
             #self.vector_sharing_resolution = None
 
-    def find_best_roll_angle(self, current_yaw_angle : float, target_yaw_angle : float) -> float:
+    def find_best_roll_angle(self, current_yaw_angle: float, target_yaw_angle: float) -> float:
         """Finds best roll angle for the targeted yaw angle"""
         difference = (target_yaw_angle - current_yaw_angle + 180) % 360 - 180
-        return 0.0 if abs(difference) < 0.01 else 30.0 if difference > 0 else -30.0
-
+        if abs(difference) < 0.001:
+            self.is_turning_right = False
+            self.is_turning_left = False
+            return 0.0
+        elif difference > 0:
+            if not self.is_turning_right:
+                self.previous_yaw_angle_difference = difference
+            self.is_turning_right = True
+            self.is_turning_left = False
+            if difference > 90:
+                return 30.0
+            elif difference > 45:
+                return 20.0
+            elif difference > 20:
+                return 10.0
+            else:
+                return 5.0
+        elif difference < 0:
+            if not self.is_turning_left:
+                self.previous_yaw_angle_difference = difference
+            self.is_turning_left = True
+            self.is_turning_right = False
+            if difference < -90:
+                return -30.0
+            elif difference < -45:
+                return -20.0
+            elif difference < -20:
+                return -10.0
+            else:
+                return -5.0
+        else:
+            return 0.0
+        
     def find_best_yaw_angle(self, position : QVector3D, destination : QVector3D) -> float:
         """Finds best yaw angle for the given destination"""
         target_yaw_angle : float  = degrees(atan2(
