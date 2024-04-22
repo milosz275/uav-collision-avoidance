@@ -104,7 +104,7 @@ One coding convention is not preserved in the scope of the project. Qt's methods
 ## Current Work / TODOs
 
 - [ ] Reimplement safe zone
-- [ ] Symmetrical bank (roll) during turn, no angle approaximation
+- [x] Symmetrical bank (roll) during turn, no angle approaximation
 - [ ] Altitude change with symmetrical command
 - [ ] Generating test cases
 - [ ] Test cases comparison
