@@ -400,9 +400,9 @@ class SimulationWidget(QWidget):
                 return super().keyPressEvent(event)
             self.simulation_state.reset()
         elif event.key() == Qt.Key.Key_Plus:
-            self.zoom(0.25)
+            self.zoom(0.0625)
         elif event.key() == Qt.Key.Key_Minus:
-            self.zoom(-0.25)
+            self.zoom(-0.0625)
         elif event.key() == Qt.Key.Key_F1:
             self.simulation_state.toggle_adsb_report()
         elif event.key() == Qt.Key.Key_F2:
