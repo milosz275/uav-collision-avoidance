@@ -44,6 +44,14 @@ class SimulationADSB(QThread):
             speed_difference = aircraft_vehicle_1.speed - aircraft_vehicle_2.speed
             time_to_closest_approach = -(QVector3D.dotProduct(relative_position, speed_difference) / QVector3D.dotProduct(speed_difference, speed_difference))
             print("Time to closest approach: " + "{:.2f}".format(time_to_closest_approach) + "s")
+            
+            for aircraft in self.aircraft_vehicles:
+                # path
+                self.aircraft_fccs[aircraft.aircraft_id].append_visited()
+
+                # console output
+                if self.simulation_state.adsb_report and aircraft.aircraft_id == 0:
+                    self.print_adsb_report(aircraft)
 
             if not self.simulation_state.avoid_collisions:
                 return
@@ -85,27 +93,39 @@ class SimulationADSB(QThread):
                     if aircraft.evade_maneuver:
                         aircraft.reset_evade_maneuver()
 
-            for aircraft in self.aircraft_vehicles:
-                # path
-                self.aircraft_fccs[aircraft.aircraft_id].append_visited()
-
-                # console output
-                if self.simulation_state.adsb_report and aircraft.aircraft_id == 0:
-                    self.print_adsb_report(aircraft)
-
     def print_adsb_report(self, aircraft : AircraftVehicle) -> None:
         """Prints ADS-B report for the aircraft to the console"""
-        print("Aircraft id: " + str(aircraft.aircraft_id) +
+        fcc = self.aircraft_fccs[aircraft.aircraft_id]
+        turning_direction = "Not turning"
+        if fcc.is_turning_left:
+            turning_direction = "Turning left"
+        elif fcc.is_turning_right:
+            turning_direction = "Turning right"
+        print("- Aircraft id: " + str(aircraft.aircraft_id) +
             "; speed: " + "{:.2f}".format(aircraft.absolute_speed) +
-            "; target speed: " + "{:.2f}".format(self.aircraft_fccs[aircraft.aircraft_id].target_speed) +
+            "; turning: " + turning_direction +
+            "; roll angle: " + "{:.2f}".format(aircraft.roll_angle) +
+            "; target roll angle: " + "{:.2f}".format(fcc.target_roll_angle) +
+            "; yaw angle: " + "{:.2f}".format(aircraft.yaw_angle) +
+            "; target yaw angle: " + "{:.2f}".format(fcc.target_yaw_angle) +
             "; x: " + "{:.2f}".format(aircraft.position.x()) +
             "; y: " + "{:.2f}".format(aircraft.position.y()) +
-            "; yaw angle: " + "{:.2f}".format(aircraft.yaw_angle) +
-            "; target yaw angle: " + "{:.2f}".format(self.aircraft_fccs[aircraft.aircraft_id].target_yaw_angle) +
-            "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle) +
-            "; roll angle: " + "{:.2f}".format(aircraft.roll_angle) +
-            "; target roll angle: " + "{:.2f}".format(self.aircraft_fccs[aircraft.aircraft_id].target_roll_angle) +
-            "; distance covered: " + "{:.2f}".format(aircraft.distance_covered) +
-            "; fps: " + "{:.2f}".format(self.simulation_state.fps) +
-            "; t: " + str(self.adsb_cycles) +
-            "; phys: " + str(self.simulation_state.physics_cycles))
+            "; z: " + "{:.2f}".format(aircraft.position.z()))
+        if fcc.destination is not None:
+            print("target pitch angle: " + "{:.2f}".format(fcc.target_pitch_angle) +
+                "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle) +
+                "; dest x: " + "{:.2f}".format(fcc.destination.x()) +
+                "; dest y: " + "{:.2f}".format(fcc.destination.y()) +
+                "; dest z: " + "{:.2f}".format(fcc.destination.z()) +
+                "; distance covered: " + "{:.2f}".format(aircraft.distance_covered) +
+                "; fps: " + "{:.2f}".format(self.simulation_state.fps) +
+                "; t: " + str(self.adsb_cycles) +
+                "; phys: " + str(self.simulation_state.physics_cycles))
+        else:
+            print("target pitch angle: " + "{:.2f}".format(fcc.target_pitch_angle) +
+                "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle) +
+                "; distance covered: " + "{:.2f}".format(aircraft.distance_covered) +
+                "; fps: " + "{:.2f}".format(self.simulation_state.fps) +
+                "; t: " + str(self.adsb_cycles) +
+                "; phys: " + str(self.simulation_state.physics_cycles) +
+                "; no destination")
