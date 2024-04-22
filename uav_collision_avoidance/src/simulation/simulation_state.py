@@ -27,20 +27,24 @@ class SimulationState(QSettings):
         self.__reset_demanded : bool = False
         self.pause_start_timestamp : QTime | None = None
         self.time_paused : int = 0 # ms
-        self.__adsb_report : bool = False
+        self.__adsb_report : bool = True
         self.__collision : bool = False
         self.__first_cause_collision : bool = False
         self.__second_cause_collision : bool = False
 
         if is_realtime:
             # render state
-            self.__gui_scale : float = 0.5 # define gui scaling
-            if SimulationSettings.screen_resolution.height() < 1440:
-                self.gui_scale = 0.375
-            elif SimulationSettings.screen_resolution.height() < 1080:
-                self.gui_scale = 0.25
-            elif SimulationSettings.screen_resolution.height() < 480:
-                self.gui_scale = 0.125
+            override_gui_scale : bool = True
+            if not override_gui_scale:
+                self.__gui_scale : float = 0.5 # define gui scaling
+                if SimulationSettings.screen_resolution.height() < 1440:
+                    self.gui_scale = 0.375
+                elif SimulationSettings.screen_resolution.height() < 1080:
+                    self.gui_scale = 0.25
+                elif SimulationSettings.screen_resolution.height() < 480:
+                    self.gui_scale = 0.125
+            else:
+                self.__gui_scale : float = 0.75
             self.fps : float = 0.0
             self.draw_fps : bool = True
             self.draw_aircraft : bool = True
