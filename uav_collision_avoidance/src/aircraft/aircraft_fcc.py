@@ -33,7 +33,6 @@ class AircraftFCC(QObject):
         self.__target_speed : float = self.aircraft.absolute_speed
         self.__is_turning_right : bool = False
         self.__is_turning_left : bool = False
-        self.previous_yaw_angle_difference : float = 0.0
 
         self.__evade_maneuver : bool = False
         self.vector_sharing_resolution : QVector3D | None = None
@@ -162,8 +161,6 @@ class AircraftFCC(QObject):
             self.is_turning_left = False
             return 0.0
         elif difference > 0:
-            if not self.is_turning_right:
-                self.previous_yaw_angle_difference = difference
             self.is_turning_right = True
             self.is_turning_left = False
             if difference > 90:
@@ -175,8 +172,6 @@ class AircraftFCC(QObject):
             else:
                 return 5.0
         elif difference < 0:
-            if not self.is_turning_left:
-                self.previous_yaw_angle_difference = difference
             self.is_turning_left = True
             self.is_turning_right = False
             if difference < -90:
