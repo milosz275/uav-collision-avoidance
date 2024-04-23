@@ -1,18 +1,23 @@
 # UAV Collision Avoidance
 
 Python project regarding implementation of UAV physics and collision detection/avoidance algorithms.
-- [Github repo](https://github.com/mldxo/uav-collision-avoidance)
-- [PyPi project](https://pypi.org/project/uav-collision-avoidance)
+- [Github](https://github.com/mldxo/uav-collision-avoidance)
+- [PyPi](https://pypi.org/project/uav-collision-avoidance)
 
 ## Research work
 
 ### Introduction
 
-UAV Collision Avoidance is my Bachelor's thesis project meeting problem of UAVs safe cooperation in the 3D space. Project implements functional physics calculations, scalable GUI, realistic ADS-B probable collision avoidance systems and on-board flight planning. Application offers realtime simulation presenting moving aircrafts as well as rendered simulation allowing for algorithm effectiveness testing.
+UAV Collision Avoidance is my Bachelor's thesis project meeting problem of UAVs safe cooperation in the 3D space. Project implements functional physics calculations, scalable GUI, realistic ADS-B probable collision avoidance systems and on-board flight planning. Application offers multithreaded realtime simulation presenting simulated aircrafts as well as linearly prerendered simulation allowing for quick algorithm effectiveness testing.
 
 ### Premises
 
-3-dimensional (3D) space defined in XYZ coordinate system, where X and Y describe flat horizontal plane and Z is height above the sea level. Physics is simulated differentiating between parts of the second according to adequate formulas. In scope of this project, UAVs' physics are considered relative to the Earth frame and the aeroplanes are considered HTOL drones (Horizontal Take-off and Landing) that can only move in direction of their speed vectors. Aircrafts' form are approaximated to simple solid sphere. The space is shared by two or three UAVs. There is no other objects or gusts of wind assumpted. No aerodynamic lift force assumed at this moment. While turning, aircrafts take always maximal angle change that physics allow them with respect of mass inertia and the angles are not approaximated to meet exact courses. The default distance units are meters [m] and speed is meters per second [m/s], frame times are represented in miliseconds [ms].
+1. System Definition: The system is defined as a 3-dimensional (3D) space using an XYZ coordinate system. X and Y represent a flat horizontal plane, while Z represents height above sea level.
+2. Physics Simulation: Physics are simulated by differentiating parts of the second according to appropriate formulas. The physics of Unmanned Aerial Vehicles (UAVs) are considered relative to the Earth's frame, separated from the aircraft's frame and wind relative frame. 3D space is flat, and the Earth's curvature is not considered.
+3. Aircraft Characteristics: The aircraft are considered Horizontal Take-off and Landing (HTOL) drones. They can only move in the direction of their speed vectors. The form of the aircraft is approximated to a simple solid sphere.
+4. Environment: The space is shared by two or three UAVs. There are no other objects or wind gusts assumed in this environment.
+5. Aerodynamics: No aerodynamic lift force is assumed at this moment. When turning, aircraft always take the maximum angle change that physics allow, respecting mass inertia. The angles are not approximated to meet exact courses.
+6. Units of Measurement: The default distance units are meters (m), speed is measured in meters per second (m/s), and frame times are represented in milliseconds (ms).
 
 ### Algorithms
 
