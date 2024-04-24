@@ -54,7 +54,7 @@ class SimulationADSB(QThread):
                 # console destination reach time
                 if fcc.destination and self.simulation_state.adsb_report:
                     time_to_reaching_destination : float = (QVector3D.dotProduct(fcc.destination - aircraft.position, aircraft.speed) / QVector3D.dotProduct(aircraft.speed, aircraft.speed))
-                    print(f"Aircraft {aircraft.aircraft_id} will reach its destination in " + "{:.2f}".format(time_to_reaching_destination) + " (" + "{:.0f}".format(time_to_reaching_destination / 60) + " minutes)")
+                    print(f"Aircraft {aircraft.aircraft_id} will reach its destination in " + "{:.2f}".format(time_to_reaching_destination) + " (" + "{:.1f}".format(time_to_reaching_destination / 60) + " minutes or " + "{:.1f}".format(time_to_reaching_destination / 3600) + " hours)")
 
                 # console report output
                 if self.simulation_state.adsb_report and aircraft.aircraft_id == 0:
@@ -64,10 +64,12 @@ class SimulationADSB(QThread):
                 if relative_position.length() < self.simulation_state.minimum_separation:
                     if not fcc.safe_zone_occupied:
                         fcc.safe_zone_occupied = True
+                        self.simulation_state.avoid_collisions = True
                     print("Safe zone occupied")
                 else:
                     if fcc.safe_zone_occupied:
                         fcc.safe_zone_occupied = False
+                        self.simulation_state.avoid_collisions = False
                     print("Safe zone free")
                     return
 
