@@ -324,8 +324,8 @@ class SimulationWidget(QWidget):
         """Updates screen offsets centering on selected aircraft"""
         scale : float = self.simulation_state.gui_scale
         id = self.simulation_state.focus_aircraft_id
-        self.screen_offset_x = - self.aircraft_vehicles[id].position.x() + self.window_width / 2 / scale
-        self.screen_offset_y = - self.aircraft_vehicles[id].position.y() + self.window_height / 2 / scale
+        self.screen_offset_x = (self.window_width / 2.0) / scale - self.aircraft_vehicles[id].position.x()
+        self.screen_offset_y = (self.window_height / 2.0) / scale - self.aircraft_vehicles[id].position.y()
 
     def update_resolutions(self) -> None:
         """Updates bounding box resolution"""
@@ -334,8 +334,13 @@ class SimulationWidget(QWidget):
 
     def zoom(self, factor : float) -> None:
         """Zooms in/out the simulation render"""
-        if self.simulation_state.gui_scale + factor <= 0:
+        if self.simulation_state.gui_scale + factor >= 2:
+            self.simulation_state.gui_scale = 2
             return
+        while factor > 0 and factor > 2 * self.simulation_state.gui_scale:
+            factor /= 2
+        while factor < 0 and self.simulation_state.gui_scale + factor <= 0:
+            factor /= 2
         old_scale : float = self.simulation_state.gui_scale
         self.simulation_state.gui_scale += factor
         scale : float = self.simulation_state.gui_scale
