@@ -27,7 +27,7 @@ class Simulation(QMainWindow):
         super().__init__()
         SimulationSettings().__init__()
         if aircrafts is None:
-            test_case : int = 0
+            test_case : int = 3
             if test_case == 0:
                 self.aircrafts : List[Aircraft] = [
                     Aircraft( # detection test
@@ -51,13 +51,24 @@ class Simulation(QMainWindow):
             elif test_case == 2:
                 self.aircrafts : List[Aircraft] = [
                     Aircraft( # avoidance test
-                        position = QVector3D(10, -10, 1000),
+                        position = QVector3D(0, 0, 1000),
+                        speed = QVector3D(30, -30, 0),
+                        initial_target = QVector3D(75000, -75000, 1000)), # 75 km, -75 km
+                    Aircraft(
+                        position = QVector3D(0, -100_000, 1000),
+                        speed = QVector3D(30, 29, 0),
+                        initial_target = QVector3D(75000, -27500, 1000)), # 75 km, -27.5 km
+                ]
+            elif test_case == 3:
+                self.aircrafts : List[Aircraft] = [
+                    Aircraft( # avoidance test fast
+                        position = QVector3D(0, 0, 1000),
                         speed = QVector3D(300, -300, 0),
-                        initial_target = QVector3D(75000, -75000, 0)), # 75 km, -75 km
+                        initial_target = QVector3D(75000, -75000, 1000)), # 75 km, -75 km
                     Aircraft(
                         position = QVector3D(0, -100_000, 1000),
                         speed = QVector3D(300, 290, 0),
-                        initial_target = QVector3D(75000, -27500, 0)), # 75 km, -27.5 km
+                        initial_target = QVector3D(75000, -27500, 1000)), # 75 km, -27.5 km
                 ]
         else:
             self.aircrafts = aircrafts
