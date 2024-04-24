@@ -46,10 +46,17 @@ class SimulationADSB(QThread):
             print("Time to closest approach: " + "{:.2f}".format(time_to_closest_approach) + "s")
             
             for aircraft in self.aircraft_vehicles:
-                # path
-                self.aircraft_fccs[aircraft.aircraft_id].append_visited()
+                fcc : AircraftFCC = self.aircraft_fccs[aircraft.aircraft_id]
 
-                # console output
+                # path
+                fcc.append_visited()
+
+                # console destination reach time
+                if fcc.destination and self.simulation_state.adsb_report:
+                    time_to_reaching_destination : float = (QVector3D.dotProduct(fcc.destination - aircraft.position, aircraft.speed) / QVector3D.dotProduct(aircraft.speed, aircraft.speed))
+                    print(f"Aircraft {aircraft.aircraft_id} will reach its destination in " + "{:.2f}".format(time_to_reaching_destination) + " (" + "{:.0f}".format(time_to_reaching_destination / 60) + " minutes)")
+
+                # console report output
                 if self.simulation_state.adsb_report and aircraft.aircraft_id == 0:
                     self.print_adsb_report(aircraft)
 
