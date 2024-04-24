@@ -42,7 +42,7 @@ class SimulationWidget(QWidget):
         self.setWindowTitle(QApplication.applicationName() + " " + QApplication.applicationVersion())
 
         self.icon = QIcon()
-        self.icon.addPixmap(self.simulation_state.aircraft_pixmap, QIcon.Mode.Normal, QIcon.State.Off)
+        self.icon.addPixmap(self.generate_icon(), QIcon.Mode.Normal, QIcon.State.Off)
         self.setWindowIcon(self.icon)
 
         self.__moving_view_up = False
@@ -51,6 +51,20 @@ class SimulationWidget(QWidget):
         self.__moving_view_right = False
 
         self.center_offsets()
+
+    def generate_icon(self) -> QPixmap:
+        """Returns icon for the main window"""
+        pixmap = QPixmap(self.simulation_state.aircraft_pixmap)
+        painter = QPainter(pixmap)
+        painter.setBrush(QColor("white"))
+        painter.drawEllipse(self.simulation_state.aircraft_pixmap.rect())
+        painter.drawPixmap(
+            self.simulation_state.aircraft_pixmap.width() * 0.125,
+            self.simulation_state.aircraft_pixmap.height() * 0.125,
+            self.simulation_state.aircraft_pixmap.scaled(self.simulation_state.aircraft_pixmap.width() * 0.75,
+            self.simulation_state.aircraft_pixmap.height() * 0.75))
+        painter.end()
+        return pixmap
 
     def draw_aircraft(self, aircraft : AircraftVehicle, scale : float) -> None:
         """Draws given aircraft vehicle"""
