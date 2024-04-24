@@ -117,15 +117,15 @@ class SimulationPhysics(QThread):
             # roll angle
             aircraft.roll_angle = (1.0 / (aircraft.roll_dynamic_delay / elapsed_time)) * (fcc.target_roll_angle - aircraft.roll_angle)
 
-            # pitch angle
-            new_pitch_angle = (1.0 / (aircraft.pitch_dynamic_delay / elapsed_time)) * (fcc.target_pitch_angle - aircraft.pitch_angle)
-            new_x_speed = aircraft.speed.x() * cos(new_pitch_angle)
-            new_y_speed = aircraft.speed.y() * cos(new_pitch_angle)
-            new_z_speed = aircraft.speed.length() ** 2 - new_x_speed ** 2 - new_y_speed ** 2
-            if new_z_speed < 0.0:
-                new_z_speed = 0.0
-            new_z_speed = sqrt(new_z_speed)
-            aircraft.speed = QVector3D(new_x_speed, new_y_speed, new_z_speed)
+            # # pitch angle # todo: fix faulty code
+            # new_pitch_angle = (1.0 / (aircraft.pitch_dynamic_delay / elapsed_time)) * (fcc.target_pitch_angle - aircraft.pitch_angle)
+            # new_x_speed = aircraft.speed.x() * cos(new_pitch_angle)
+            # new_y_speed = aircraft.speed.y() * cos(new_pitch_angle)
+            # new_z_speed = aircraft.speed.length() ** 2 - new_x_speed ** 2 - new_y_speed ** 2
+            # if new_z_speed < 0.0:
+            #     new_z_speed = 0.0
+            # new_z_speed = sqrt(new_z_speed)
+            # aircraft.speed = QVector3D(new_x_speed, new_y_speed, new_z_speed)
 
             # yaw angle
             roll_angle : float = aircraft.roll_angle
