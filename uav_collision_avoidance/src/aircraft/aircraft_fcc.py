@@ -35,6 +35,7 @@ class AircraftFCC(QObject):
         self.__is_turning_left : bool = False
         self.ignore_destinations : bool = False
 
+        self.__safe_zone_occupied : bool = False
         self.__evade_maneuver : bool = False
         self.vector_sharing_resolution : QVector3D | None = None
 
@@ -113,6 +114,22 @@ class AircraftFCC(QObject):
         """Formats angle into -180-180 domain"""
         angle = self.normalize_angle(angle)
         return angle if angle <= 180 else -180 + (angle - 180)
+    
+    @property
+    def safe_zone_occupied(self) -> bool:
+        """Returns safe zone occupied state"""
+        return self.__safe_zone_occupied
+    
+    @safe_zone_occupied.setter
+    def safe_zone_occupied(self, value : bool) -> None:
+        """Sets safe zone occupied state"""
+        if self.__safe_zone_occupied and value:
+            print("Safe zone already occupied")
+            logging.warning("Safe zone already occupied")
+        if not self.__safe_zone_occupied and not value:
+            print("Safe zone already free")
+            logging.warning("Safe zone already free")
+        self.__safe_zone_occupied = value
     
     @property
     def evade_maneuver(self) -> bool:
