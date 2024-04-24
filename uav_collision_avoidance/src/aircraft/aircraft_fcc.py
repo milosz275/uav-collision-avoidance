@@ -33,6 +33,7 @@ class AircraftFCC(QObject):
         self.__target_speed : float = self.aircraft.absolute_speed
         self.__is_turning_right : bool = False
         self.__is_turning_left : bool = False
+        self.ignore_destinations : bool = False
 
         self.__evade_maneuver : bool = False
         self.vector_sharing_resolution : QVector3D | None = None
@@ -124,13 +125,12 @@ class AircraftFCC(QObject):
         print(str(self.aircraft.aircraft_id) + ": miss distance vector: " + "{:.2f}".format(miss_distance_vector.x()) + " " + "{:.2f}".format(miss_distance_vector.y()) + " " + "{:.2f}".format(miss_distance_vector.z()))
         print(str(self.aircraft.aircraft_id) + ": unresolved region: " + "{:.2f}".format(unresolved_region))
         print(str(self.aircraft.aircraft_id) + ": time to closest approach: " + "{:.2f}".format(time_to_closest_approach))
-        
-        if (miss_distance_vector.x() == 0 and miss_distance_vector.y() == 0 and miss_distance_vector.z() == 0):
-            return
 
         if self.__evade_maneuver:
             logging.warning("Another evade maneuver in progress")
         else:
+            
+
             print(f"Aircraft {self.aircraft.aircraft_id} applying evade maneuver")
             logging.info("Aircraft %s applying evade maneuver", self.aircraft.aircraft_id)
             self.__evade_maneuver = True
@@ -140,10 +140,16 @@ class AircraftFCC(QObject):
             else:
                 self.vector_sharing_resolution = (opponent_speed.length() * unresolved_region * miss_distance_vector) / ((opponent_speed.length() + self.aircraft.speed.length()) * miss_distance_vector.length())
             print("Vector sharing resolution: " + "{:.2f}".format(self.vector_sharing_resolution.x()) + " " + "{:.2f}".format(self.vector_sharing_resolution.y()) + " " + "{:.2f}".format(self.vector_sharing_resolution.z()))
-            
-            # self.vector_sharing_resolution *= 2
 
-            target_avoiding : QVector3D = self.aircraft.position + (self.aircraft.speed * time_to_closest_approach + self.vector_sharing_resolution)
+            modified_speed_vector : QVector3D = (self.aircraft.speed * time_to_closest_approach + self.vector_sharing_resolution)
+            target_avoiding : QVector3D = self.aircraft.position + modified_speed_vector
+            print("Set target avoiding collision: " + "{:.2f}".format(target_avoiding.x()) + " " + "{:.2f}".format(target_avoiding.y()) + " " + "{:.2f}".format(target_avoiding.z()))
+            
+            unit_vector : QVector3D = modified_speed_vector.normalized()
+            print("Unit vector: " + "{:.2f}".format(unit_vector.x()) + " " + "{:.2f}".format(unit_vector.y()) + " " + "{:.2f}".format(unit_vector.z()))
+
+            target_avoiding_from_unit : QVector3D = self.aircraft.position + (unit_vector * modified_speed_vector.length())
+            print("Set target avoiding from unit: " + "{:.2f}".format(target_avoiding_from_unit.x()) + " " + "{:.2f}".format(target_avoiding_from_unit.y()) + " " + "{:.2f}".format(target_avoiding_from_unit.z()))
             self.add_first_destination(target_avoiding)
 
     def reset_evade_maneuver(self) -> None:
@@ -195,7 +201,7 @@ class AircraftFCC(QObject):
 
     def update_target_yaw_angle(self) -> None:
         """Updates current yaw angle"""
-        if self.destinations:
+        if self.destinations and not self.ignore_destinations:
             destination = self.destinations[0]
             distance = dist(self.aircraft.position.toTuple(), destination.toTuple())
             if distance < self.aircraft.size / 2:
