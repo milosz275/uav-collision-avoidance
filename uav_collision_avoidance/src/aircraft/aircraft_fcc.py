@@ -109,7 +109,7 @@ class AircraftFCC(QObject):
         angle = angle % 360
         return angle if angle >= 0 else angle + 360
 
-    def format_angle(self, angle : float) -> float:
+    def format_yaw_angle(self, angle : float) -> float:
         """Formats angle into -180-180 domain"""
         angle = self.normalize_angle(angle)
         return angle if angle <= 180 else -180 + (angle - 180)
@@ -207,9 +207,16 @@ class AircraftFCC(QObject):
             destination.y() - position.y(),
             destination.x() - position.x()))
         target_yaw_angle += 90
-        return self.format_angle(target_yaw_angle)
+        return self.format_yaw_angle(target_yaw_angle)
+    
+    def find_best_pitch_angle(self, position : QVector3D, destination : QVector3D) -> float:
+        """Finds best pitch angle for the given destination"""
+        target_pitch_angle : float = degrees(atan2(
+            destination.z() - position.z(),
+            dist(position.toTuple(), destination.toTuple())))
+        return target_pitch_angle
 
-    def update_target_yaw_angle(self) -> None:
+    def update_target_yaw_pitch_angles(self) -> None:
         """Updates current yaw angle"""
         if self.destinations and not self.ignore_destinations:
             destination = self.destinations[0]
@@ -225,6 +232,9 @@ class AircraftFCC(QObject):
                     print(f"Aircraft {self.aircraft.aircraft_id} visited destination and is free now")
                     return
             self.target_yaw_angle = self.find_best_yaw_angle(
+                self.aircraft.position,
+                destination)
+            self.target_pitch_angle = self.find_best_pitch_angle(
                 self.aircraft.position,
                 destination)
             
@@ -244,13 +254,13 @@ class AircraftFCC(QObject):
 
     def update(self) -> None:
         """Updates current targeted movement angles"""
-        self.update_target_yaw_angle()
+        self.update_target_yaw_pitch_angles()
         self.update_target_roll_angle()
 
     def update_target(self, target : QVector3D) -> None:
         """Updates target position"""
         self.target_yaw_angle = self.find_best_yaw_angle(self.aircraft.position, target)
-        self.update_target_roll_angle()    
+        self.update_target_roll_angle()      
 
     def reset(self) -> None:
         """Resets aircraft flight control computer"""
