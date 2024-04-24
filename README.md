@@ -109,12 +109,15 @@ One coding convention is not preserved in the scope of the project. Qt's methods
 ## Current Work / TODOs
 
 - [ ] Reimplement safe zone
+- [ ] Head-on collision avoidance
 - [x] Symmetrical bank (roll) during turn, no angle approaximation
 - [ ] Altitude change with symmetrical command
-- [ ] Generating test cases
+- [ ] Generating test cases and batch loading
 - [ ] Test cases comparison
-- [ ] Documentation
+- [ ] Aircraft 0 manual control override
+- [ ] Flight control computer angle optimization
 - [ ] Centered view optimization
+- [ ] Documentation
 
 ## Authors
 
