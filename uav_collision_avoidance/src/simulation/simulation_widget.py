@@ -339,8 +339,8 @@ class SimulationWidget(QWidget):
         old_scale : float = self.simulation_state.gui_scale
         self.simulation_state.gui_scale += factor
         scale : float = self.simulation_state.gui_scale
-        self.screen_offset_x = self.screen_offset_x * old_scale / scale
-        self.screen_offset_y = self.screen_offset_y * old_scale / scale
+        self.screen_offset_x = self.screen_offset_x * (old_scale / scale)
+        self.screen_offset_y = self.screen_offset_y * (old_scale / scale)
 
     def paintEvent(self, event : QPaintEvent) -> None:
         """Qt method painting the aircrafts"""
