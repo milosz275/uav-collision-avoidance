@@ -135,7 +135,7 @@ class AircraftFCC(QObject):
 
             # this is temporal solution of the problem below
             if miss_distance_vector.length() == 0:
-                miss_distance_vector = QVector3D(self.aircraft.size * 0.75, self.aircraft.size * 0.75, 0.0)
+                miss_distance_vector = QVector3D(0.01, 0.01, 0.0)
 
             target_avoiding : QVector3D = QVector3D()
             if miss_distance_vector.length() == 0:
