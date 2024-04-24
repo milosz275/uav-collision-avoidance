@@ -60,6 +60,17 @@ class SimulationADSB(QThread):
                 if self.simulation_state.adsb_report and aircraft.aircraft_id == 0:
                     self.print_adsb_report(aircraft)
 
+                # safe zone occupancy check
+                if relative_position.length() < self.simulation_state.minimum_separation:
+                    if not fcc.safe_zone_occupied:
+                        fcc.safe_zone_occupied = True
+                    print("Safe zone occupied")
+                else:
+                    if fcc.safe_zone_occupied:
+                        fcc.safe_zone_occupied = False
+                    print("Safe zone free")
+                    return
+
             if not self.simulation_state.avoid_collisions:
                 return
 
