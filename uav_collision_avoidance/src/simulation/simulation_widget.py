@@ -45,10 +45,14 @@ class SimulationWidget(QWidget):
         self.icon.addPixmap(self.generate_icon(), QIcon.Mode.Normal, QIcon.State.Off)
         self.setWindowIcon(self.icon)
 
-        self.__moving_view_up = False
-        self.__moving_view_down = False
-        self.__moving_view_left = False
-        self.__moving_view_right = False
+        self.__moving_view_up : bool = False
+        self.__moving_view_down : bool = False
+        self.__moving_view_left : bool = False
+        self.__moving_view_right : bool = False
+        self.__steering_left : bool = False
+        self.__steering_right : bool = False
+        self.__steering_up : bool = False
+        self.__steering_down : bool = False
 
         self.center_offsets()
 
@@ -290,6 +294,32 @@ class SimulationWidget(QWidget):
         if self.__moving_view_right:
             self.screen_offset_x -= 10.0 / scale
 
+    def update_steering(self) -> None:
+        """Updates aircraft steering based on current input"""
+        if self.aircrafts[0] and (self.__steering_up or self.__steering_down or self.__steering_left or self.__steering_right):
+            if sum([self.__steering_up, self.__steering_down, self.__steering_left, self.__steering_right]) >= 3:
+                return
+            self.aircraft_fccs[0].ignore_destinations = True
+            target_yaw_angle : float | None = None
+            if self.__steering_up and self.__steering_left:
+                target_yaw_angle = -45.0
+            elif self.__steering_up and self.__steering_right:
+                target_yaw_angle = 45.0
+            elif self.__steering_down and self.__steering_left:
+                target_yaw_angle = -135.0
+            elif self.__steering_down and self.__steering_right:
+                target_yaw_angle = 135.0
+            elif self.__steering_up:
+                target_yaw_angle = 0.0
+            elif self.__steering_down:
+                target_yaw_angle = 180.0
+            elif self.__steering_left:
+                target_yaw_angle = -90.0
+            elif self.__steering_right:
+                target_yaw_angle = 90.0
+            if target_yaw_angle is not None:
+                self.aircraft_fccs[0].target_yaw_angle = target_yaw_angle
+
     def center_offsets(self) -> None:
         """Updates screen offsets centering on selected aircraft"""
         scale : float = self.simulation_state.gui_scale
@@ -316,6 +346,7 @@ class SimulationWidget(QWidget):
         """Qt method painting the aircrafts"""
         self.simulation_fps.count_frame()
         scale : float = self.simulation_state.gui_scale
+        self.update_steering()
         if not self.simulation_state.follow_aircraft:
             self.update_moving_offsets()
         else:
@@ -413,6 +444,7 @@ class SimulationWidget(QWidget):
             if event.isAutoRepeat():
                 return super().keyPressEvent(event)
             self.simulation_state.reset()
+            self.center_offsets()
         elif event.key() == Qt.Key.Key_Plus:
             self.zoom(0.0625)
         elif event.key() == Qt.Key.Key_Minus:
@@ -443,13 +475,13 @@ class SimulationWidget(QWidget):
             self.__moving_view_down = True
         if self.aircrafts[0]:
             if event.key() == Qt.Key.Key_A:
-                self.aircraft_fccs[0].target_yaw_angle = -90.0
+                self.__steering_left = True
             elif event.key() == Qt.Key.Key_D:
-                self.aircraft_fccs[0].target_yaw_angle = 90.0
+                self.__steering_right = True
             elif event.key() == Qt.Key.Key_W:
-                self.aircraft_fccs[0].target_yaw_angle = 0.0
+                self.__steering_up = True
             elif event.key() == Qt.Key.Key_S:
-                self.aircraft_fccs[0].target_yaw_angle = 180.0
+                self.__steering_down = True
         return super().keyPressEvent(event)
     
     def keyReleaseEvent(self, event: QKeyEvent) -> None:
@@ -464,6 +496,16 @@ class SimulationWidget(QWidget):
             self.__moving_view_up = False
         elif event.key() == Qt.Key.Key_Down:
             self.__moving_view_down = False
+        if self.aircrafts[0]:
+            self.aircraft_fccs[0].ignore_destinations = False
+            if event.key() == Qt.Key.Key_A:
+                self.__steering_left = False
+            elif event.key() == Qt.Key.Key_D:
+                self.__steering_right = False
+            elif event.key() == Qt.Key.Key_W:
+                self.__steering_up = False
+            elif event.key() == Qt.Key.Key_S:
+                self.__steering_down = False
         return super().keyReleaseEvent(event)
     
     def resizeEvent(self, event: QPaintEvent) -> None:
