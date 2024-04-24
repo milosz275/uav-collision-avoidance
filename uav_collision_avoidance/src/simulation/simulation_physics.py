@@ -2,7 +2,7 @@
 
 import logging
 from copy import copy
-from math import sin, cos, dist, tan, radians
+from math import sin, cos, dist, tan, radians, sqrt
 from typing import List
 
 from PySide6.QtCore import QThread, QTime
@@ -100,7 +100,7 @@ class SimulationPhysics(QThread):
             current_speed = aircraft.absolute_speed
             target_speed = fcc.target_speed
             speed_difference = abs(current_speed - target_speed)
-            if speed_difference > 0.001 and target_speed > 20.0:
+            if speed_difference > 0.001 and current_speed > 20.0 and current_speed < 340: # make drone subsonic
                 max_speed_delta = aircraft.max_acceleration / elapsed_time
                 if speed_difference < max_speed_delta:
                     pass # become target
@@ -118,6 +118,14 @@ class SimulationPhysics(QThread):
             aircraft.roll_angle = (1.0 / (aircraft.roll_dynamic_delay / elapsed_time)) * (fcc.target_roll_angle - aircraft.roll_angle)
 
             # pitch angle
+            new_pitch_angle = (1.0 / (aircraft.pitch_dynamic_delay / elapsed_time)) * (fcc.target_pitch_angle - aircraft.pitch_angle)
+            new_x_speed = aircraft.speed.x() * cos(new_pitch_angle)
+            new_y_speed = aircraft.speed.y() * cos(new_pitch_angle)
+            new_z_speed = aircraft.speed.length() ** 2 - new_x_speed ** 2 - new_y_speed ** 2
+            if new_z_speed < 0.0:
+                new_z_speed = 0.0
+            new_z_speed = sqrt(new_z_speed)
+            aircraft.speed = QVector3D(new_x_speed, new_y_speed, new_z_speed)
 
             # yaw angle
             roll_angle : float = aircraft.roll_angle
