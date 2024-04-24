@@ -54,7 +54,7 @@ class SimulationPhysics(QThread):
             self.simulation_state.update_simulation_settings()
             self.update_aircrafts_speed_angles(elapsed_time)
             if self.update_aircrafts_position(elapsed_time):
-                logging.warn("Aircrafts collided at coordinates: " + str(self.aircraft_vehicles[0].position.toTuple()) + " and " + str(self.aircraft_vehicles[1].position.toTuple()))
+                logging.warn("Collision Occured. Aircrafts coordinates: " + str(self.aircraft_vehicles[0].position.toTuple()) + " and " + str(self.aircraft_vehicles[1].position.toTuple()))
                 QApplication.beep()
                 self.simulation_state.register_collision()
                 if self.isRunning():
@@ -71,9 +71,12 @@ class SimulationPhysics(QThread):
     def update_aircrafts_position(self, elapsed_time : float) -> bool:
         """Updates aircrafts position, returns true on collision"""
         for aircraft in self.aircraft_vehicles:
+            if aircraft.position.z() <= 0.0:
+                print("Collision with ground")
+                return True
             relative_distance : float = dist(aircraft.position.toTuple(), self.aircraft_vehicles[1 - aircraft.aircraft_id].position.toTuple())
             if relative_distance <= aircraft.size:
-                print("Collision")
+                print("Collision with another aircraft")
                 return True
             old_pos : QVector3D = copy(aircraft.position)
             aircraft.move(
