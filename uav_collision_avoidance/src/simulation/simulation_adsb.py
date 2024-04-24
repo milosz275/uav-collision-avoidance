@@ -64,6 +64,10 @@ class SimulationADSB(QThread):
                     QVector3D.crossProduct(relative_position, speed_difference_unit))
                 print("Miss distance at closest approach: " + "{:.2f}".format(miss_distance_vector.length()) + "m")
 
+                if miss_distance_vector.length() == 0:
+                    print("Head-on collision detected")
+                    logging.info("Head-on collision detected")
+
                 # resolve confict condition
                 unresolved_region : float = self.simulation_state.minimum_separation - abs(miss_distance_vector.length())
                 if unresolved_region > 0.0:
