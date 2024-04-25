@@ -87,18 +87,26 @@ class AircraftFCC(QObject):
                 print("Attempted to stack same destination")
                 logging.warning(f"Attempted to stack same destination: {destination}")
                 return None
+        if destination.z() < 500:
+            if destination.z() < 0:
+                print("Attempted to set destination below ground")
+                logging.warning(f"Attempted to set destination below ground: {destination}")
+            else:
+                print("Attempted to set destination too low")
+                logging.warning(f"Attempted to set destination too low: {destination}")
+            destination = QVector3D(destination.x(), destination.y(), 500)
         return destination
 
     def add_last_destination(self, destination : QVector3D) -> None:
         """Appends the given location (QVector3D) to the end of the destinations list."""
-        destination = self.check_new_destination(destination, False)
+        destination : QVector3D = self.check_new_destination(destination, False)
         if destination is not None:
             self.destinations.append(destination)
             logging.info("Aircraft %s added new last destination: %s", self.aircraft.aircraft_id, destination.toTuple())
 
     def add_first_destination(self, destination : QVector3D) -> None:
         """Pushes given location to the top of destinations list"""
-        destination = self.check_new_destination(destination, True)
+        destination : QVector3D = self.check_new_destination(destination, True)
         if destination is not None:
             self.destinations.appendleft(destination)
             logging.info("Aircraft %s added new first destination: %s", self.aircraft.aircraft_id, destination.toTuple())
