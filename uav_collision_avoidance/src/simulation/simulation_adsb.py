@@ -64,7 +64,8 @@ class SimulationADSB(QThread):
                 if relative_position.length() < self.simulation_state.minimum_separation:
                     if not fcc.safe_zone_occupied:
                         fcc.safe_zone_occupied = True
-                        self.simulation_state.avoid_collisions = True
+                        if not self.simulation_state.override_avoid_collisions:
+                            self.simulation_state.avoid_collisions = True
                     print("Safe zone occupied")
                 else:
                     if fcc.safe_zone_occupied:
