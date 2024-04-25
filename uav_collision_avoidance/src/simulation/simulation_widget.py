@@ -389,6 +389,8 @@ class SimulationWidget(QWidget):
                 self.draw_destinations(aircraft, scale)
             if self.simulation_state.draw_speed_vectors:
                 self.draw_vector(aircraft.position, aircraft.position + aircraft.speed, scale)
+            if self.simulation_state.draw_safezones:
+                self.draw_circle(aircraft.position, self.simulation_state.minimum_separation, scale)
         return super().paintEvent(event)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
@@ -450,6 +452,8 @@ class SimulationWidget(QWidget):
                 return super().keyPressEvent(event)
             self.simulation_state.reset()
             self.center_offsets()
+        elif event.key() == Qt.Key.Key_F:
+            self.simulation_state.toggle_fps()
         elif event.key() == Qt.Key.Key_Plus:
             self.zoom(0.0625)
         elif event.key() == Qt.Key.Key_Minus:
@@ -470,6 +474,8 @@ class SimulationWidget(QWidget):
             self.simulation_state.follow_aircraft = not self.simulation_state.follow_aircraft
         elif event.key() == Qt.Key.Key_M:
             self.simulation_state.focus_aircraft_id = int(not self.simulation_state.focus_aircraft_id)
+        elif event.key() == Qt.Key.Key_Z:
+            self.simulation_state.draw_safezones = not self.simulation_state.draw_safezones
         elif event.key() == Qt.Key.Key_Left:
             self.__moving_view_left = True
         elif event.key() == Qt.Key.Key_Right:
