@@ -123,10 +123,16 @@ class SimulationPhysics(QThread):
             if not abs(current_pitch_angle - target_pitch_angle) < 0.001 and current_pitch_angle < 90.0 and current_pitch_angle > -90.0:
                 delta_pitch_angle : float = (1.0 / (aircraft.pitch_dynamic_delay / elapsed_time)) * (target_pitch_angle - aircraft.pitch_angle)
                 new_pitch_angle : float = current_pitch_angle
-                if target_pitch_angle > current_pitch_angle:
-                    new_pitch_angle = current_pitch_angle + delta_pitch_angle
-                else:
-                    new_pitch_angle = current_pitch_angle - delta_pitch_angle
+                if target_pitch_angle > 0:
+                    if target_pitch_angle > current_pitch_angle:
+                        new_pitch_angle = current_pitch_angle + delta_pitch_angle
+                    else:
+                        new_pitch_angle = current_pitch_angle - delta_pitch_angle
+                else: # target_pitch_angle < 0
+                    if target_pitch_angle < current_pitch_angle:
+                        new_pitch_angle = current_pitch_angle + delta_pitch_angle
+                    else:
+                        new_pitch_angle = current_pitch_angle - delta_pitch_angle
 
                 current_speed : float = aircraft.absolute_speed
                 new_speed_z = current_speed * sin(radians(new_pitch_angle))
