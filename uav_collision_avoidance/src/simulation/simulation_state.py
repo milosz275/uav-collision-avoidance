@@ -20,6 +20,7 @@ class SimulationState(QSettings):
         self.update_settings()
         self.is_realtime : bool = is_realtime
         self.avoid_collisions : bool = avoid_collisions
+        self.override_avoid_collisions : bool = False
         self.minimum_separation : float = 9260.0 # 5nmi
         self.physics_cycles : int = 0
         self.is_paused : bool = False
