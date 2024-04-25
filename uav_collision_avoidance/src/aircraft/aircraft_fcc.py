@@ -73,25 +73,35 @@ class AircraftFCC(QObject):
         """Sets turning left state"""
         self.__is_turning_left = value
 
-    def add_last_destination(self, destination : QVector3D) -> None:
-        """Appends the given location (QVector3D) to the end of the destinations list."""
+    def check_new_destination(self, destination : QVector3D, first : bool) -> QVector3D | None:
+        """Checks if the given destination is already in the destinations list"""
         if not all(isinstance(coord, (int, float)) for coord in (destination.x(), destination.y(), destination.z())):
             raise TypeError("Destination coordinates must be int or float.")
+        if len(self.destinations) > 0 and first:
+            if dist(destination.toTuple(), self.destinations[0].toTuple()) < 1.0:
+                print("Attempted to stack same destination")
+                logging.warning(f"Attempted to stack same destination: {destination}")
+                return None
+        elif len(self.destinations) > 0 and not first:
+            if dist(destination.toTuple(), self.destinations[len(self.destinations) - 1].toTuple()) < 1.0:
+                print("Attempted to stack same destination")
+                logging.warning(f"Attempted to stack same destination: {destination}")
+                return None
+        return destination
 
-        self.destinations.append(destination)
+    def add_last_destination(self, destination : QVector3D) -> None:
+        """Appends the given location (QVector3D) to the end of the destinations list."""
+        destination = self.check_new_destination(destination, False)
+        if destination is not None:
+            self.destinations.append(destination)
+            logging.info("Aircraft %s added new last destination: %s", self.aircraft.aircraft_id, destination.toTuple())
 
     def add_first_destination(self, destination : QVector3D) -> None:
         """Pushes given location to the top of destinations list"""
-        if not all(isinstance(coord, (int, float)) for coord in (destination.x(), destination.y(), destination.z())):
-            raise TypeError("Destination coordinates must be int or float.")
-
-        if len(self.destinations) > 0 and dist(destination.toTuple(), self.destinations[0].toTuple()) < 1.0:
-            print("Attempted to stack same destination")
-            logging.warning(f"Attempted to stack same destination: {destination}")
-            return
-
-        self.destinations.appendleft(destination)
-        logging.info("Aircraft %s added new first destination: %s", self.aircraft.aircraft_id, destination.toTuple())
+        destination = self.check_new_destination(destination, True)
+        if destination is not None:
+            self.destinations.appendleft(destination)
+            logging.info("Aircraft %s added new first destination: %s", self.aircraft.aircraft_id, destination.toTuple())
 
     @property
     def destination(self) -> QVector3D | None:
