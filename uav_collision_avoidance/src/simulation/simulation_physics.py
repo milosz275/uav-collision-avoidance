@@ -101,8 +101,9 @@ class SimulationPhysics(QThread):
             current_speed = aircraft.absolute_speed
             target_speed = fcc.target_speed
             speed_difference = abs(current_speed - target_speed)
-            if speed_difference > 0.001 and current_speed > 20.0 and current_speed < 340: # make drone subsonic
-                max_speed_delta = aircraft.max_acceleration / elapsed_time
+            max_speed_delta = aircraft.max_acceleration / elapsed_time
+            if speed_difference > 0.001 and current_speed - max_speed_delta > 20.0 and current_speed + max_speed_delta < 340: # make drone subsonic
+                
                 if speed_difference < max_speed_delta:
                     pass # become target
                 elif current_speed < target_speed:
