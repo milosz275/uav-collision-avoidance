@@ -20,7 +20,7 @@ class SimulationState(QSettings):
         self.update_settings()
         self.is_realtime : bool = is_realtime
         self.avoid_collisions : bool = avoid_collisions
-        self.override_avoid_collisions : bool = True
+        self.override_avoid_collisions : bool = False
         self.minimum_separation : float = 9260.0 # 5nmi
         self.physics_cycles : int = 0
         self.is_paused : bool = False
@@ -37,7 +37,7 @@ class SimulationState(QSettings):
             # render state
             override_gui_scale : bool = True
             if not override_gui_scale:
-                self.__gui_scale : float = 0.5 # define gui scaling
+                self.gui_scale : float = 0.5 # define gui scaling
                 if SimulationSettings.screen_resolution.height() < 1440:
                     self.gui_scale = 0.375
                 elif SimulationSettings.screen_resolution.height() < 1080:
@@ -45,9 +45,9 @@ class SimulationState(QSettings):
                 elif SimulationSettings.screen_resolution.height() < 480:
                     self.gui_scale = 0.125
             else:
-                self.__gui_scale : float = 0.75
+                self.gui_scale : float = 0.75
             self.fps : float = 0.0
-            self.__draw_fps : bool = True
+            self.draw_fps : bool = True
             self.draw_aircraft : bool = True
             self.draw_grid : bool = False
             self.draw_path : bool = True
@@ -74,11 +74,6 @@ class SimulationState(QSettings):
     def adsb_report(self) -> None:
         """Returns ADS-B commandline info reporting flag"""
         return self.__adsb_report
-    
-    @property
-    def draw_fps(self) -> bool:
-        """Returns FPS display flag"""
-        return self.__draw_fps
 
     def update_settings(self) -> None:
         """Updates all state settings"""
@@ -92,7 +87,7 @@ class SimulationState(QSettings):
 
     def toggle_fps(self) -> None:
         """Toggles FPS display"""
-        self.__draw_fps = not self.__draw_fps
+        self.draw_fps = not self.draw_fps
     
     def update_render_settings(self) -> None:
         """Updates simulation render state settings"""
@@ -165,14 +160,3 @@ class SimulationState(QSettings):
         """Sets back simulation reset state"""
         with QMutexLocker(self.__mutex):
             self.__reset_demanded = False
-
-    @property
-    def gui_scale(self) -> float:
-        """Returns GUI scaling factor"""
-        return self.__gui_scale
-    
-    @gui_scale.setter
-    def gui_scale(self, value : float) -> None:
-        """Sets GUI scaling factor"""
-        if value > 0.0:
-            self.__gui_scale = value
