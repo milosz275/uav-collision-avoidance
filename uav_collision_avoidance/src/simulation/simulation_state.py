@@ -20,7 +20,7 @@ class SimulationState(QSettings):
         self.update_settings()
         self.is_realtime : bool = is_realtime
         self.avoid_collisions : bool = avoid_collisions
-        self.override_avoid_collisions : bool = False
+        self.override_avoid_collisions : bool = True
         self.minimum_separation : float = 9260.0 # 5nmi
         self.physics_cycles : int = 0
         self.is_paused : bool = False
@@ -47,11 +47,12 @@ class SimulationState(QSettings):
             else:
                 self.__gui_scale : float = 0.75
             self.fps : float = 0.0
-            self.draw_fps : bool = True
+            self.__draw_fps : bool = True
             self.draw_aircraft : bool = True
             self.draw_grid : bool = False
             self.draw_path : bool = True
             self.draw_speed_vectors : bool = True
+            self.draw_safezones : bool = True
             self.draw_collision_detection : bool = True
             self.optimize_drawing : bool = False
             self.follow_aircraft : bool = False
@@ -73,6 +74,11 @@ class SimulationState(QSettings):
     def adsb_report(self) -> None:
         """Returns ADS-B commandline info reporting flag"""
         return self.__adsb_report
+    
+    @property
+    def draw_fps(self) -> bool:
+        """Returns FPS display flag"""
+        return self.__draw_fps
 
     def update_settings(self) -> None:
         """Updates all state settings"""
@@ -83,6 +89,10 @@ class SimulationState(QSettings):
     def toggle_adsb_report(self) -> None:
         """Toggles ADS-B commandline info report"""
         self.__adsb_report = not self.__adsb_report
+
+    def toggle_fps(self) -> None:
+        """Toggles FPS display"""
+        self.__draw_fps = not self.__draw_fps
     
     def update_render_settings(self) -> None:
         """Updates simulation render state settings"""
