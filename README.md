@@ -8,12 +8,12 @@ Python project regarding implementation of UAV physics and collision detection/a
 
 ### Introduction
 
-UAV Collision Avoidance is my Bachelor's thesis project meeting problem of UAVs safe cooperation in the 3D space. Project implements functional physics calculations, scalable GUI, realistic ADS-B probable collision avoidance systems and on-board flight planning. Application offers multithreaded realtime simulation presenting simulated aircrafts as well as linearly prerendered simulation allowing for quick algorithm effectiveness testing.
+UAV Collision Avoidance is my Bachelor's thesis project meeting problem of UAVs safe cooperation in the 3D space. Project implements functional physics calculations, scalable GUI, realistic ADS-B probable collision avoidance systems and on-board flight planning. Application offers multithreaded realtime simulation presenting simulated aircrafts as well as linearly prerendered simulation allowing for quick algorithm effectiveness testing. The project is based on two research papers[^4][^5].
 
 ### Premises
 
 1. System Definition: The system is defined as a 3-dimensional (3D) space using an XYZ coordinate system. X and Y represent a flat horizontal plane, while Z represents height above sea level.
-2. Physics Simulation: Physics are simulated by differentiating parts of the second according to appropriate formulas. The physics of Unmanned Aerial Vehicles (UAVs) are considered relative to the Earth's frame, separated from the aircraft's frame and wind relative frame. 3D space is flat, and the Earth's curvature is not considered.
+2. Physics Simulation: Physics are simulated by differentiating parts of the second according to appropriate formulas. The physics of Unmanned Aerial Vehicles (UAVs) are considered relative to the Earth's frame, separated from the aircraft's frame and wind relative frame. 3D space is flat, and the Earth's curvature is not considered. Gaining or losing altitude preserves the aircraft's speed.
 3. Aircraft Characteristics: The aircraft are considered Horizontal Take-off and Landing (HTOL) drones. They can only move in the direction of their speed vectors. The form of the aircraft is approximated to a simple solid sphere.
 4. Environment: The space is shared by two or three UAVs. There are no other objects or wind gusts assumed in this environment.
 5. Aerodynamics: No aerodynamic lift force is assumed at this moment. When turning, aircraft always take the maximum angle change that physics allow, respecting mass inertia. The angles are not approximated to meet exact courses.
@@ -103,6 +103,8 @@ python main.py [argument]
 ```
 
 ### Remarks
+
+3-dimensional (3D) world is projected on 2D screen by flattening height (z coordinate). On the program start, the view is centered on the first aircraft. The view can be moved with arrow keys.
 
 One coding convention is not preserved in the scope of the project. Qt's methods are CamelCase formatted and the rest is default Python naming convention including snake_case for variable and member names.
 
