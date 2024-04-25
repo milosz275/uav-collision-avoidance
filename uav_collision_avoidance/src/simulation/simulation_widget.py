@@ -221,7 +221,7 @@ class SimulationWidget(QWidget):
             return
         for aircraft in self.aircraft_vehicles:
             relative_position = aircraft.position - self.aircraft_vehicles[1 - aircraft.aircraft_id].position
-            speed_difference = aircraft.speed - self.aircraft_vehicles[1 - aircraft.aircraft_id].speed
+            speed_difference : QVector3D = aircraft.speed - self.aircraft_vehicles[1 - aircraft.aircraft_id].speed
             time_to_closest_approach = -(QVector3D.dotProduct(relative_position, speed_difference) / QVector3D.dotProduct(speed_difference, speed_difference))
             if time_to_closest_approach > 0:
                 speed_difference_unit = speed_difference.normalized()
