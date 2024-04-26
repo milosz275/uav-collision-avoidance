@@ -2,6 +2,7 @@
 
 import logging
 from typing import List
+from math import sqrt
 
 from PySide6.QtCore import QThread, QTime
 from PySide6.QtGui import QVector3D
@@ -57,7 +58,7 @@ class SimulationADSB(QThread):
                     print(f"Aircraft {aircraft.aircraft_id} will reach its destination in " + "{:.2f}".format(time_to_reaching_destination) + " (" + "{:.1f}".format(time_to_reaching_destination / 60) + " minutes or " + "{:.1f}".format(time_to_reaching_destination / 3600) + " hours)")
 
                 # console report output
-                if self.simulation_state.adsb_report and aircraft.aircraft_id == 0:
+                if self.simulation_state.adsb_report and aircraft.aircraft_id == 0 and self.simulation_state.is_realtime:
                     self.print_adsb_report(aircraft)
 
                 # safe zone occupancy check
@@ -139,10 +140,20 @@ class SimulationADSB(QThread):
                 "; t: " + str(self.adsb_cycles) +
                 "; phys: " + str(self.simulation_state.physics_cycles))
         else:
-            print("target pitch angle: " + "{:.2f}".format(fcc.target_pitch_angle) +
-                "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle) +
-                "; distance covered: " + "{:.2f}".format(aircraft.distance_covered) +
-                "; fps: " + "{:.2f}".format(self.simulation_state.fps) +
-                "; t: " + str(self.adsb_cycles) +
-                "; phys: " + str(self.simulation_state.physics_cycles) +
-                "; no destination")
+            if self.simulation_state.is_realtime:
+                print("target pitch angle: " + "{:.2f}".format(fcc.target_pitch_angle) +
+                    "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle) +
+                    "; distance covered: " + "{:.2f}".format(aircraft.distance_covered) +
+                    "; fps: " + "{:.2f}".format(self.simulation_state.fps) +
+                    "; t: " + str(self.adsb_cycles) +
+                    "; phys: " + str(self.simulation_state.physics_cycles) +
+                    "; no destination")
+        # speed check
+        absolute_speed = sqrt(aircraft.speed.x() ** 2 + aircraft.speed.y() ** 2 + aircraft.speed.z() ** 2)
+        horizontal_speed = sqrt(aircraft.speed.x() ** 2 + aircraft.speed.y() ** 2)
+        vertical_speed = abs(aircraft.speed.z())
+        geometrical_speed = sqrt(horizontal_speed ** 2 + vertical_speed ** 2)
+        print("absolute speed: " + "{:.2f}".format(absolute_speed) +
+            "; horizontal speed: " + "{:.2f}".format(horizontal_speed) +
+            "; vertical speed: " + "{:.2f}".format(vertical_speed) +
+            "; geometrical speed: " + "{:.2f}".format(geometrical_speed))
