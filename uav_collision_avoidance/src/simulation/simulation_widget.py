@@ -58,8 +58,8 @@ class SimulationWidget(QWidget):
 
     def generate_icon(self) -> QPixmap:
         """Returns icon for the main window"""
-        pixmap = QPixmap(self.simulation_state.aircraft_pixmap)
-        painter = QPainter(pixmap)
+        pixmap : QPixmap = QPixmap(self.simulation_state.aircraft_pixmap)
+        painter : QPainter = QPainter(pixmap)
         painter.setBrush(QColor("white"))
         painter.drawEllipse(self.simulation_state.aircraft_pixmap.rect())
         painter.drawPixmap(
@@ -140,8 +140,8 @@ class SimulationWidget(QWidget):
         y_offset = self.screen_offset_y * scale
         painter.drawEllipse(
             QPointF(
-                point.x() * scale - (size * scale / 2) + x_offset,
-                point.y() * scale - (size * scale / 2) + y_offset),
+                point.x() * scale + x_offset,
+                point.y() * scale + y_offset),
             float(size * scale),
             float(size * scale))
         painter.end()
@@ -155,8 +155,8 @@ class SimulationWidget(QWidget):
         y_offset = self.screen_offset_y * scale
         painter.drawEllipse(
             QPointF(
-                point.x() * scale - (size * scale / 2) + x_offset,
-                point.y() * scale - (size * scale / 2) + y_offset),
+                point.x() * scale + x_offset,
+                point.y() * scale + y_offset),
             float(size * scale),
             float(size * scale))
         painter.end()
@@ -334,8 +334,8 @@ class SimulationWidget(QWidget):
 
     def zoom(self, factor : float) -> None:
         """Zooms in/out the simulation render"""
-        if self.simulation_state.gui_scale + factor >= 2:
-            self.simulation_state.gui_scale = 2
+        if self.simulation_state.gui_scale + factor >= 3:
+            self.simulation_state.gui_scale = 3
             return
         while factor > 0 and factor > 2 * self.simulation_state.gui_scale:
             factor /= 2
