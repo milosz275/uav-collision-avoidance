@@ -75,6 +75,20 @@ Install the app by running the following command:
 pip install uav-collision-avoidance
 ```
 
+#### Debian 12 Dependencies
+
+For Debian 12, you need to install the following dependencies:
+
+```bash
+sudo apt-get install libgl1 libxcb-xinerama0
+```
+
+To run the app headlessly, you need to run the following export:
+
+```bash
+export QT_QPA_PLATFORM=offscreen
+```
+
 ### Usage
 
 Use any of the following to run the app:
