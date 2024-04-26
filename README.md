@@ -69,11 +69,16 @@ There are several key shortcuts for realtime version of the app that allow full-
 
 ### Install
 
-Use `pip install uav-collision-avoidance` to install the app and run one of the following:
-- uav-collision-avoidance
-- uav-collision-avoidance realtime
-- uav-collision-avoidance prerender
-- uav-collision-avoidance tests
+Use ```pip install uav-collision-avoidance``` to install the app:
+
+### Usage
+
+Use any of the following to run the app:
+
+- ```uav-collision-avoidance```
+- ```uav-collision-avoidance realtime```
+- ```uav-collision-avoidance prerender```
+- ```uav-collision-avoidance tests```
 
 ### Build
 
