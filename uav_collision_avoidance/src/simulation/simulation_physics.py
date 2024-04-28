@@ -19,13 +19,53 @@ class SimulationPhysics(QThread):
 
     def __init__(self, parent : QMainWindow, aircrafts : List[Aircraft], simulation_state : SimulationState) -> None:
         super(SimulationPhysics, self).__init__(parent)
-        self.aircrafts = aircrafts
-        self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle for aircraft in self.aircrafts]
-        self.aircraft_fccs : List[AircraftFCC] = [aircraft.fcc for aircraft in self.aircrafts]
-        self.simulation_state = simulation_state
-        self.cycles : int = 0
-        self.global_start_timestamp : QTime | None = None
-        self.global_stop_timestamp : QTime | None = None
+        self.__aircrafts = aircrafts
+        self.__aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle for aircraft in self.aircrafts]
+        self.__aircraft_fccs : List[AircraftFCC] = [aircraft.fcc for aircraft in self.aircrafts]
+        self.__simulation_state = simulation_state
+        self.__cycles : int = 0
+        self.__global_start_timestamp : QTime | None = None
+        self.__global_stop_timestamp : QTime | None = None
+
+    @property
+    def aircrafts(self) -> List[Aircraft]:
+        """Returns aircrafts"""
+        return self.__aircrafts
+    
+    @property
+    def aircraft_vehicles(self) -> List[AircraftVehicle]:
+        """Returns aircraft vehicles"""
+        return self.__aircraft_vehicles
+    
+    @property
+    def aircraft_fccs(self) -> List[AircraftFCC]:
+        """Returns aircraft flight control computers"""
+        return self.__aircraft_fccs
+    
+    @property
+    def simulation_state(self) -> SimulationState:
+        """Returns simulation state"""
+        return self.__simulation_state
+    
+    @property
+    def cycles(self) -> int:
+        """Returns physics cycles count"""
+        return self.__cycles
+    
+    def count_cycles(self) -> None:
+        """Increments physics cycle counter"""
+        self.__cycles += 1
+        self.simulation_state.physics_cycles = self.cycles
+    
+    @property
+    def global_start_timestamp(self) -> QTime | None:
+        """Returns global start timestamp"""
+        return self.__global_start_timestamp
+    
+    @property
+    def global_stop_timestamp(self) -> QTime | None:
+        """Returns global stop timestamp"""
+        return self.__global_stop_timestamp
 
     def run(self) -> None:
         """Runs physics simulation thread"""
@@ -39,11 +79,11 @@ class SimulationPhysics(QThread):
     
     def mark_start_time(self) -> None:
         """Marks start time of the simulation"""
-        self.global_start_timestamp = QTime.currentTime()
+        self.__global_start_timestamp = QTime.currentTime()
 
     def mark_stop_time(self) -> None:
         """Marks stop time of the simulation"""
-        self.global_stop_timestamp = QTime.currentTime()
+        self.__global_stop_timestamp = QTime.currentTime()
     
     def cycle(self, elapsed_time : float) -> None:
         """Executes physics simulation cycle"""
@@ -156,8 +196,3 @@ class SimulationPhysics(QThread):
 
                 aircraft.speed.setX(sin(radians(new_yaw_angle)) * current_horizontal_speed)
                 aircraft.speed.setY(-cos(radians(new_yaw_angle)) * current_horizontal_speed)
-
-    def count_cycles(self) -> None:
-        """Increments physics cycle counter"""
-        self.cycles += 1
-        self.simulation_state.physics_cycles = self.cycles
