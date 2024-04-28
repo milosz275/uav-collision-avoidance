@@ -13,3 +13,4 @@ pyside6
 
 # Tests
 pytest
+screeninfo
