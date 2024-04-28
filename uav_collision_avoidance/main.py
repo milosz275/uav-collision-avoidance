@@ -5,6 +5,7 @@ import platform
 import datetime
 import signal
 from pathlib import Path
+from screeninfo import get_monitors
 
 from PySide6.QtWidgets import QApplication
 from .version import __version__ as version
@@ -35,37 +36,35 @@ def main():
     """Executes main function"""
     import sys
     args = sys.argv[1:]
-    realtime : bool = True
-    run_tests : bool = False
-    if len(args) > 0:
-        if args[0] == "realtime":
-            realtime = True
-        elif args[0] == "prerender":
-            realtime = False
-        elif args[0] == "tests":
-            run_tests = True
-        elif len(args) > 1:
-            logging.error("Invalid arguments: %s", args)
-            sys.exit(1)
-        else:
-            logging.error("Invalid argument: %s", args[0])
-            sys.exit(1)
     app = QApplication(args)
     app.setApplicationName("UAV Collsion Avoidance")
     app.setApplicationVersion(version)
     SimulationSettings.screen_resolution = app.primaryScreen().size()
     logging.info("%s %s", app.applicationName(), app.applicationVersion())
-    sim = Simulation()
-    if run_tests:
-        realtime = False
-        sim.run_tests(20)
-        sys.exit()
-    elif realtime:
-        sim.run_realtime()
-        sys.exit(app.exec())
+    sim : Simulation | None = None
+    if len(args) > 0:
+        if args[0] == "realtime":
+            if len(get_monitors) == 0:
+                logging.warning("Launching GUI Application without monitors detected")
+            sim = Simulation()
+            sys.exit(app.exec())
+        elif args[0] == "headless":
+            sim = Simulation(headless = True)
+            sys.exit(0)
+        elif args[0] == "tests":
+            sim = Simulation(headless = True, tests = True)
+            sys.exit(0)
+        elif len(args) > 1:
+            print(f"Invalid arguments: {args}")
+            logging.error("Invalid arguments: %s", args)
+            sys.exit(1)
+        else:
+            print(f"Invalid argument: {args[0]}")
+            logging.error("Invalid argument: %s", args[0])
+            sys.exit(1)
     else:
-        sim.run_prerender()
-        sys.exit()
+        sim = Simulation()
+    sys.exit(app.exec())
 
 if __name__ == "__main__":
     main()
