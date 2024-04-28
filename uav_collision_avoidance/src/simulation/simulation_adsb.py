@@ -18,12 +18,42 @@ class SimulationADSB(QThread):
 
     def __init__(self, parent : QMainWindow, aircrafts : List[Aircraft], simulation_state : SimulationState) -> None:
         super(SimulationADSB, self).__init__(parent)
-        self.aircrafts = aircrafts
-        self.aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle for aircraft in self.aircrafts]
-        self.aircraft_fccs : List[AircraftFCC] = [aircraft.fcc for aircraft in self.aircrafts]
-        self.simulation_state = simulation_state
-        self.adsb_cycles : int = 0
+        self.__aircrafts = aircrafts
+        self.__aircraft_vehicles : List[AircraftVehicle] = [aircraft.vehicle for aircraft in self.aircrafts]
+        self.__aircraft_fccs : List[AircraftFCC] = [aircraft.fcc for aircraft in self.aircrafts]
+        self.__simulation_state = simulation_state
+        self.__adsb_cycles : int = 0
         
+    @property
+    def aircrafts(self) -> List[Aircraft]:
+        """Returns aircrafts"""
+        return self.__aircrafts
+    
+    @property
+    def aircraft_vehicles(self) -> List[AircraftVehicle]:
+        """Returns aircraft vehicles"""
+        return self.__aircraft_vehicles
+    
+    @property
+    def aircraft_fccs(self) -> List[AircraftFCC]:
+        """Returns aircraft flight control computers"""
+        return self.__aircraft_fccs
+    
+    @property
+    def simulation_state(self) -> SimulationState:
+        """Returns simulation state"""
+        return self.__simulation_state
+    
+    @property
+    def adsb_cycles(self) -> int:
+        """Returns ADS-B cycles count"""
+        return self.__adsb_cycles
+    
+    def count_adsb_cycles(self) -> None:
+        """Increments ADS-B cycle counter"""
+        self.__adsb_cycles += 1
+        self.simulation_state.adsb_cycles = self.adsb_cycles
+
     def run(self) -> None:
         """Runs ADS-B simulation thread with precise timeout"""
         while not self.isInterruptionRequested():
@@ -38,7 +68,7 @@ class SimulationADSB(QThread):
         aircraft_vehicle_2 : AircraftVehicle = self.aircraft_vehicles[1]
 
         if not self.simulation_state.is_paused:
-            self.adsb_cycles += 1
+            self.count_adsb_cycles()
             self.simulation_state.update_adsb_settings()
 
             relative_position = aircraft_vehicle_1.position - aircraft_vehicle_2.position
