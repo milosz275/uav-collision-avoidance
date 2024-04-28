@@ -461,21 +461,21 @@ class SimulationWidget(QWidget):
         elif event.key() == Qt.Key.Key_F1:
             self.simulation_state.toggle_adsb_report()
         elif event.key() == Qt.Key.Key_F2:
-            self.aircraft_fccs[0].target_speed -= 10.0
+            self.aircraft_fccs[0].accelerate(-10.0)
         elif event.key() == Qt.Key.Key_F3:
-            self.aircraft_fccs[0].target_speed += 10.0
+            self.aircraft_fccs[0].accelerate(10.0)
         elif event.key() == Qt.Key.Key_O:
-            self.simulation_state.toggle_first_causing_collision()
+            self.simulation_state.toggle_first_cause_collision()
         elif event.key() == Qt.Key.Key_P:
-            self.simulation_state.toggle_second_causing_collision()
+            self.simulation_state.toggle_second_cause_collision()
         elif event.key() == Qt.Key.Key_T:
-            self.simulation_state.avoid_collisions = not self.simulation_state.avoid_collisions
+            self.simulation_state.toggle_avoid_collisions()
         elif event.key() == Qt.Key.Key_N:
-            self.simulation_state.follow_aircraft = not self.simulation_state.follow_aircraft
+            self.simulation_state.toggle_follow_aircraft()
         elif event.key() == Qt.Key.Key_M:
-            self.simulation_state.focus_aircraft_id = int(not self.simulation_state.focus_aircraft_id)
+            self.simulation_state.toggle_focus_aircraft()
         elif event.key() == Qt.Key.Key_Z:
-            self.simulation_state.draw_safezones = not self.simulation_state.draw_safezones
+            self.simulation_state.toggle_draw_safezones()
         elif event.key() == Qt.Key.Key_Left:
             self.__moving_view_left = True
         elif event.key() == Qt.Key.Key_Right:
