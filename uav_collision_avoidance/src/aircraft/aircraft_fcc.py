@@ -16,31 +16,108 @@ class AircraftFCC(QObject):
 
     def __init__(self, aircraft_id : int, initial_target : QVector3D | None, aircraft : AircraftVehicle) -> None:
         super().__init__()
-        self.aircraft_id = aircraft_id
-        self.aircraft = aircraft
-
-        self.destinations : deque[QVector3D] = deque()
-
+        self.__aircraft_id = aircraft_id
+        self.__aircraft = aircraft
+        self.__destinations : deque[QVector3D] = deque()
+        self.__destinations_history : List[QVector3D] = []
+        self.__visited : List[QVector3D] = []
+        self.__autopilot : bool = True
+        self.__ignore_destinations : bool = False
+        self.__target_yaw_angle : float = 0.0
         if initial_target is None:
-            self.target_yaw_angle : float = aircraft.yaw_angle
+            self.__target_yaw_angle = aircraft.yaw_angle
+            self.__autopilot = False
         else:
-            self.target_yaw_angle : float = self.find_best_yaw_angle(aircraft.position, initial_target)
+            self.__target_yaw_angle = self.find_best_yaw_angle(aircraft.position, initial_target)
             self.add_first_destination(initial_target)
-
-        self.initial_course : float = copy(self.target_yaw_angle)
-        self.target_roll_angle : float = 0.0
-        self.target_pitch_angle : float = 0.0
+        self.__target_roll_angle : float = 0.0
+        self.__target_pitch_angle : float = 0.0
         self.__target_speed : float = self.aircraft.absolute_speed
+        self.__initial_course : float = copy(self.target_yaw_angle)
         self.__is_turning_right : bool = False
         self.__is_turning_left : bool = False
-        self.ignore_destinations : bool = False
-
         self.__safe_zone_occupied : bool = False
         self.__evade_maneuver : bool = False
-        self.vector_sharing_resolution : QVector3D | None = None
+        self.__vector_sharing_resolution : QVector3D | None = None
 
-        self.destinations_history : List[QVector3D] = []
-        self.visited : List[QVector3D] = []
+    @property
+    def aircraft_id(self) -> int:
+        """Returns aircraft id"""
+        return self.__aircraft_id
+    
+    @property
+    def aircraft(self) -> AircraftVehicle:
+        """Returns aircraft vehicle"""
+        return self.__aircraft
+    
+    @property
+    def destinations(self) -> deque[QVector3D]:
+        """Returns destinations list"""
+        return self.__destinations
+    
+    @property
+    def destinations_history(self) -> List[QVector3D]:
+        """Returns destinations history list"""
+        return self.__destinations_history
+    
+    @property
+    def visited(self) -> List[QVector3D]:
+        """Returns visited list"""
+        return self.__visited
+    
+    @property
+    def autopilot(self) -> bool:
+        """Returns autopilot state"""
+        return self.__autopilot
+    
+    def toggle_autopilot(self) -> None:
+        """Toggles autopilot state"""
+        self.__autopilot = not self.__autopilot
+
+    @property
+    def ignore_destinations(self) -> bool:
+        """Returns ignore destinations state"""
+        return self.__ignore_destinations
+    
+    @ignore_destinations.setter
+    def ignore_destinations(self, value : bool) -> None:
+        """Sets ignore destinations state"""
+        self.__ignore_destinations = value
+
+    @property
+    def target_yaw_angle(self) -> float:
+        """Returns target yaw angle"""
+        return self.__target_yaw_angle
+    
+    @target_yaw_angle.setter
+    def target_yaw_angle(self, angle : float) -> None:
+        """Sets target yaw angle"""
+        self.__target_yaw_angle = angle
+
+    @property
+    def target_roll_angle(self) -> float:
+        """Returns target roll angle"""
+        return self.__target_roll_angle
+    
+    @target_roll_angle.setter
+    def target_roll_angle(self, angle : float) -> None:
+        """Sets target roll angle"""
+        self.__target_roll_angle = angle
+
+    @property
+    def target_pitch_angle(self) -> float:
+        """Returns target pitch angle"""
+        return self.__target_pitch_angle
+    
+    @target_pitch_angle.setter
+    def target_pitch_angle(self, angle : float) -> None:
+        """Sets target pitch angle"""
+        self.__target_pitch_angle = angle
+
+    @property
+    def initial_course(self) -> float:
+        """Returns initial course"""
+        return self.__initial_course
     
     @property
     def target_speed(self) -> float:
@@ -52,6 +129,12 @@ class AircraftFCC(QObject):
         """Sets target speed"""
         if speed > 0:
             self.__target_speed = speed
+
+    def accelerate(self, acceleration : float) -> None:
+        """Accelerates aircraft's targeted speed"""
+        if self.__target_speed + acceleration <= 0:
+            return
+        self.__target_speed += acceleration
     
     @property
     def is_turning_right(self) -> bool:
@@ -137,6 +220,16 @@ class AircraftFCC(QObject):
         angle = self.normalize_angle(angle)
         return angle if angle <= 180 else -180 + (angle - 180)
     
+    @property
+    def vector_sharing_resolution(self) -> QVector3D | None:
+        """Returns vector sharing resolution"""
+        return self.__vector_sharing_resolution
+    
+    @vector_sharing_resolution.setter
+    def vector_sharing_resolution(self, value : QVector3D | None) -> None:
+        """Sets vector sharing resolution"""
+        self.__vector_sharing_resolution = value
+
     @property
     def safe_zone_occupied(self) -> bool:
         """Returns safe zone occupied state"""
@@ -257,7 +350,7 @@ class AircraftFCC(QObject):
 
     def update_target_yaw_pitch_angles(self) -> None:
         """Updates current yaw angle"""
-        if self.destinations and not self.ignore_destinations:
+        if self.destinations and self.autopilot and not self.ignore_destinations:
             destination = self.destinations[0]
             distance = dist(self.aircraft.position.toTuple(), destination.toTuple())
             if distance < self.aircraft.size / 2:
