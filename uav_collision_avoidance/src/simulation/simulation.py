@@ -23,96 +23,89 @@ from ..simulation.simulation_fps import SimulationFPS
 class Simulation(QMainWindow):
     """Main simulation App"""
 
-    def __init__(self, aircrafts : List[Aircraft] | None = None, simulation_time : int = 100_000) -> None:
+    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 1000_000) -> None: # approx 27.78 hours
         super().__init__()
         SimulationSettings().__init__()
-        if aircrafts is None:
-            test_case : int = 3
-            if test_case == 0:
-                self.aircrafts : List[Aircraft] = [
-                    Aircraft( # detection test
-                        position = QVector3D(-800, 4000, 1000),
-                        speed = QVector3D(60, -60, 0),
-                        initial_target = QVector3D(1_000_100, -1_001_000, 1000)),
-                    Aircraft(
-                        position = QVector3D(4000, 6000, 1000),
-                        speed = QVector3D(0, -85, 0),
-                        initial_target = QVector3D(900, -1_001_300, 1000)),
-                ]
-            elif test_case == 1:
-                self.aircrafts : List[Aircraft] = [
-                    Aircraft( # almost head on
-                        position = QVector3D(-3000, 500, 1000),
-                        speed = QVector3D(70, 0.1, 0)),
-                    Aircraft(
-                        position = QVector3D(5000, 500, 1000),
-                        speed = QVector3D(-50, 0, 0)),
-                ]
-            elif test_case == 2:
-                self.aircrafts : List[Aircraft] = [
-                    Aircraft( # avoidance test
-                        position = QVector3D(0, 0, 1000),
-                        speed = QVector3D(30, -30, 0),
-                        initial_target = QVector3D(75000, -75000, 1000)), # 75 km, -75 km
-                    Aircraft(
-                        position = QVector3D(0, -100_000, 1000),
-                        speed = QVector3D(30, 29, 0),
-                        initial_target = QVector3D(75000, -27500, 1000)), # 75 km, -27.5 km
-                ]
-            elif test_case == 3:
-                self.aircrafts : List[Aircraft] = [
-                    Aircraft( # avoidance test fast
-                        position = QVector3D(0, 0, 1000),
-                        speed = QVector3D(300, -300, 0),
-                        initial_target = QVector3D(75000, -75000, 1000)), # 75 km, -75 km
-                    Aircraft(
-                        position = QVector3D(0, -100_000, 1000),
-                        speed = QVector3D(300, 290, 0),
-                        initial_target = QVector3D(75000, -27500, 1000)), # 75 km, -27.5 km
-                ]
-        else:
-            self.aircrafts = aircrafts
-        self.simulation_time : int = simulation_time
-        self.state : SimulationState | None = None
+        self.__headless : bool = headless
+        self.__tests : bool = tests
+        self.__simulation_time : int = simulation_time
+        self.__aircrafts : List[Aircraft] | None = None
+        self.__state : SimulationState | None = None
+        self.setup_debug_aircrafts()
+        self.run()
 
-    def run_realtime(self) -> None:
-        """Executes realtime simulation"""
+    @property
+    def headless(self) -> bool:
+        """Returns headless flag"""
+        return self.__headless
+    
+    @property
+    def tests(self) -> bool:
+        """Returns tests flag"""
+        return self.__tests
+    
+    @property
+    def simulation_time(self) -> int:
+        """Returns simulation time"""
+        return self.__simulation_time
+    
+    @property
+    def aircrafts(self) -> List[Aircraft]:
+        """Returns aircrafts list"""
+        return self.__aircrafts
+    
+    @property
+    def state(self) -> SimulationState:
+        """Returns simulation state"""
+        return self.__state
+    
+    @state.setter
+    def state(self, state : SimulationState) -> None:
+        """Sets simulation state"""
+        self.__state = state
+    
+    def run(self) -> None:
+        """Executes simulation"""
         if self.state is not None:
             print("Another instance already running")
             return
+        if self.aircrafts is None:
+            print("No aircrafts to simulate")
+            return
+        if self.headless:
+            if self.tests:
+                self.run_tests()
+            else:
+                self.run_headless()
+        else:
+            self.run_gui()
+
+    def run_gui(self) -> None:
+        """Executes realtime simulation"""
         logging.info("Starting realtime simulation")
         self.state = SimulationState(SimulationSettings(), is_realtime = True)
-
         self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
-        self.simulation_physics.start(priority = QThread.Priority.TimeCriticalPriority)
-
         self.simulation_adsb = SimulationADSB(self, self.aircrafts, self.state)
-        self.simulation_adsb.start(priority = QThread.Priority.NormalPriority)
-
         self.simulation_fps = SimulationFPS(self, self.state)
-        self.simulation_fps.start(priority = QThread.Priority.NormalPriority)
-
         self.simulation_widget = SimulationWidget(self.aircrafts, self.simulation_fps, self.state)
-        self.simulation_widget.show()
-
         self.simulation_render = SimulationRender(self, self.simulation_widget, self.state)
+        self.simulation_physics.start(priority = QThread.Priority.TimeCriticalPriority)
+        self.simulation_adsb.start(priority = QThread.Priority.NormalPriority)
+        self.simulation_fps.start(priority = QThread.Priority.NormalPriority)
+        self.simulation_widget.show()
         self.simulation_render.start(priority = QThread.Priority.NormalPriority)
-
-        self.simulation_widget.stop_signal.connect(self.stop_simulation)
+        self.simulation_widget.stop_signal.connect(self.stop)
     
-    def run_prerender(self) -> None:
-        """Executes prerender simulation"""
-        if self.state is not None:
-            print("Another instance already running")
-            return
-        logging.info("Starting prerendered simulation")
+    def run_headless(self) -> None:
+        """Executes simulation without GUI"""
+        logging.info("Starting headless simulation")
         self.state = SimulationState(SimulationSettings(), is_realtime = False)
         self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
         self.simulation_adsb = SimulationADSB(self, self.aircrafts, self.state)
         time_step : int = int(self.state.simulation_threshold)
         adsb_step : int = int(self.state.adsb_threshold)
         partial_time_counter : int = adsb_step
-        for time in range(0, self.simulation_time, time_step):
+        for time in range(0, int(self.simulation_time / self.state.simulation_threshold), time_step):
             print(time)
             self.simulation_physics.cycle(time_step)
             if partial_time_counter >= adsb_step:
@@ -121,7 +114,7 @@ class Simulation(QMainWindow):
             partial_time_counter += time_step
             if self.state.collision:
                 break
-        self.stop_simulation()
+        self.stop()
     
     def run_tests(self, test_number : int = 10) -> None:
         """Runs simulation tests"""
@@ -131,18 +124,18 @@ class Simulation(QMainWindow):
         start_timestamp = QTime.currentTime()
         for i in range(0, test_number, 1):
             logging.info("Test %d", i)
-            self.run_prerender()
+            self.run_headless()
             self.state = None
         real_time : float = start_timestamp.msecsTo(QTime.currentTime()) / 1000
         print("Total time elapsed: " + "{:.2f}".format(real_time) + "s")
         logging.info("Total time elapsed: %ss", "{:.2f}".format(real_time))
     
-    def stop_simulation(self) -> None:
+    def stop(self) -> None:
         """Stops simulation"""
-        if self.state.is_realtime:
-            self.stop_realtime_simulation()
+        if self.headless:
+            self.stop_headless_simulation()
         else:
-            self.stop_prerender_simulation()
+            self.stop_realtime_simulation()
         self.state.reset()
         self.state.is_running = False
 
@@ -151,12 +144,10 @@ class Simulation(QMainWindow):
         if not self.state.is_running:
             return
         logging.info("Stopping realtime simulation")
-
         self.simulation_physics.requestInterruption()
         self.simulation_adsb.requestInterruption()
         self.simulation_render.requestInterruption()
         self.simulation_fps.requestInterruption()
-
         self.simulation_physics.quit()
         self.simulation_physics.wait()
 
@@ -175,7 +166,6 @@ class Simulation(QMainWindow):
             logging.info("Calculated time efficiency: " + "{:.2f}".format(simulated_time / real_time * 100) + "%")
 
         self.export_visited_locations()
-
         self.simulation_adsb.quit()
         self.simulation_adsb.wait()
         self.simulation_render.quit()
@@ -183,14 +173,77 @@ class Simulation(QMainWindow):
         self.simulation_fps.quit()
         self.simulation_fps.wait()
     
-    def stop_prerender_simulation(self) -> None:
-        """Finishes all active prerender simulation threads"""
+    def stop_headless_simulation(self) -> None:
+        """Finishes headless simulation"""
         if not self.state.is_running:
+            print("No simulation running")
             return
-        logging.info("Stopping prerendered simulation")
+        logging.info("Stopping headless simulation")
         self.simulation_physics.reset_aircrafts()
         self.state.reset()
-    
+
+    def add_aircraft(self, aircraft : Aircraft) -> None:
+        """Adds aircraft to simulation"""
+        if self.aircrafts is None:
+            self.__aircrafts = []
+        self.aircrafts.append(aircraft)
+
+    def remove_aircraft(self, aircraft : Aircraft) -> None:
+        """Removes aircraft from simulation"""
+        if self.aircrafts is not None:
+            self.aircrafts.remove(aircraft)
+
+    def setup_aircrafts(self, aircrafts : List[Aircraft]) -> None:
+        """Sets up aircrafts list"""
+        self.__aircrafts = aircrafts
+
+    def setup_debug_aircrafts(self) -> None:
+        """Sets up debug aircrafts list"""
+        test_case : int = 0
+        if test_case == 0:
+            aircrafts : List[Aircraft] = [
+                Aircraft( # detection test
+                    position = QVector3D(-800, 4000, 1000),
+                    speed = QVector3D(60, -60, 0),
+                    initial_target = QVector3D(51_900, -50_000, 10000)),
+                Aircraft(
+                    position = QVector3D(4000, 6000, 1000),
+                    speed = QVector3D(0, -85, 0),
+                    initial_target = QVector3D(900, -1_001_300, 1000)),
+            ]
+        elif test_case == 1:
+            aircrafts : List[Aircraft] = [
+                Aircraft( # almost head on
+                    position = QVector3D(-3000, 500, 1000),
+                    speed = QVector3D(70, 0.1, 0)),
+                Aircraft(
+                    position = QVector3D(5000, 500, 1000),
+                    speed = QVector3D(-50, 0, 0)),
+            ]
+        elif test_case == 2:
+            aircrafts : List[Aircraft] = [
+                Aircraft( # avoidance test
+                    position = QVector3D(0, 0, 1000),
+                    speed = QVector3D(30, -30, 0),
+                    initial_target = QVector3D(75000, -75000, 1000)), # 75 km, -75 km
+                Aircraft(
+                    position = QVector3D(0, -100_000, 1000),
+                    speed = QVector3D(30, 29, 0),
+                    initial_target = QVector3D(75000, -27500, 1000)), # 75 km, -27.5 km
+            ]
+        elif test_case == 3:
+            aircrafts : List[Aircraft] = [
+                Aircraft( # avoidance test fast
+                    position = QVector3D(0, 0, 1000),
+                    speed = QVector3D(300, -300, 0),
+                    initial_target = QVector3D(75000, -75000, 1000)), # 75 km, -75 km
+                Aircraft(
+                    position = QVector3D(0, -100_000, 1000),
+                    speed = QVector3D(300, 290, 0),
+                    initial_target = QVector3D(75000, -27500, 1000)), # 75 km, -27.5 km
+            ]
+        self.setup_aircrafts(aircrafts)
+
     def export_visited_locations(self) -> None:
         """Exports aircrafts visited location lists"""
         export_time = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
@@ -208,6 +261,6 @@ class Simulation(QMainWindow):
     
     def closeEvent(self, event: QCloseEvent) -> None:
         """Qt method performed on the main window close event"""
-        self.stop_simulation()
+        self.stop()
         event.accept()
         return super().closeEvent(event)
