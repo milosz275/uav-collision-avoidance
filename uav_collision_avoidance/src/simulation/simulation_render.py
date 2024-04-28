@@ -11,9 +11,19 @@ class SimulationRender(QThread):
 
     def __init__(self, parent : QMainWindow, simulation_widget : SimulationWidget, simulation_state : SimulationState) -> None:
         super(SimulationRender, self).__init__(parent)
-        self.simulation_widget = simulation_widget
-        self.simulation_state = simulation_state
+        self.__simulation_widget = simulation_widget
+        self.__simulation_state = simulation_state
         
+    @property
+    def simulation_widget(self) -> SimulationWidget:
+        """Returns simulation widget"""
+        return self.__simulation_widget
+    
+    @property
+    def simulation_state(self) -> SimulationState:
+        """Returns simulation state"""
+        return self.__simulation_state
+
     def run(self) -> None:
         """Runs simulation widget update with precise timeout"""
         while not self.isInterruptionRequested():
