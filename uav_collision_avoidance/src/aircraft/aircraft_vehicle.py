@@ -24,7 +24,7 @@ class AircraftVehicle(QObject):
 
         self.__size : float = 20.0
         self.__roll_angle = 0.0 # bank angle
-        self.initial_roll_angle = self.__roll_angle
+        self.__initial_roll_angle = self.__roll_angle
         self.__distance_covered : float = 0.0
 
     @property
@@ -67,6 +67,11 @@ class AircraftVehicle(QObject):
     def roll_angle(self, roll_angle_delta : float) -> None:
         """Adds roll angle delta"""
         self.__roll_angle += roll_angle_delta
+
+    @property
+    def initial_roll_angle(self) -> float:
+        """Returns initial roll angle"""
+        return self.__initial_roll_angle
     
     @property
     def distance_covered(self) -> float:
