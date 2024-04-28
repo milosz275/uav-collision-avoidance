@@ -36,11 +36,9 @@ Application is built based on two main object types, simulation and aircraft. Si
 ### App arguments
 
 There are three possible arguments at the moment:
-- realtime - runs GUI application with realtime simulation
-- prerender - runs physical simulation
-- tests - runs full tests with comparison of using and not using collision avoidance algorithm
-
-App defaults to realtime simulation.
+- default (no arguments) - runs GUI simulation
+- headless - runs physical simulation with ADS-B and collision avoidance algorithm
+- tests - runs full tests comparing effectiveness of collision avoidance algorithm
 
 ### Key shortcuts
 
@@ -98,11 +96,7 @@ uav-collision-avoidance
 ```
 
 ```bash
-uav-collision-avoidance realtime
-```
-
-```bash
-uav-collision-avoidance prerender
+uav-collision-avoidance headless
 ```
 
 ```bash
