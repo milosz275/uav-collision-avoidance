@@ -75,6 +75,7 @@ class SimulationPhysics(QThread):
         while not self.isInterruptionRequested():
             start_timestamp = QTime.currentTime()
             self.cycle(self.simulation_state.simulation_threshold)
+            self.test_speed()
             self.msleep(max(0, (self.simulation_state.simulation_threshold) - start_timestamp.msecsTo(QTime.currentTime())))
         self.mark_stop_time()
         return super().run()
@@ -202,3 +203,21 @@ class SimulationPhysics(QThread):
 
                 aircraft.speed.setX(sin(radians(new_yaw_angle)) * current_horizontal_speed)
                 aircraft.speed.setY(-cos(radians(new_yaw_angle)) * current_horizontal_speed)
+
+    def test_speed(self) -> None:
+        """Tests speed"""
+        for aircraft in self.aircraft_vehicles:
+            speed : float = aircraft.absolute_speed
+            absolute_speed : float = sqrt(aircraft.speed.x() ** 2 + aircraft.speed.y() ** 2 + aircraft.speed.z() ** 2)
+            horizontal_speed : float = sqrt(aircraft.speed.x() ** 2 + aircraft.speed.y() ** 2)
+            vertical_speed : float = abs(aircraft.speed.z())
+            geometrical_speed : float = sqrt(horizontal_speed ** 2 + vertical_speed ** 2)
+            assert speed == absolute_speed
+            assert horizontal_speed == aircraft.horizontal_speed
+            assert vertical_speed == aircraft.vertical_speed
+            assert geometrical_speed == speed
+            assert speed > 0.0
+            assert horizontal_speed > 0.0
+            assert geometrical_speed > 0.0
+            assert geometrical_speed >= horizontal_speed
+            assert geometrical_speed >= vertical_speed
