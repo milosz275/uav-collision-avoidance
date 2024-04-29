@@ -6,16 +6,17 @@ from typing import List
 from collections import deque
 from math import dist, atan2, degrees
 
-from PySide6.QtCore import QObject
+from PySide6.QtCore import QObject, QMutex, QMutexLocker
 from PySide6.QtGui import QVector3D
 
 from .aircraft_vehicle import AircraftVehicle
 
 class AircraftFCC(QObject):
     """Aircraft Flight Control Computer"""
-
+    
     def __init__(self, aircraft_id : int, initial_target : QVector3D | None, aircraft : AircraftVehicle) -> None:
         super().__init__()
+        self.__mutex : QMutex = QMutex()
         self.__aircraft_id = aircraft_id
         self.__aircraft = aircraft
         self.__destinations : deque[QVector3D] = deque()
@@ -23,6 +24,7 @@ class AircraftFCC(QObject):
         self.__visited : List[QVector3D] = []
         self.__autopilot : bool = True
         self.__ignore_destinations : bool = False
+        self.__initial_target : QVector3D | None = initial_target
         self.__target_yaw_angle : float = 0.0
         if initial_target is None:
             self.__target_yaw_angle = aircraft.yaw_angle
@@ -33,7 +35,6 @@ class AircraftFCC(QObject):
         self.__target_roll_angle : float = 0.0
         self.__target_pitch_angle : float = 0.0
         self.__target_speed : float = self.aircraft.absolute_speed
-        self.__initial_course : float = copy(self.target_yaw_angle)
         self.__is_turning_right : bool = False
         self.__is_turning_left : bool = False
         self.__safe_zone_occupied : bool = False
@@ -43,118 +44,141 @@ class AircraftFCC(QObject):
     @property
     def aircraft_id(self) -> int:
         """Returns aircraft id"""
-        return self.__aircraft_id
+        with QMutexLocker(self.__mutex):
+            return self.__aircraft_id
     
     @property
     def aircraft(self) -> AircraftVehicle:
         """Returns aircraft vehicle"""
-        return self.__aircraft
+        with QMutexLocker(self.__mutex):
+            return self.__aircraft
     
     @property
     def destinations(self) -> deque[QVector3D]:
         """Returns destinations list"""
-        return self.__destinations
+        with QMutexLocker(self.__mutex):
+            return self.__destinations
     
     @property
     def destinations_history(self) -> List[QVector3D]:
         """Returns destinations history list"""
-        return self.__destinations_history
+        with QMutexLocker(self.__mutex):
+            return self.__destinations_history
     
     @property
     def visited(self) -> List[QVector3D]:
         """Returns visited list"""
-        return self.__visited
+        with QMutexLocker(self.__mutex):
+            return self.__visited
     
     @property
     def autopilot(self) -> bool:
         """Returns autopilot state"""
-        return self.__autopilot
+        with QMutexLocker(self.__mutex):
+            return self.__autopilot
     
     def toggle_autopilot(self) -> None:
         """Toggles autopilot state"""
-        self.__autopilot = not self.__autopilot
+        with QMutexLocker(self.__mutex):
+            self.__autopilot = not self.__autopilot
 
     @property
     def ignore_destinations(self) -> bool:
         """Returns ignore destinations state"""
-        return self.__ignore_destinations
+        with QMutexLocker(self.__mutex):
+            return self.__ignore_destinations
     
     @ignore_destinations.setter
     def ignore_destinations(self, value : bool) -> None:
         """Sets ignore destinations state"""
-        self.__ignore_destinations = value
+        with QMutexLocker(self.__mutex):
+            self.__ignore_destinations = value
+
+    @property
+    def initial_target(self) -> QVector3D | None:
+        """Returns initial target"""
+        with QMutexLocker(self.__mutex):
+            return self.__initial_target
 
     @property
     def target_yaw_angle(self) -> float:
         """Returns target yaw angle"""
-        return self.__target_yaw_angle
+        with QMutexLocker(self.__mutex):
+            return self.__target_yaw_angle
     
     @target_yaw_angle.setter
     def target_yaw_angle(self, angle : float) -> None:
         """Sets target yaw angle"""
-        self.__target_yaw_angle = angle
+        with QMutexLocker(self.__mutex):
+            self.__target_yaw_angle = angle
 
     @property
     def target_roll_angle(self) -> float:
         """Returns target roll angle"""
-        return self.__target_roll_angle
+        with QMutexLocker(self.__mutex):
+            return self.__target_roll_angle
     
     @target_roll_angle.setter
     def target_roll_angle(self, angle : float) -> None:
         """Sets target roll angle"""
-        self.__target_roll_angle = angle
+        with QMutexLocker(self.__mutex):
+            self.__target_roll_angle = angle
 
     @property
     def target_pitch_angle(self) -> float:
         """Returns target pitch angle"""
-        return self.__target_pitch_angle
+        with QMutexLocker(self.__mutex):
+            return self.__target_pitch_angle
     
     @target_pitch_angle.setter
     def target_pitch_angle(self, angle : float) -> None:
         """Sets target pitch angle"""
-        self.__target_pitch_angle = angle
-
-    @property
-    def initial_course(self) -> float:
-        """Returns initial course"""
-        return self.__initial_course
+        with QMutexLocker(self.__mutex):
+            self.__target_pitch_angle = angle
     
     @property
     def target_speed(self) -> float:
         """Returns target speed"""
-        return self.__target_speed
+        with QMutexLocker(self.__mutex):
+            return self.__target_speed
     
     @target_speed.setter
     def target_speed(self, speed : float) -> None:
         """Sets target speed"""
         if speed > 0:
-            self.__target_speed = speed
+            with QMutexLocker(self.__mutex):
+                self.__target_speed = speed
 
     def accelerate(self, acceleration : float) -> None:
         """Accelerates aircraft's targeted speed"""
-        if self.__target_speed + acceleration <= 0:
-            return
-        self.__target_speed += acceleration
+        with QMutexLocker(self.__mutex):
+            if self.__target_speed + acceleration <= 0:
+                return
+            self.__target_speed += acceleration
     
     @property
     def is_turning_right(self) -> bool:
         """Returns turning right state"""
-        return self.__is_turning_right
+        with QMutexLocker(self.__mutex):
+            return self.__is_turning_right
     
     @is_turning_right.setter
     def is_turning_right(self, value : bool) -> None:
         """Sets turning right state"""
-        self.__is_turning_right = value
+        with QMutexLocker(self.__mutex):
+            self.__is_turning_right = value
 
     @property
     def is_turning_left(self) -> bool:
         """Returns turning left state"""
-        return self.__is_turning_left
+        with QMutexLocker(self.__mutex):
+            return self.__is_turning_left
     
     @is_turning_left.setter
     def is_turning_left(self, value : bool) -> None:
         """Sets turning left state"""
-        self.__is_turning_left = value
+        with QMutexLocker(self.__mutex):
+            self.__is_turning_left = value
 
     def check_new_destination(self, destination : QVector3D, first : bool) -> QVector3D | None:
         """Checks if the given destination is already in the destinations list"""
@@ -188,23 +212,26 @@ class AircraftFCC(QObject):
         """Appends the given location (QVector3D) to the end of the destinations list."""
         destination : QVector3D = self.check_new_destination(destination, False)
         if destination is not None:
-            self.destinations.append(destination)
-            logging.info("Aircraft %s added new last destination: %s", self.aircraft.aircraft_id, destination.toTuple())
+            with QMutexLocker(self.__mutex):
+                self.__destinations.append(destination)
+                logging.info("Aircraft %s added new last destination: %s", self.__aircraft.aircraft_id, destination.toTuple())
 
     def add_first_destination(self, destination : QVector3D) -> None:
         """Pushes given location to the top of destinations list"""
         destination : QVector3D = self.check_new_destination(destination, True)
         if destination is not None:
-            self.destinations.appendleft(destination)
-            logging.info("Aircraft %s added new first destination: %s", self.aircraft.aircraft_id, destination.toTuple())
+            with QMutexLocker(self.__mutex):
+                self.__destinations.appendleft(destination)
+                logging.info("Aircraft %s added new first destination: %s", self.__aircraft.aircraft_id, destination.toTuple())
 
     @property
     def destination(self) -> QVector3D | None:
         """Returns current destination"""
-        if len(self.destinations) > 0:
-            return self.destinations[0]
-        else:
-            return None
+        with QMutexLocker(self.__mutex):
+            if len(self.__destinations) > 0:
+                return self.__destinations[0]
+            else:
+                return None
 
     def append_visited(self) -> None:
         """Appends current location to visited list"""
@@ -223,33 +250,38 @@ class AircraftFCC(QObject):
     @property
     def vector_sharing_resolution(self) -> QVector3D | None:
         """Returns vector sharing resolution"""
-        return self.__vector_sharing_resolution
+        with QMutexLocker(self.__mutex):
+            return self.__vector_sharing_resolution
     
     @vector_sharing_resolution.setter
     def vector_sharing_resolution(self, value : QVector3D | None) -> None:
         """Sets vector sharing resolution"""
-        self.__vector_sharing_resolution = value
+        with QMutexLocker(self.__mutex):
+            self.__vector_sharing_resolution = value
 
     @property
     def safe_zone_occupied(self) -> bool:
         """Returns safe zone occupied state"""
-        return self.__safe_zone_occupied
+        with QMutexLocker(self.__mutex):
+            return self.__safe_zone_occupied
     
     @safe_zone_occupied.setter
     def safe_zone_occupied(self, value : bool) -> None:
         """Sets safe zone occupied state"""
-        if self.__safe_zone_occupied and value:
-            print("Safe zone already occupied")
-            logging.warning("Safe zone already occupied")
-        if not self.__safe_zone_occupied and not value:
-            print("Safe zone already free")
-            logging.warning("Safe zone already free")
-        self.__safe_zone_occupied = value
+        with QMutexLocker(self.__mutex):
+            if self.__safe_zone_occupied and value:
+                print("Safe zone already occupied")
+                logging.warning("Safe zone already occupied")
+            if not self.__safe_zone_occupied and not value:
+                print("Safe zone already free")
+                logging.warning("Safe zone already free")
+            self.__safe_zone_occupied = value
     
     @property
     def evade_maneuver(self) -> bool:
         """Returns evade maneuver state"""
-        return self.__evade_maneuver
+        with QMutexLocker(self.__mutex):
+            return self.__evade_maneuver
 
     def apply_evade_maneuver(self, opponent_speed : QVector3D, miss_distance_vector : QVector3D, unresolved_region : float, time_to_closest_approach : float) -> None:
         """Applies evade maneuver"""
@@ -296,10 +328,11 @@ class AircraftFCC(QObject):
 
     def reset_evade_maneuver(self) -> None:
         """Resets evade maneuver"""
-        if self.__evade_maneuver:
-            logging.info("Aircraft %s reset evade maneuver", self.aircraft.aircraft_id)
-            self.__evade_maneuver = False
-            #self.vector_sharing_resolution = None
+        with QMutexLocker(self.__mutex):
+            if self.__evade_maneuver:
+                logging.info("Aircraft %s reset evade maneuver", self.aircraft.aircraft_id)
+                self.__evade_maneuver = False
+                #self.vector_sharing_resolution = None
 
     def find_best_roll_angle(self, current_yaw_angle: float, target_yaw_angle: float) -> float:
         """Finds best roll angle for the targeted yaw angle"""
@@ -399,7 +432,9 @@ class AircraftFCC(QObject):
         self.destinations.clear()
         self.destinations_history.clear()
         self.visited.clear()
-        self.target_yaw_angle = self.initial_course
-        self.target_roll_angle = 0.0
-        self.target_pitch_angle = 0.0
+        if self.initial_target is not None:
+            self.add_first_destination(self.initial_target)
+        self.__target_yaw_angle = 0.0
+        self.__target_roll_angle = 0.0
+        self.__target_pitch_angle = 0.0
         self.__evade_maneuver = False
