@@ -160,21 +160,38 @@ class SimulationADSB(QThread):
             "; y: " + "{:.2f}".format(aircraft.position.y()) +
             "; z: " + "{:.2f}".format(aircraft.position.z()))
         if fcc.destination is not None:
-            print("target pitch angle: " + "{:.2f}".format(fcc.target_pitch_angle) +
-                "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle) +
-                "; dest x: " + "{:.2f}".format(fcc.destination.x()) +
-                "; dest y: " + "{:.2f}".format(fcc.destination.y()) +
-                "; dest z: " + "{:.2f}".format(fcc.destination.z()) +
-                "; distance covered: " + "{:.2f}".format(aircraft.distance_covered) +
-                "; fps: " + "{:.2f}".format(self.simulation_state.fps) +
-                "; t: " + str(self.adsb_cycles) +
-                "; phys: " + str(self.simulation_state.physics_cycles))
+            if self.simulation_state.is_realtime:
+                print("target pitch angle: " + "{:.2f}".format(fcc.target_pitch_angle) +
+                    "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle) +
+                    "; dest x: " + "{:.2f}".format(fcc.destination.x()) +
+                    "; dest y: " + "{:.2f}".format(fcc.destination.y()) +
+                    "; dest z: " + "{:.2f}".format(fcc.destination.z()) +
+                    "; distance covered: " + "{:.2f}".format(aircraft.distance_covered) +
+                    "; fps: " + "{:.2f}".format(self.simulation_state.fps) +
+                    "; t: " + str(self.adsb_cycles) +
+                    "; phys: " + str(self.simulation_state.physics_cycles))
+            else:
+                print("target pitch angle: " + "{:.2f}".format(fcc.target_pitch_angle) +
+                    "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle) +
+                    "; dest x: " + "{:.2f}".format(fcc.destination.x()) +
+                    "; dest y: " + "{:.2f}".format(fcc.destination.y()) +
+                    "; dest z: " + "{:.2f}".format(fcc.destination.z()) +
+                    "; distance covered: " + "{:.2f}".format(aircraft.distance_covered) +
+                    "; t: " + str(self.adsb_cycles) +
+                    "; phys: " + str(self.simulation_state.physics_cycles))
         else:
             if self.simulation_state.is_realtime:
                 print("target pitch angle: " + "{:.2f}".format(fcc.target_pitch_angle) +
                     "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle) +
                     "; distance covered: " + "{:.2f}".format(aircraft.distance_covered) +
                     "; fps: " + "{:.2f}".format(self.simulation_state.fps) +
+                    "; t: " + str(self.adsb_cycles) +
+                    "; phys: " + str(self.simulation_state.physics_cycles) +
+                    "; no destination")
+            else:
+                print("target pitch angle: " + "{:.2f}".format(fcc.target_pitch_angle) +
+                    "; pitch angle: " + "{:.2f}".format(aircraft.pitch_angle) +
+                    "; distance covered: " + "{:.2f}".format(aircraft.distance_covered) +
                     "; t: " + str(self.adsb_cycles) +
                     "; phys: " + str(self.simulation_state.physics_cycles) +
                     "; no destination")
