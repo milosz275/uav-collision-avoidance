@@ -63,6 +63,9 @@ def main(arg = None):
             sim = Simulation(headless = True, tests = True)
             QApplication.shutdown(app)
             sys.exit(0)
+        elif args[0] == "version":
+            print(f"{app.applicationName()} {app.applicationVersion()}")
+            sys.exit(0)
         elif len(args) > 1:
             print(f"Invalid arguments: {args}")
             logging.error("Invalid arguments: %s", args)
