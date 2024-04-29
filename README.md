@@ -39,6 +39,7 @@ There are three possible arguments at the moment:
 - default (no arguments) - runs GUI simulation
 - headless - runs physical simulation with ADS-B and collision avoidance algorithm
 - tests - runs full tests comparing effectiveness of collision avoidance algorithm
+- version - prints version of the app
 
 ### Key shortcuts
 
@@ -101,6 +102,10 @@ uav-collision-avoidance headless
 
 ```bash
 uav-collision-avoidance tests
+```
+
+```bash
+uav-collision-avoidance version
 ```
 
 ### Build
