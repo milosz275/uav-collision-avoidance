@@ -32,7 +32,7 @@ if platform.system() == "Windows":
         f"io.github.mldxo.uav-collision-avoidance.{version}")
 logging.info("Detected platform: %s", platform.system())
 
-def main():
+def main(arg = None):
     """Executes main function"""
     import sys
     args = sys.argv[1:]
@@ -42,13 +42,13 @@ def main():
     SimulationSettings.screen_resolution = app.primaryScreen().size()
     logging.info("%s %s", app.applicationName(), app.applicationVersion())
     sim : Simulation | None = None
-    if len(args) > 0:
+    if len(args) > 0 or arg is not None:
         if args[0] == "realtime":
             if len(get_monitors) == 0:
                 logging.warning("Launching GUI Application without monitors detected")
             sim = Simulation()
             sys.exit(app.exec())
-        elif args[0] == "headless":
+        elif args[0] == "headless" or arg == "headless":
             sim = Simulation(headless = True)
             sys.exit(0)
         elif args[0] == "tests":
