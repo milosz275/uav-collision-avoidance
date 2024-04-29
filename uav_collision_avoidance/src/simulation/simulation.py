@@ -94,14 +94,14 @@ class Simulation(QMainWindow):
         self.simulation_render.start(priority = QThread.Priority.NormalPriority)
         self.simulation_widget.stop_signal.connect(self.stop)
     
-    def run_headless(self, aircrafts : List[Aircraft] | None = None) -> None:
+    def run_headless(self, aircrafts : List[Aircraft] | None = None, avoid_collisions : bool = False) -> None:
         """Executes simulation without GUI"""
         logging.info("Starting headless simulation")
         if aircrafts is None or aircrafts == []:
             self.setup_debug_aircrafts()
         else:
             self.setup_aircrafts(aircrafts)
-        self.state = SimulationState(SimulationSettings(), is_realtime = False)
+        self.state = SimulationState(SimulationSettings(), is_realtime = False, avoid_collisions = avoid_collisions)
         self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
         self.simulation_adsb = SimulationADSB(self, self.aircrafts, self.state)
         time_step : int = int(self.state.simulation_threshold)
@@ -126,9 +126,16 @@ class Simulation(QMainWindow):
         start_timestamp = QTime.currentTime()
         #list_of_aircrafts : List[List[Aircraft]] = self.generate_test_aircrafts(test_number) # todo
         for i in range(0, test_number, 1):
-            logging.info("Test %d", i)
-            # self.run_headless(list_of_aircrafts[i])
+            logging.info("Test %d - no collision avoidance", i)
+            # self.run_headless(aircrafts = list_of_aircrafts[i], avoid_collisions = False)
             self.run_headless()
+            # self.export_results()
+            self.state = None
+
+            logging.info("Test %d - collision avoidance", i)
+            # self.run_headless(aircrafts = list_of_aircrafts[i], avoid_collisions = True)
+            self.run_headless()
+            # self.export_results()
             self.state = None
         real_time : float = start_timestamp.msecsTo(QTime.currentTime()) / 1000
         print("Total time elapsed: " + "{:.2f}".format(real_time) + "s")
