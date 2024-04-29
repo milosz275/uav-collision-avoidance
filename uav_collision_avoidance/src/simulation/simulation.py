@@ -23,7 +23,7 @@ from ..simulation.simulation_fps import SimulationFPS
 class Simulation(QMainWindow):
     """Main simulation App"""
 
-    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 1000_000) -> None: # approx 27.78 hours
+    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 10_000_000) -> None: # 10_000_000 ms = 10_000 s = 2h 46m 40s
         super().__init__()
         SimulationSettings().__init__()
         self.__headless : bool = headless
@@ -69,7 +69,7 @@ class Simulation(QMainWindow):
         if self.state is not None:
             print("Another instance already running")
             return
-        if self.aircrafts is None:
+        if self.aircrafts is None and not self.tests:
             print("No aircrafts to simulate")
             return
         if self.headless:
@@ -96,9 +96,11 @@ class Simulation(QMainWindow):
         self.simulation_render.start(priority = QThread.Priority.NormalPriority)
         self.simulation_widget.stop_signal.connect(self.stop)
     
-    def run_headless(self) -> None:
+    def run_headless(self, aircrafts : List[Aircraft] | None = None) -> None:
         """Executes simulation without GUI"""
         logging.info("Starting headless simulation")
+        if aircrafts is not None:
+            self.setup_aircrafts(aircrafts)
         self.state = SimulationState(SimulationSettings(), is_realtime = False)
         self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
         self.simulation_adsb = SimulationADSB(self, self.aircrafts, self.state)
@@ -199,7 +201,7 @@ class Simulation(QMainWindow):
 
     def setup_debug_aircrafts(self) -> None:
         """Sets up debug aircrafts list"""
-        test_case : int = 0
+        test_case : int = 3
         if test_case == 0:
             aircrafts : List[Aircraft] = [
                 Aircraft( # detection test
