@@ -60,8 +60,14 @@ class Aircraft(QObject):
             Aircraft.__current_id += 1
             return aircraft_id
     
+    def __reset_current_id(self) -> None:
+        """Resets current id"""
+        with QMutexLocker(self.__mutex):
+            Aircraft.__current_id = 0
+
     def reset(self) -> None:
         """Resets aircraft to initial state"""
+        self.__reset_current_id()
         self.__vehicle.speed = copy(self.initial_speed)
         self.__vehicle.position = copy(self.initial_position)
         self.__vehicle.roll_angle = copy(self.initial_roll_angle)
