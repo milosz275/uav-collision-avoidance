@@ -149,3 +149,55 @@ class AircraftVehicle(QObject):
         """Returns pitch angle"""
         with QMutexLocker(self.__mutex):
             return degrees(atan2(self.__speed.z(), sqrt(self.__speed.x() ** 2 + self.__speed.y() ** 2)))
+
+    def __str__(self) -> str:
+        with QMutexLocker(self.__mutex):
+            return f"Vehicle {self.__aircraft_id} at {self.__position} with speed {self.__speed} and roll angle {self.__roll_angle} degrees"
+        
+    def __repr__(self) -> str:
+        with QMutexLocker(self.__mutex):
+            return f"Vehicle {self.__aircraft_id} at {self.__position} with speed {self.__speed} and roll angle {self.__roll_angle} degrees"
+        
+    def __eq__(self, other) -> bool:
+        with QMutexLocker(self.__mutex):
+            return self.__aircraft_id == other.__aircraft_id
+        
+    def __ne__(self, other) -> bool:
+        with QMutexLocker(self.__mutex):
+            return self.__aircraft_id != other.__aircraft_id
+        
+    def __lt__(self, other) -> bool:
+        with QMutexLocker(self.__mutex):
+            return self.__aircraft_id < other.__aircraft_id
+        
+    def __le__(self, other) -> bool:
+        with QMutexLocker(self.__mutex):
+            return self.__aircraft_id <= other.__aircraft_id
+        
+    def __gt__(self, other) -> bool:
+        with QMutexLocker(self.__mutex):
+            return self.__aircraft_id > other.__aircraft_id
+        
+    def __ge__(self, other) -> bool:
+        with QMutexLocker(self.__mutex):
+            return self.__aircraft_id >= other.__aircraft_id
+        
+    def __copy__(self):
+        with QMutexLocker(self.__mutex):
+            return AircraftVehicle(self.__aircraft_id, self.__position, self.__speed, self.__initial_roll_angle)
+
+    def __deepcopy__(self, memo):
+        with QMutexLocker(self.__mutex):
+            return AircraftVehicle(self.__aircraft_id, self.__position, self.__speed, self.__initial_roll_angle)
+        
+    def __del__(self):
+        with QMutexLocker(self.__mutex):
+            del self.__position
+            del self.__speed
+            del self.__roll_angle
+            del self.__initial_roll_angle
+            del self.__distance_covered
+            del self.__size
+            del self.__aircraft_id
+            del self.__mutex
+            del self
