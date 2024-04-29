@@ -438,6 +438,12 @@ class AircraftFCC(QObject):
         self.__target_roll_angle = 0.0
         self.__target_pitch_angle = 0.0
         self.__evade_maneuver = False
+        self.__vector_sharing_resolution = None
+        self.__safe_zone_occupied = False
+        self.__autopilot = True
+        self.__ignore_destinations = False
+        self.__is_turning_right = False
+        self.__is_turning_left = False
 
     def __str__(self) -> str:
         return f"AircraftFCC: {self.aircraft_id}"
