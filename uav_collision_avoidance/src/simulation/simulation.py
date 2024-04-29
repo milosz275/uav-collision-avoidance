@@ -3,6 +3,7 @@
 import csv
 import logging
 import datetime
+from copy import copy
 from typing import List
 from pathlib import Path
 
@@ -19,6 +20,7 @@ from ..simulation.simulation_render import SimulationRender
 from ..simulation.simulation_widget import SimulationWidget
 from ..simulation.simulation_adsb import SimulationADSB
 from ..simulation.simulation_fps import SimulationFPS
+from ..simulation.simulation_data import SimulationData
 
 class Simulation(QMainWindow):
     """Main simulation App"""
@@ -94,13 +96,20 @@ class Simulation(QMainWindow):
         self.simulation_render.start(priority = QThread.Priority.NormalPriority)
         self.simulation_widget.stop_signal.connect(self.stop)
     
-    def run_headless(self, aircrafts : List[Aircraft] | None = None, avoid_collisions : bool = False) -> None:
+    def run_headless(self, avoid_collisions : bool = False, aircrafts : List[Aircraft] | None = None) -> None:
         """Executes simulation without GUI"""
         logging.info("Starting headless simulation")
         if aircrafts is None or aircrafts == []:
             self.setup_debug_aircrafts()
         else:
             self.setup_aircrafts(aircrafts)
+        simulation_data : SimulationData = SimulationData()
+        simulation_data.aircraft_1_initial_position = copy(self.aircrafts[0].vehicle.position)
+        simulation_data.aircraft_2_initial_position = copy(self.aircrafts[1].vehicle.position)
+        simulation_data.aircraft_1_initial_roll_angle = copy(self.aircrafts[0].vehicle.roll_angle)
+        simulation_data.aircraft_2_initial_roll_angle = copy(self.aircrafts[1].vehicle.roll_angle)
+        simulation_data.collision = False
+
         self.state = SimulationState(SimulationSettings(), is_realtime = False, avoid_collisions = avoid_collisions)
         self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
         self.simulation_adsb = SimulationADSB(self, self.aircrafts, self.state)
@@ -108,15 +117,19 @@ class Simulation(QMainWindow):
         adsb_step : int = int(self.state.adsb_threshold)
         partial_time_counter : int = adsb_step
         for time in range(0, int(self.simulation_time / self.state.simulation_threshold), time_step):
-            print(time)
             self.simulation_physics.cycle(time_step)
             if partial_time_counter >= adsb_step:
                 self.simulation_adsb.cycle()
                 partial_time_counter = 0
             partial_time_counter += time_step
             if self.state.collision:
+                simulation_data.collision = True
                 break
+        simulation_data.minimal_miss_distance = copy(self.simulation_adsb.minimal_miss_distance)
+        simulation_data.aircraft_1_final_position = copy(self.aircrafts[0].vehicle.position)
+        simulation_data.aircraft_2_final_position = copy(self.aircrafts[1].vehicle.position)
         self.stop()
+        return simulation_data
     
     def run_tests(self, test_number : int = 10) -> None:
         """Runs simulation tests"""
@@ -125,18 +138,73 @@ class Simulation(QMainWindow):
         logging.info("Running simulation tests")
         start_timestamp = QTime.currentTime()
         #list_of_aircrafts : List[List[Aircraft]] = self.generate_test_aircrafts(test_number) # todo
+        export_time = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        try:
+            Path("logs/data").mkdir(parents=True, exist_ok=True)
+        except:
+            return
+        file = open(f"logs/data/simulation-{export_time}.csv", "w")
+        writer = csv.writer(file)
+        writer.writerow([
+            "test_id",
+            "aircraft_1_init_pos_x",
+            "aircraft_1_init_pos_y",
+            "aircraft_1_init_pos_z",
+            "aircraft_2_init_pos_x",
+            "aircraft_2_init_pos_y",
+            "aircraft_2_init_pos_z",
+            "aircraft_1_final_pos_x_if_no_avoidance",
+            "aircraft_1_final_pos_y_if_no_avoidance",
+            "aircraft_1_final_pos_z_if_no_avoidance",
+            "aircraft_2_final_pos_x_if_no_avoidance",
+            "aircraft_2_final_pos_y_if_no_avoidance",
+            "aircraft_2_final_pos_z_if_no_avoidance",
+            "aircraft_1_final_pos_x_if_avoidance",
+            "aircraft_1_final_pos_y_if_avoidance",
+            "aircraft_1_final_pos_z_if_avoidance",
+            "aircraft_2_final_pos_x_if_avoidance",
+            "aircraft_2_final_pos_y_if_avoidance",
+            "aircraft_2_final_pos_z_if_avoidance",
+            "collision_if_no_avoidance",
+            "collision_if_avoidance",
+            "minimal_miss_distance_if_no_avoidance",
+            "minimal_miss_distance_if_avoidance"])
         for i in range(0, test_number, 1):
             logging.info("Test %d - no collision avoidance", i)
-            # self.run_headless(aircrafts = list_of_aircrafts[i], avoid_collisions = False)
-            self.run_headless()
-            # self.export_results()
+            # self.run_headless(avoid_collisions = True, aircrafts = list_of_aircrafts[i])
+            simulation_data_no_avoidance : SimulationData = self.run_headless()
             self.state = None
 
             logging.info("Test %d - collision avoidance", i)
-            # self.run_headless(aircrafts = list_of_aircrafts[i], avoid_collisions = True)
-            self.run_headless()
-            # self.export_results()
+            # self.run_headless(avoid_collisions = True, aircrafts = list_of_aircrafts[i])
+            simulation_data_avoidance : SimulationData = self.run_headless(avoid_collisions = True)
             self.state = None
+
+            writer.writerow([
+                i,
+                simulation_data_no_avoidance.aircraft_1_initial_position.x(),
+                simulation_data_no_avoidance.aircraft_1_initial_position.y(),
+                simulation_data_no_avoidance.aircraft_1_initial_position.z(),
+                simulation_data_no_avoidance.aircraft_2_initial_position.x(),
+                simulation_data_no_avoidance.aircraft_2_initial_position.y(),
+                simulation_data_no_avoidance.aircraft_2_initial_position.z(),
+                simulation_data_no_avoidance.aircraft_1_final_position.x(),
+                simulation_data_no_avoidance.aircraft_1_final_position.y(),
+                simulation_data_no_avoidance.aircraft_1_final_position.z(),
+                simulation_data_no_avoidance.aircraft_2_final_position.x(),
+                simulation_data_no_avoidance.aircraft_2_final_position.y(),
+                simulation_data_no_avoidance.aircraft_2_final_position.z(),
+                simulation_data_avoidance.aircraft_1_final_position.x(),
+                simulation_data_avoidance.aircraft_1_final_position.y(),
+                simulation_data_avoidance.aircraft_1_final_position.z(),
+                simulation_data_avoidance.aircraft_2_final_position.x(),
+                simulation_data_avoidance.aircraft_2_final_position.y(),
+                simulation_data_avoidance.aircraft_2_final_position.z(),
+                simulation_data_no_avoidance.collision,
+                simulation_data_avoidance.collision,
+                simulation_data_no_avoidance.minimal_miss_distance,
+                simulation_data_avoidance.minimal_miss_distance])
+        file.close()
         real_time : float = start_timestamp.msecsTo(QTime.currentTime()) / 1000
         print("Total time elapsed: " + "{:.2f}".format(real_time) + "s")
         logging.info("Total time elapsed: %ss", "{:.2f}".format(real_time))
@@ -233,7 +301,7 @@ class Simulation(QMainWindow):
             ]
         elif test_case == 2:
             aircrafts : List[Aircraft] = [
-                Aircraft( # avoidance test
+                Aircraft( # avoidance test slow
                     position = QVector3D(0, 0, 1000),
                     speed = QVector3D(30, -30, 0),
                     initial_target = QVector3D(75000, -75000, 1000)), # 75 km, -75 km
@@ -243,6 +311,17 @@ class Simulation(QMainWindow):
                     initial_target = QVector3D(75000, -27500, 1000)), # 75 km, -27.5 km
             ]
         elif test_case == 3:
+            aircrafts : List[Aircraft] = [
+                Aircraft( # avoidance test
+                    position = QVector3D(0, 0, 1000),
+                    speed = QVector3D(150, -150, 0),
+                    initial_target = QVector3D(75000, -75000, 1000)), # 75 km, -75 km
+                Aircraft(
+                    position = QVector3D(0, -100_000, 1000),
+                    speed = QVector3D(150, 145, 0),
+                    initial_target = QVector3D(75000, -27500, 1000)), # 75 km, -27.5 km
+            ]
+        elif test_case == 4:
             aircrafts : List[Aircraft] = [
                 Aircraft( # avoidance test fast
                     position = QVector3D(0, 0, 1000),
