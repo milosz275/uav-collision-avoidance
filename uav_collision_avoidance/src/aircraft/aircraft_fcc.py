@@ -330,7 +330,7 @@ class AircraftFCC(QObject):
         """Resets evade maneuver"""
         with QMutexLocker(self.__mutex):
             if self.__evade_maneuver:
-                logging.info("Aircraft %s reset evade maneuver", self.aircraft.aircraft_id)
+                logging.info("Aircraft %s reset evade maneuver", self.__aircraft.aircraft_id)
                 self.__evade_maneuver = False
                 #self.vector_sharing_resolution = None
 
