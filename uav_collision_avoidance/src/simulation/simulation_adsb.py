@@ -32,11 +32,13 @@ class SimulationADSB(QThread):
     @property
     def aircraft_vehicles(self) -> List[AircraftVehicle]:
         """Returns aircraft vehicles"""
+        self.__aircraft_vehicles = [aircraft.vehicle for aircraft in self.aircrafts]
         return self.__aircraft_vehicles
     
     @property
     def aircraft_fccs(self) -> List[AircraftFCC]:
         """Returns aircraft flight control computers"""
+        self.__aircraft_fccs = [aircraft.fcc for aircraft in self.aircrafts]
         return self.__aircraft_fccs
     
     @property
