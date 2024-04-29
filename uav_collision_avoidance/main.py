@@ -50,7 +50,7 @@ def main(arg = None):
     logging.info("%s %s", app.applicationName(), app.applicationVersion())
     sim : Simulation | None = None
     if len(args) > 0 or arg is not None:
-        if args[0] == "realtime":
+        if args[0] == "realtime" or args[0] == "default":
             if len(get_monitors) == 0:
                 logging.warning("Launching GUI Application without monitors detected")
             sim = Simulation()
