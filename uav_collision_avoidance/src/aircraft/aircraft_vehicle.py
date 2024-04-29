@@ -12,7 +12,7 @@ class AircraftVehicle(QObject):
     pitch_dynamic_delay : float = 2000 # ms
     max_acceleration : float = 2.0 # m/s^2
 
-    def __init__(self, aircraft_id : int, position : QVector3D, speed : QVector3D) -> None:
+    def __init__(self, aircraft_id : int, position : QVector3D, speed : QVector3D, initial_roll_angle : float) -> None:
         super().__init__()
         self.__mutex : QMutex = QMutex()
         
@@ -23,65 +23,81 @@ class AircraftVehicle(QObject):
         self.__speed = speed
 
         self.__size : float = 20.0
-        self.__roll_angle = 0.0 # bank angle
+        self.__roll_angle = initial_roll_angle
         self.__initial_roll_angle = self.__roll_angle
         self.__distance_covered : float = 0.0
 
     @property
     def aircraft_id(self) -> int:
         """Returns aircraft id"""
-        return self.__aircraft_id
+        with QMutexLocker(self.__mutex):
+            return self.__aircraft_id
     
     @property
     def position(self) -> QVector3D:
         """Returns position"""
-        return self.__position
+        with QMutexLocker(self.__mutex):
+            return self.__position
     
     @position.setter
     def position(self, position : QVector3D) -> None:
         """Sets position"""
         del self.__position
-        self.__position = position
+        with QMutexLocker(self.__mutex):
+            self.__position = position
     
     @property
     def speed(self) -> QVector3D:
         """Returns speed"""
-        return self.__speed
+        with QMutexLocker(self.__mutex):
+            return self.__speed
     
     @speed.setter
     def speed(self, speed : QVector3D) -> None:
         """Sets speed"""
-        self.__speed = speed
+        with QMutexLocker(self.__mutex):
+            self.__speed = speed
     
     @property
     def size(self) -> float:
         """Returns size"""
-        return self.__size
+        with QMutexLocker(self.__mutex):
+            return self.__size
     
     @property
     def roll_angle(self) -> float:
         """Returns roll angle"""
-        return self.__roll_angle
+        with QMutexLocker(self.__mutex):
+            return self.__roll_angle
 
     @roll_angle.setter
     def roll_angle(self, roll_angle_delta : float) -> None:
         """Adds roll angle delta"""
-        self.__roll_angle += roll_angle_delta
+        with QMutexLocker(self.__mutex):
+            self.__roll_angle += roll_angle_delta
 
     @property
     def initial_roll_angle(self) -> float:
         """Returns initial roll angle"""
-        return self.__initial_roll_angle
+        with QMutexLocker(self.__mutex):
+            return self.__initial_roll_angle
     
     @property
     def distance_covered(self) -> float:
         """Returns covered distance"""
-        return self.__distance_covered
+        with QMutexLocker(self.__mutex):
+            return self.__distance_covered
 
     @distance_covered.setter
     def distance_covered(self, distance_covered_delta : float) -> None:
         """Appends delta to distance covered"""
-        self.__distance_covered += distance_covered_delta
+        with QMutexLocker(self.__mutex):
+            self.__distance_covered += distance_covered_delta
+
+    def reset_distance_covered(self) -> None:
+        """Resets distance covered"""
+        with QMutexLocker(self.__mutex):
+            self.__distance_covered = 0.0
     
     def move(self, dx : float, dy : float, dz : float = 0.0) -> None:
         """Applies position deltas for the vehicle"""
