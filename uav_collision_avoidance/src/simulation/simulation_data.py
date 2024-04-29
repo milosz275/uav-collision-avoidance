@@ -13,10 +13,16 @@ class SimulationData(QObject):
         self.__aircraft_2_initial_position : QVector3D = QVector3D(0, 0, 0)
         self.__aircraft_1_final_position : QVector3D = QVector3D(0, 0, 0)
         self.__aircraft_2_final_position : QVector3D = QVector3D(0, 0, 0)
+        self.__aircraft_1_initial_speed : QVector3D = QVector3D(0, 0, 0)
+        self.__aircraft_2_initial_speed : QVector3D = QVector3D(0, 0, 0)
+        self.__aircraft_1_final_speed : QVector3D = QVector3D(0, 0, 0)
+        self.__aircraft_2_final_speed : QVector3D = QVector3D(0, 0, 0)
+        self.__aircraft_1_initial_target : QVector3D = QVector3D(0, 0, 0)
+        self.__aircraft_2_initial_target : QVector3D = QVector3D(0, 0, 0)
         self.__aircraft_1_initial_roll_angle : float = 0.0
         self.__aircraft_2_initial_roll_angle : float = 0.0
         self.__collision : bool | None = None
-        self.__minimal_miss_distance : float | None = None
+        self.__minimal_relative_distance : float | None = None
 
     @property
     def aircraft_1_initial_position(self) -> QVector3D:
@@ -59,6 +65,66 @@ class SimulationData(QObject):
         self.__aircraft_2_final_position = position
 
     @property
+    def aircraft_1_initial_speed(self) -> QVector3D:
+        """Returns aircraft 1 initial speed"""
+        return self.__aircraft_1_initial_speed
+    
+    @aircraft_1_initial_speed.setter
+    def aircraft_1_initial_speed(self, speed : QVector3D) -> None:
+        """Sets aircraft 1 initial speed"""
+        self.__aircraft_1_initial_speed = speed
+
+    @property
+    def aircraft_2_initial_speed(self) -> QVector3D:
+        """Returns aircraft 2 initial speed"""
+        return self.__aircraft_2_initial_speed
+    
+    @aircraft_2_initial_speed.setter
+    def aircraft_2_initial_speed(self, speed : QVector3D) -> None:
+        """Sets aircraft 2 initial speed"""
+        self.__aircraft_2_initial_speed = speed
+
+    @property
+    def aircraft_1_final_speed(self) -> QVector3D:
+        """Returns aircraft 1 final speed"""
+        return self.__aircraft_1_final_speed
+    
+    @aircraft_1_final_speed.setter
+    def aircraft_1_final_speed(self, speed : QVector3D) -> None:
+        """Sets aircraft 1 final speed"""
+        self.__aircraft_1_final_speed = speed
+
+    @property
+    def aircraft_2_final_speed(self) -> QVector3D:
+        """Returns aircraft 2 final speed"""
+        return self.__aircraft_2_final_speed
+    
+    @aircraft_2_final_speed.setter
+    def aircraft_2_final_speed(self, speed : QVector3D) -> None:
+        """Sets aircraft 2 final speed"""
+        self.__aircraft_2_final_speed = speed
+
+    @property
+    def aircraft_1_initial_target(self) -> QVector3D:
+        """Returns aircraft 1 initial target"""
+        return self.__aircraft_1_initial_target
+    
+    @aircraft_1_initial_target.setter
+    def aircraft_1_initial_target(self, target : QVector3D) -> None:
+        """Sets aircraft 1 initial target"""
+        self.__aircraft_1_initial_target = target
+
+    @property
+    def aircraft_2_initial_target(self) -> QVector3D:
+        """Returns aircraft 2 initial target"""
+        return self.__aircraft_2_initial_target
+    
+    @aircraft_2_initial_target.setter
+    def aircraft_2_initial_target(self, target : QVector3D) -> None:
+        """Sets aircraft 2 initial target"""
+        self.__aircraft_2_initial_target = target
+
+    @property
     def aircraft_1_initial_roll_angle(self) -> float:
         """Returns aircraft 1 initial roll angle"""
         return self.__aircraft_1_initial_roll_angle
@@ -89,14 +155,14 @@ class SimulationData(QObject):
         self.__collision = collision
 
     @property
-    def minimal_miss_distance(self) -> float | None:
+    def minimal_relative_distance(self) -> float | None:
         """Returns minimal miss distance"""
-        return self.__minimal_miss_distance
+        return self.__minimal_relative_distance
     
-    @minimal_miss_distance.setter
-    def minimal_miss_distance(self, distance : float) -> None:
+    @minimal_relative_distance.setter
+    def minimal_relative_distance(self, distance : float) -> None:
         """Sets minimal miss distance"""
-        self.__minimal_miss_distance = distance
+        self.__minimal_relative_distance = distance
 
     def reset(self) -> None:
         """Resets simulation data"""
@@ -107,4 +173,4 @@ class SimulationData(QObject):
         self.__aircraft_1_initial_roll_angle = 0.0
         self.__aircraft_2_initial_roll_angle = 0.0
         self.__collision = False
-        self.__minimal_miss_distance = 0.0
+        self.__minimal_relative_distance = 0.0
