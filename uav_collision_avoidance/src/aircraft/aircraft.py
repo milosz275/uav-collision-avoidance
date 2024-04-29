@@ -2,7 +2,7 @@
 
 from copy import copy
 
-from PySide6.QtCore import QObject
+from PySide6.QtCore import QObject, QMutex, QMutexLocker
 from PySide6.QtGui import QVector3D
 
 from .aircraft_vehicle import AircraftVehicle
@@ -13,41 +13,56 @@ class Aircraft(QObject):
     
     __current_id : int = 0
 
-    def __init__(self, position : QVector3D, speed : QVector3D, initial_target : QVector3D | None = None) -> None:
+    def __init__(self, position : QVector3D, speed : QVector3D, initial_target : QVector3D | None = None, initial_roll_angle : float = 0.0) -> None:
         super().__init__()
+        self.__mutex : QMutex = QMutex()
         self.__aircraft_id = self.__obtain_id()
-        self.__vehicle = AircraftVehicle(self.__aircraft_id, position=position, speed=speed)
+        self.__vehicle = AircraftVehicle(self.__aircraft_id, position=position, speed=speed, initial_roll_angle=initial_roll_angle)
         self.__fcc = AircraftFCC(self.__aircraft_id, initial_target, self.__vehicle)
         self.__initial_position = copy(position)
         self.__initial_speed = copy(speed)
+        self.__initial_roll_angle = initial_roll_angle
     
     @property
     def vehicle(self) -> AircraftVehicle:
         """Returns aircraft vehicle"""
-        return self.__vehicle
+        with QMutexLocker(self.__mutex):
+            return self.__vehicle
     
     @property
     def fcc(self) -> AircraftFCC:
         """Returns aircraft fcc"""
-        return self.__fcc
+        with QMutexLocker(self.__mutex):
+            return self.__fcc
     
     @property
     def initial_position(self) -> QVector3D:
         """Returns initial position"""
-        return self.__initial_position
+        with QMutexLocker(self.__mutex):
+            return self.__initial_position
     
     @property
     def initial_speed(self) -> QVector3D:
         """Returns initial speed"""
-        return self.__initial_speed
+        with QMutexLocker(self.__mutex):
+            return self.__initial_speed
+        
+    @property
+    def initial_roll_angle(self) -> float:
+        """Returns initial roll angle"""
+        with QMutexLocker(self.__mutex):
+            return self.__initial_roll_angle
 
     def __obtain_id(self) -> int:
         """Gets unique id for the aircraft"""
-        aircraft_id = Aircraft.__current_id
-        Aircraft.__current_id += 1
-        return aircraft_id
+        with QMutexLocker(self.__mutex):
+            aircraft_id = Aircraft.__current_id
+            Aircraft.__current_id += 1
+            return aircraft_id
     
     def reset(self) -> None:
         """Resets aircraft to initial state"""
         self.__vehicle.speed = copy(self.initial_speed)
         self.__vehicle.position = copy(self.initial_position)
+        self.__vehicle.roll_angle = copy(self.initial_roll_angle)
+        self.__vehicle.reset_distance_covered()
