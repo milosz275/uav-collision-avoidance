@@ -68,8 +68,6 @@ class Simulation(QMainWindow):
         if self.state is not None:
             print("Another instance already running")
             return
-        if self.aircrafts is None and not self.tests:
-            self.setup_debug_aircrafts()
         if self.headless:
             if self.tests:
                 self.run_tests()
@@ -80,6 +78,8 @@ class Simulation(QMainWindow):
 
     def run_gui(self) -> None:
         """Executes realtime simulation"""
+        if self.aircrafts is None or self.aircrafts == []:
+            self.setup_debug_aircrafts()
         logging.info("Starting realtime simulation")
         self.state = SimulationState(SimulationSettings(), is_realtime = True)
         self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
