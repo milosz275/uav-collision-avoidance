@@ -33,8 +33,9 @@ class SimulationState(QSettings):
         self.__second_cause_collision : bool = False
         self.update_settings()
 
+        # render state
+        self.__fps : float = 0.0
         if is_realtime:
-            # render state
             override_gui_scale : bool = True
             if not override_gui_scale:
                 self.__gui_scale : float = 0.5 # define gui scaling
@@ -46,7 +47,6 @@ class SimulationState(QSettings):
                     self.__gui_scale = 0.125
             else:
                 self.__gui_scale : float = 0.75
-            self.__fps : float = 0.0
             self.__draw_fps : bool = True
             self.__draw_aircraft : bool = True
             self.__draw_grid : bool = False
