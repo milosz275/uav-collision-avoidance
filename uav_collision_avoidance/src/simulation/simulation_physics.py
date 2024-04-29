@@ -212,10 +212,10 @@ class SimulationPhysics(QThread):
             horizontal_speed : float = sqrt(aircraft.speed.x() ** 2 + aircraft.speed.y() ** 2)
             vertical_speed : float = abs(aircraft.speed.z())
             geometrical_speed : float = sqrt(horizontal_speed ** 2 + vertical_speed ** 2)
-            assert speed == absolute_speed
-            assert horizontal_speed == aircraft.horizontal_speed
-            assert vertical_speed == aircraft.vertical_speed
-            assert geometrical_speed == speed
+            assert abs(speed - absolute_speed) < 0.0001
+            assert abs(horizontal_speed - aircraft.horizontal_speed) < 0.0001
+            assert abs(vertical_speed - aircraft.vertical_speed) < 0.0001
+            assert abs(geometrical_speed - speed) < 0.0001
             assert speed > 0.0
             assert horizontal_speed > 0.0
             assert geometrical_speed > 0.0
