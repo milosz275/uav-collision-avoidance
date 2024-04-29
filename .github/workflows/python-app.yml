@@ -20,6 +20,11 @@ jobs:
       uses: actions/setup-python@v3
       with:
         python-version: "3.11"
+    - name: Export variables
+      run: | 
+        echo "::set-env name=PYTHON_VERSION::3.11"
+        echo "::set-env name=DISPLAY:::0.0"
+        echo "::set-env name=QT_QPA_PLATFORM::offscreen"
     - name: Install libraries
       run: sudo apt-get install libxcb-xinerama0 libegl1-mesa libegl1-mesa-dev
     - name: Install dependencies
