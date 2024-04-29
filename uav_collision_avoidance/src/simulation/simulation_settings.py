@@ -5,7 +5,7 @@ from PySide6.QtCore import QSize
 class SimulationSettings:
     """Settings for the simulation"""
 
-    screen_resolution : QSize
+    screen_resolution : QSize | None = None
     resolution : tuple
     g_acceleration : float = 9.81
     simulation_frequency : float = 100.0
@@ -17,4 +17,5 @@ class SimulationSettings:
     @classmethod
     def __init__(cls) -> None:
         """Initialises Settings using screen resolution"""
-        cls.resolution = (int(cls.screen_resolution.width() * 0.6), int(cls.screen_resolution.height() * 0.75))
+        if cls.screen_resolution is not None:
+            cls.resolution = (int(cls.screen_resolution.width() * 0.6), int(cls.screen_resolution.height() * 0.75))
