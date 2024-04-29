@@ -54,13 +54,16 @@ def main(arg = None):
             if len(get_monitors) == 0:
                 logging.warning("Launching GUI Application without monitors detected")
             sim = Simulation()
+            sim.run()
             sys.exit(app.exec())
         elif args[0] == "headless" or arg == "headless":
             sim = Simulation(headless = True)
+            sim.run()
             QApplication.shutdown(app)
             sys.exit(0)
         elif args[0] == "tests" or arg == "tests":
             sim = Simulation(headless = True, tests = True)
+            sim.run()
             QApplication.shutdown(app)
             sys.exit(0)
         elif args[0] == "version":
@@ -76,6 +79,7 @@ def main(arg = None):
             sys.exit(1)
     else:
         sim = Simulation()
+        sim.run()
     sys.exit(app.exec())
 
 if __name__ == "__main__":
