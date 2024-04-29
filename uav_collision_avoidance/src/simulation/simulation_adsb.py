@@ -23,6 +23,7 @@ class SimulationADSB(QThread):
         self.__aircraft_fccs : List[AircraftFCC] = [aircraft.fcc for aircraft in self.aircrafts]
         self.__simulation_state = simulation_state
         self.__adsb_cycles : int = 0
+        self.__minimal_miss_distance : float = float("inf")
         
     @property
     def aircrafts(self) -> List[Aircraft]:
@@ -56,6 +57,16 @@ class SimulationADSB(QThread):
         self.__adsb_cycles += 1
         self.simulation_state.adsb_cycles = self.adsb_cycles
 
+    @property
+    def minimal_miss_distance(self) -> float:
+        """Returns minimal miss distance"""
+        return self.__minimal_miss_distance
+    
+    @minimal_miss_distance.setter
+    def minimal_miss_distance(self, minimal_miss_distance : float) -> None:
+        """Sets minimal miss distance"""
+        self.__minimal_miss_distance = minimal_miss_distance
+
     def run(self) -> None:
         """Runs ADS-B simulation thread with precise timeout"""
         while not self.isInterruptionRequested():
@@ -85,9 +96,10 @@ class SimulationADSB(QThread):
                 fcc.append_visited()
 
                 # console destination reach time
-                if fcc.destination and self.simulation_state.adsb_report:
+                if fcc.destination is not None and self.simulation_state.adsb_report:
                     time_to_reaching_destination : float = (QVector3D.dotProduct(fcc.destination - aircraft.position, aircraft.speed) / QVector3D.dotProduct(aircraft.speed, aircraft.speed))
                     print(f"Aircraft {aircraft.aircraft_id} will reach its destination in " + "{:.2f}".format(time_to_reaching_destination) + " (" + "{:.1f}".format(time_to_reaching_destination / 60) + " minutes or " + "{:.1f}".format(time_to_reaching_destination / 3600) + " hours)")
+                    print("Collision avoidance: " + str(self.simulation_state.avoid_collisions))
 
                 # console report output
                 if self.simulation_state.adsb_report and aircraft.aircraft_id == 0 and self.simulation_state.is_realtime:
@@ -114,6 +126,9 @@ class SimulationADSB(QThread):
                     speed_difference_unit,
                     QVector3D.crossProduct(relative_position, speed_difference_unit))
                 print("Miss distance at closest approach: " + "{:.2f}".format(miss_distance_vector.length()) + "m (" + "{:.2f}".format(self.aircraft_vehicles[0].size / 2 + self.aircraft_vehicles[1].size / 2) + "m is collision distance)")
+
+                if miss_distance_vector.length() < self.__minimal_miss_distance:
+                    self.__minimal_miss_distance = miss_distance_vector.length()
 
                 if miss_distance_vector.length() == 0:
                     print("Head-on collision detected")
