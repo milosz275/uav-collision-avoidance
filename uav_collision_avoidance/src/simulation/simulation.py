@@ -31,7 +31,6 @@ class Simulation(QMainWindow):
         self.__simulation_time : int = simulation_time
         self.__aircrafts : List[Aircraft] | None = None
         self.__state : SimulationState | None = None
-        self.setup_debug_aircrafts()
         self.run()
 
     @property
@@ -70,8 +69,7 @@ class Simulation(QMainWindow):
             print("Another instance already running")
             return
         if self.aircrafts is None and not self.tests:
-            print("No aircrafts to simulate")
-            return
+            self.setup_debug_aircrafts()
         if self.headless:
             if self.tests:
                 self.run_tests()
@@ -99,7 +97,9 @@ class Simulation(QMainWindow):
     def run_headless(self, aircrafts : List[Aircraft] | None = None) -> None:
         """Executes simulation without GUI"""
         logging.info("Starting headless simulation")
-        if aircrafts is not None:
+        if aircrafts is None or aircrafts == []:
+            self.setup_debug_aircrafts()
+        else:
             self.setup_aircrafts(aircrafts)
         self.state = SimulationState(SimulationSettings(), is_realtime = False)
         self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
@@ -124,8 +124,10 @@ class Simulation(QMainWindow):
             test_number = 10
         logging.info("Running simulation tests")
         start_timestamp = QTime.currentTime()
+        #list_of_aircrafts : List[List[Aircraft]] = self.generate_test_aircrafts(test_number) # todo
         for i in range(0, test_number, 1):
             logging.info("Test %d", i)
+            # self.run_headless(list_of_aircrafts[i])
             self.run_headless()
             self.state = None
         real_time : float = start_timestamp.msecsTo(QTime.currentTime()) / 1000
