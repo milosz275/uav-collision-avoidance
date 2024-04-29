@@ -50,9 +50,11 @@ def main(arg = None):
             sys.exit(app.exec())
         elif args[0] == "headless" or arg == "headless":
             sim = Simulation(headless = True)
+            QApplication.shutdown(app)
             sys.exit(0)
-        elif args[0] == "tests":
+        elif args[0] == "tests" or arg == "tests":
             sim = Simulation(headless = True, tests = True)
+            QApplication.shutdown(app)
             sys.exit(0)
         elif len(args) > 1:
             print(f"Invalid arguments: {args}")
