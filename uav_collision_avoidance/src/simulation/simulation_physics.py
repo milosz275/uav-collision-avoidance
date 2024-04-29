@@ -111,12 +111,12 @@ class SimulationPhysics(QThread):
         """Updates aircrafts position, returns true on collision"""
         for aircraft in self.aircraft_vehicles:
             if aircraft.position.z() <= 0.0:
-                logging.warn("Aircraft's " + str(aircraft.aircraft_id) + "collision with the ground. Coordinates: " + str(self.aircraft_vehicles[aircraft.aircraft_id].position.toTuple()))
+                logging.warning("Aircraft's " + str(aircraft.aircraft_id) + "collision with the ground. Coordinates: " + str(self.aircraft_vehicles[aircraft.aircraft_id].position.toTuple()))
                 print("Collision with ground")
                 return True
             relative_distance : float = dist(aircraft.position.toTuple(), self.aircraft_vehicles[1 - aircraft.aircraft_id].position.toTuple())
             if relative_distance <= aircraft.size:
-                logging.warn("Aircrafts' 0 and 1 collision. Coordinates: " + str(self.aircraft_vehicles[0].position.toTuple()) + " and " + str(self.aircraft_vehicles[1].position.toTuple()))
+                logging.warning("Aircrafts' 0 and 1 collision. Coordinates: " + str(self.aircraft_vehicles[0].position.toTuple()) + " and " + str(self.aircraft_vehicles[1].position.toTuple()))
                 print("Collision with another aircraft")
                 return True
             old_pos : QVector3D = copy(aircraft.position)
