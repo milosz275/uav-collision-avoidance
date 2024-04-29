@@ -438,3 +438,31 @@ class AircraftFCC(QObject):
         self.__target_roll_angle = 0.0
         self.__target_pitch_angle = 0.0
         self.__evade_maneuver = False
+
+    def __str__(self) -> str:
+        return f"AircraftFCC: {self.aircraft_id}"
+    
+    def __repr__(self) -> str:
+        return f"AircraftFCC: {self.aircraft_id}"
+    
+    def __del__(self) -> None:
+        with QMutexLocker(self.__mutex):
+            del self.__aircraft_id
+            del self.__aircraft
+            del self.__destinations
+            del self.__destinations_history
+            del self.__visited
+            del self.__autopilot
+            del self.__ignore_destinations
+            del self.__initial_target
+            del self.__target_yaw_angle
+            del self.__target_roll_angle
+            del self.__target_pitch_angle
+            del self.__target_speed
+            del self.__is_turning_right
+            del self.__is_turning_left
+            del self.__safe_zone_occupied
+            del self.__evade_maneuver
+            del self.__vector_sharing_resolution
+            del self.__mutex
+            del self
