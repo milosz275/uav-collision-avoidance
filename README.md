@@ -159,7 +159,9 @@ One coding convention is not preserved in the scope of the project. Qt's methods
 
 ## Authors
 
-- [Miłosz Maculewicz](https://github.com/mldxo)
+[Miłosz Maculewicz](https://github.com/mldxo)
+
+`© 2024 Miłosz Maculewicz. All rights reserved.`
 
 ## References
 
