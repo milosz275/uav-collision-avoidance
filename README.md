@@ -1,3 +1,6 @@
+[![Build](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/python-app.yml/badge.svg)](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/python-app.yml)
+[![CodeQL](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/github-code-scanning/codeql)
+
 # UAV Collision Avoidance
 
 Python project regarding implementation of UAV physics and collision detection/avoidance algorithms.
