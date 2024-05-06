@@ -11,14 +11,6 @@ from PySide6.QtWidgets import QApplication
 from .version import __version__ as version
 from .src.simulation.simulation import Simulation, SimulationSettings
 
-def signal_handler(sig, frame):
-    logging.warning("Ctrl+C keyboard interrupt. Exiting...")
-    try:
-        signal.default_int_handler(sig, frame)
-    except KeyboardInterrupt:
-        import sys
-        sys.exit(1)
-signal.signal(signal.SIGINT, signal_handler)
 try:
     start_time = datetime.datetime.now().strftime("%Y-%m-%d")
     Path("logs").mkdir(parents=True, exist_ok=True)
@@ -31,6 +23,15 @@ except:
         level=logging.DEBUG,
         format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
         handlers=[logging.StreamHandler()])
+    
+def signal_handler(sig, frame):
+    logging.warning("Ctrl+C keyboard interrupt. Exiting...")
+    try:
+        signal.default_int_handler(sig, frame)
+    except KeyboardInterrupt:
+        import sys
+        sys.exit(1)
+signal.signal(signal.SIGINT, signal_handler)
 
 logging.info("-" * 120)
 if platform.system() == "Windows":
@@ -64,6 +65,20 @@ def main(arg = None):
         elif args[0] == "tests" or arg == "tests":
             sim = Simulation(headless = True, tests = True)
             sim.run()
+            QApplication.shutdown(app)
+            sys.exit(0)
+        elif args[0] == "load":
+            file_path : str = "data/simulation-2024-05-06-19-22-46.csv"
+            if len(args) > 1:
+                file_path = args[1]
+                if len(args) > 2:
+                    print(f"Invalid arguments: {args}")
+                    logging.warning("Invalid arguments: %s", args)
+            sim = Simulation(headless = True)
+            assert sim.load_simulation_data_from_file(file_path = file_path, test_id = 0, avoid_collisions = False)
+            sim.run_headless(avoid_collisions = False)
+            assert sim.load_simulation_data_from_file(file_path = file_path, test_id = 0, avoid_collisions = True)
+            sim.run_headless(avoid_collisions = True)
             QApplication.shutdown(app)
             sys.exit(0)
         elif args[0] == "version":
