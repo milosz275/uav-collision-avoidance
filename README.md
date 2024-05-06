@@ -42,6 +42,7 @@ There are three possible arguments at the moment:
 - default (no arguments) - runs GUI simulation
 - headless - runs physical simulation with ADS-B and collision avoidance algorithm
 - tests - runs full tests comparing effectiveness of collision avoidance algorithm
+- load [filename] - loads simulation from file when specified, otherwise loads default example test case from data directory
 - version - prints version of the app
 
 ### Key shortcuts
@@ -105,6 +106,10 @@ uav-collision-avoidance headless
 
 ```bash
 uav-collision-avoidance tests
+```
+
+```bash
+uav-collision-avoidance load [filename]
 ```
 
 ```bash
