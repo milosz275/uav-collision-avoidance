@@ -10,6 +10,7 @@ pyinstaller
 
 # UAV Collision Avoidance
 pyside6
+numpy
 
 # Tests
 pytest

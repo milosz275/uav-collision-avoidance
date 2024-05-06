@@ -4,7 +4,6 @@ from PySide6.QtWidgets import QApplication
 from main import *
 from . import Simulation, SimulationSettings
 
-
 def test_headless():
     with pytest.raises(SystemExit) as e:
         main("headless")

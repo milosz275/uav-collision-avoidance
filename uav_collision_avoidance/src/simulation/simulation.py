@@ -5,6 +5,7 @@ import logging
 import datetime
 from copy import copy
 from typing import List
+from numpy import random, ndarray, clip
 from pathlib import Path
 
 from PySide6.QtCore import QThread, QTime
@@ -159,20 +160,82 @@ class Simulation(QMainWindow):
         simulation_data.aircraft_2_final_position = copy(self.aircrafts[1].vehicle.position)
         simulation_data.aircraft_1_final_speed = copy(self.aircrafts[0].vehicle.speed)
         simulation_data.aircraft_2_final_speed = copy(self.aircrafts[1].vehicle.speed)
+        self.export_visited_locations()
         self.stop()
         return simulation_data
     
+    def generate_test_aircrafts(self) -> List[List[Aircraft]]:
+        """Generates test cases"""
+        logging.info("Generating test cases")
+        list_of_lists : List[List[Aircraft]] = []
+        test_minimal_altitude : int = 1000
+        test_maximal_altitude : int = 7000
+        test_minimal_speed : int = 30
+        test_maximal_speed : int = 100
+        test_minimal_target_pitch_angle : int = -30
+        test_maximal_target_pitch_angle : int = 30
+        test_average_aircraft_size : int = 20
+        test_start_relative_distance : int = 10_000
+
+        # todo: generate random parameters for test cases
+
+        if len(list_of_lists) == 0:
+            for i in range (0, 10, 1):
+                list_of_aircrafts : List[Aircraft] = []
+                aircraft : Aircraft = Aircraft( # detection test
+                    aircraft_id = 0,
+                    position = QVector3D(-800, 4000, 1000),
+                    speed = QVector3D(60, -60, 0),
+                    initial_target = QVector3D(51_900, -50_000, 10000)) # 51.9 km, -50 km
+                list_of_aircrafts.append(aircraft)
+                aircraft = Aircraft(
+                    aircraft_id = 1,
+                    position = QVector3D(4000, 6000, 1000),
+                    speed = QVector3D(0, -85, 0),
+                    initial_target = QVector3D(900, -1_001_300, 1000)) # 0.9 km, -1001.3 km
+                list_of_aircrafts.append(aircraft)
+                list_of_lists.append(list_of_aircrafts)
+
+        return list_of_lists
+    
     def run_tests(self, test_number : int = 10) -> None:
         """Runs simulation tests"""
-        if test_number < 1:
+        if test_number < 10:
             test_number = 10
+        elif test_number > 100:
+            test_number = 100
         logging.info("Running simulation tests")
+        list_of_lists : List[List[Aircraft]] = self.generate_test_aircrafts()
+        lists_count : int = len(list_of_lists)
+        print("Generated aircrafts pairs: ", lists_count)
+        for i in range(0, lists_count, 1):
+            print("Aircrafts pair ", i)
+            for aircraft in list_of_lists[i]:
+                print("Aircraft: ", aircraft.vehicle.position, aircraft.vehicle.speed, aircraft.fcc.destination)
+        if lists_count > test_number:
+            random_indices : ndarray = random.normal(0, 1, test_number)
+            random_indices = random_indices - min(random_indices)
+            random_indices = random_indices / max(random_indices)
+            random_indices = random_indices * lists_count
+            random_indices = random_indices.astype(int)
+            random_indices = clip(random_indices, 0, lists_count - 1)
+
+            random_indices : List[int] = random_indices.tolist()
+            random_indices_set : set = set(random_indices)
+            random_indices = []
+            while random_indices_set:
+                random_indices.append(random_indices_set.pop())
+            random_indices.sort(reverse = False)
+            assert len(random_indices) <= test_number
+            print("Selected indices: ", random_indices)
+            print("Indices count: ", len(random_indices))
+            list_of_lists = [list_of_lists[i] for i in random_indices]
         start_timestamp = QTime.currentTime()
-        #list_of_aircrafts : List[List[Aircraft]] = self.generate_test_aircrafts(test_number) # todo
         export_time = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         try:
             Path("data").mkdir(parents=True, exist_ok=True)
         except:
+            logging.error("Failed to create data directory")
             return
         file = open(f"data/simulation-{export_time}.csv", "w")
         writer = csv.writer(file)
@@ -224,15 +287,25 @@ class Simulation(QMainWindow):
             "collision_if_avoidance",
             "minimal_relative_distance_if_no_avoidance",
             "minimal_relative_distance_if_avoidance"])
+        file.close()
+        file = open(f"data/simulation-{export_time}.csv", "a")
+        writer = csv.writer(file)
+        
         for i in range(0, test_number, 1):
             logging.info("Test %d - no collision avoidance", i)
-            # self.run_headless(avoid_collisions = True, aircrafts = list_of_aircrafts[i])
-            simulation_data_no_avoidance : SimulationData = self.run_headless()
+            aircrafts : List[Aircraft] = list_of_lists[i]
+            print("Aircrafts count: ", len(aircrafts))
+            simulation_data_no_avoidance : SimulationData = self.run_headless(
+                avoid_collisions = False,
+                aircrafts = aircrafts)
+            # simulation_data_no_avoidance : SimulationData = self.run_headless(avoid_collisions = False)
             self.state = None
 
             logging.info("Test %d - collision avoidance", i)
-            # self.run_headless(avoid_collisions = True, aircrafts = list_of_aircrafts[i])
-            simulation_data_avoidance : SimulationData = self.run_headless(avoid_collisions = True)
+            simulation_data_avoidance : SimulationData = self.run_headless(
+                avoid_collisions = True,
+                aircrafts = aircrafts)
+            # simulation_data_avoidance : SimulationData = self.run_headless(avoid_collisions = True)
             self.state = None
 
             writer.writerow([
@@ -283,6 +356,9 @@ class Simulation(QMainWindow):
                 simulation_data_avoidance.collision,
                 simulation_data_no_avoidance.minimal_relative_distance,
                 simulation_data_avoidance.minimal_relative_distance])
+            file.close()
+            file = open(f"data/simulation-{export_time}.csv", "a")
+            writer = csv.writer(file)
         file.close()
         real_time : float = start_timestamp.msecsTo(QTime.currentTime()) / 1000
         print("Total time elapsed: " + "{:.2f}".format(real_time) + "s")
@@ -383,15 +459,17 @@ class Simulation(QMainWindow):
         """Sets up aircrafts list"""
         self.__aircrafts = aircrafts
 
-    def setup_debug_aircrafts(self, test_case : int = 3) -> None:
+    def setup_debug_aircrafts(self, test_case : int = 0) -> None:
         """Sets up debug aircrafts list"""
         if test_case == 0:
             aircrafts : List[Aircraft] = [
                 Aircraft( # detection test
+                    aircraft_id = 0,
                     position = QVector3D(-800, 4000, 1000),
                     speed = QVector3D(60, -60, 0),
                     initial_target = QVector3D(51_900, -50_000, 10000)),
                 Aircraft(
+                    aircraft_id = 1,
                     position = QVector3D(4000, 6000, 1000),
                     speed = QVector3D(0, -85, 0),
                     initial_target = QVector3D(900, -1_001_300, 1000)),
@@ -399,19 +477,23 @@ class Simulation(QMainWindow):
         elif test_case == 1:
             aircrafts : List[Aircraft] = [
                 Aircraft( # almost head on
+                    aircraft_id = 0,
                     position = QVector3D(-3000, 500, 1000),
                     speed = QVector3D(70, 0.1, 0)),
                 Aircraft(
+                    aircraft_id = 1,
                     position = QVector3D(5000, 500, 1000),
                     speed = QVector3D(-50, 0, 0)),
             ]
         elif test_case == 2:
             aircrafts : List[Aircraft] = [
                 Aircraft( # avoidance test slow
+                    aircraft_id = 0,
                     position = QVector3D(0, 0, 1000),
                     speed = QVector3D(30, -30, 0),
                     initial_target = QVector3D(75000, -75000, 1000)), # 75 km, -75 km
                 Aircraft(
+                    aircraft_id = 1,
                     position = QVector3D(0, -100_000, 1000),
                     speed = QVector3D(30, 29, 0),
                     initial_target = QVector3D(75000, -27500, 1000)), # 75 km, -27.5 km
@@ -419,10 +501,12 @@ class Simulation(QMainWindow):
         elif test_case == 3:
             aircrafts : List[Aircraft] = [
                 Aircraft( # avoidance test
+                    aircraft_id = 0,
                     position = QVector3D(0, 0, 1000),
                     speed = QVector3D(150, -150, 0),
                     initial_target = QVector3D(75000, -75000, 1000)), # 75 km, -75 km
                 Aircraft(
+                    aircraft_id = 1,
                     position = QVector3D(0, -100_000, 1000),
                     speed = QVector3D(150, 145, 0),
                     initial_target = QVector3D(75000, -27500, 1000)), # 75 km, -27.5 km
@@ -430,10 +514,12 @@ class Simulation(QMainWindow):
         elif test_case == 4:
             aircrafts : List[Aircraft] = [
                 Aircraft( # avoidance test fast
+                    aircraft_id = 0,
                     position = QVector3D(0, 0, 1000),
                     speed = QVector3D(300, -300, 0),
                     initial_target = QVector3D(75000, -75000, 1000)), # 75 km, -75 km
                 Aircraft(
+                    aircraft_id = 1,
                     position = QVector3D(0, -100_000, 1000),
                     speed = QVector3D(300, 290, 0),
                     initial_target = QVector3D(75000, -27500, 1000)), # 75 km, -27.5 km
@@ -451,11 +537,13 @@ class Simulation(QMainWindow):
         self.__simulation_data = data
         self.__aircrafts = [
             Aircraft(
+                aircraft_id = 0,
                 position = data.aircraft_1_initial_position,
                 speed = data.aircraft_1_initial_speed,
                 initial_target = data.aircraft_1_initial_target,
                 initial_roll_angle = data.aircraft_1_initial_roll_angle),
             Aircraft(
+                aircraft_id = 1,
                 position = data.aircraft_2_initial_position,
                 speed = data.aircraft_2_initial_speed,
                 initial_target = data.aircraft_2_initial_target,
