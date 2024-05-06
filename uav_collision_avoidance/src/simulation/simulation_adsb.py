@@ -93,8 +93,18 @@ class SimulationADSB(QThread):
                 self.__minimal_relative_distance = relative_position.length()
             print("Minimal relative distance: " + "{:.2f}".format(self.__minimal_relative_distance) + "m")
             
+            fcc : AircraftFCC | None = None
             for aircraft in self.aircraft_vehicles:
-                fcc : AircraftFCC = self.aircraft_fccs[aircraft.aircraft_id]
+                try:
+                    fcc = self.aircraft_fccs[aircraft.aircraft_id]
+                except IndexError:
+                    logging.error("Aircraft flight control computer %d not found", aircraft.aircraft_id)
+                    print(f"Aircraft flight control computer {aircraft.aircraft_id} not found")
+                    if len(self.aircraft_fccs) == 2:
+                        if aircraft.aircraft_id % 2 == 0:
+                            fcc = self.aircraft_fccs[0]
+                        else:
+                            fcc = self.aircraft_fccs[1]
 
                 # path
                 fcc.append_visited()
