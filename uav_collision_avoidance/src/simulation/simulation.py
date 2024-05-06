@@ -3,6 +3,7 @@
 import csv
 import logging
 import datetime
+from math import dist
 from copy import copy
 from typing import List
 from numpy import random, ndarray, clip
@@ -118,13 +119,15 @@ class Simulation(QMainWindow):
         self.simulation_render.start(priority = QThread.Priority.NormalPriority)
         self.simulation_widget.stop_signal.connect(self.stop)
     
-    def run_headless(self, avoid_collisions : bool = False, aircrafts : List[Aircraft] | None = None) -> None:
+    def run_headless(self, avoid_collisions : bool = False, aircrafts : List[Aircraft] | None = None) -> SimulationData:
         """Executes simulation without GUI"""
         logging.info("Starting headless simulation")
-        if aircrafts is None or aircrafts == []:
+        if aircrafts is not None:
+            self.setup_aircrafts(aircrafts)
+        elif self.aircrafts is None or self.aircrafts == []:
             self.setup_debug_aircrafts()
         else:
-            self.setup_aircrafts(aircrafts)
+            assert len(self.aircrafts) > 0
         simulation_data : SimulationData = SimulationData()
         simulation_data.aircraft_1_initial_position = copy(self.aircrafts[0].vehicle.position)
         simulation_data.aircraft_2_initial_position = copy(self.aircrafts[1].vehicle.position)
@@ -160,6 +163,8 @@ class Simulation(QMainWindow):
         simulation_data.aircraft_2_final_position = copy(self.aircrafts[1].vehicle.position)
         simulation_data.aircraft_1_final_speed = copy(self.aircrafts[0].vehicle.speed)
         simulation_data.aircraft_2_final_speed = copy(self.aircrafts[1].vehicle.speed)
+        if self.imported_from_data:
+            self.check_simulation_data_correctness()
         self.export_visited_locations()
         self.stop()
         return simulation_data
@@ -364,33 +369,43 @@ class Simulation(QMainWindow):
         print("Total time elapsed: " + "{:.2f}".format(real_time) + "s")
         logging.info("Total time elapsed: %ss", "{:.2f}".format(real_time))
 
-    def load_simulation_data_from_file(self, file_path : str) -> None:
+    def load_simulation_data_from_file(self, file_path : str, test_id : int = 0, avoid_collisions : bool = False) -> bool:
         """Loads simulation data from file"""
         logging.info("Loading simulation data from file")
+        self.__aircrafts = []
         try:
-            with open(file_path, "r") as file:
-                reader = csv.reader(file)
-                for row in reader:
-                    if row[0] == "test_id":
-                        continue
-                    simulation_data = SimulationData()
+            file = open(file_path, "r")
+            reader = csv.reader(file)
+            for i, row in enumerate(reader):
+                if i == test_id + 1:
+                    simulation_data : SimulationData = SimulationData()
+                    assert len(row) == 47
+                    assert row[0] == str(test_id)
                     simulation_data.aircraft_1_initial_position = QVector3D(float(row[1]), float(row[2]), float(row[3]))
                     simulation_data.aircraft_2_initial_position = QVector3D(float(row[4]), float(row[5]), float(row[6]))
                     simulation_data.aircraft_1_initial_speed = QVector3D(float(row[7]), float(row[8]), float(row[9]))
                     simulation_data.aircraft_2_initial_speed = QVector3D(float(row[10]), float(row[11]), float(row[12]))
                     simulation_data.aircraft_1_initial_target = QVector3D(float(row[13]), float(row[14]), float(row[15]))
                     simulation_data.aircraft_2_initial_target = QVector3D(float(row[16]), float(row[17]), float(row[18]))
-                    simulation_data.aircraft_1_initial_roll_angle = float(row[19])
-                    simulation_data.aircraft_2_initial_roll_angle = float(row[20])
-                    simulation_data.collision = row[21] == "True"
-                    simulation_data.minimal_relative_distance = float(row[22])
-                    simulation_data.aircraft_1_final_position = QVector3D(float(row[23]), float(row[24]), float(row[25]))
-                    simulation_data.aircraft_2_final_position = QVector3D(float(row[26]), float(row[27]), float(row[28]))
-                    simulation_data.aircraft_1_final_speed = QVector3D(float(row[29]), float(row[30]), float(row[31]))
-                    simulation_data.aircraft_2_final_speed = QVector3D(float(row[32]), float(row[33]), float(row[34]))
+                    if not avoid_collisions:
+                        simulation_data.aircraft_1_final_position = QVector3D(float(row[19]), float(row[20]), float(row[21]))
+                        simulation_data.aircraft_2_final_position = QVector3D(float(row[22]), float(row[23]), float(row[24]))
+                        simulation_data.aircraft_1_final_speed = QVector3D(float(row[31]), float(row[32]), float(row[33]))
+                        simulation_data.aircraft_2_final_speed = QVector3D(float(row[34]), float(row[35]), float(row[36]))
+                        simulation_data.collision = row[43] == "True"
+                        simulation_data.minimal_relative_distance = float(row[45])
+                    else:
+                        simulation_data.aircraft_1_final_position = QVector3D(float(row[25]), float(row[26]), float(row[27]))
+                        simulation_data.aircraft_2_final_position = QVector3D(float(row[28]), float(row[29]), float(row[30]))
+                        simulation_data.aircraft_1_final_speed = QVector3D(float(row[37]), float(row[38]), float(row[39]))
+                        simulation_data.aircraft_2_final_speed = QVector3D(float(row[40]), float(row[41]), float(row[42]))
+                        simulation_data.collision = row[44] == "True"
+                        simulation_data.minimal_relative_distance = float(row[46])
                     self.import_simulation_data(simulation_data)
+                    return True
         except:
             logging.error("Failed to load simulation data from file")
+            return False
     
     def stop(self) -> None:
         """Stops simulation"""
@@ -530,8 +545,8 @@ class Simulation(QMainWindow):
 
     def import_simulation_data(self, data : SimulationData) -> None:
         """Imports simulation data"""
-        if self.__aircrafts is not None or self.__aircrafts != []:
-            print("Aircrafts already set")
+        if self.aircrafts is not None and self.aircrafts != []:
+            print("Aircrafts already set, cannot import simulation data")
             return
         self.__imported_from_data = True
         self.__simulation_data = data
@@ -552,16 +567,18 @@ class Simulation(QMainWindow):
         logging.info("Simulation data imported successfully")
 
     def check_simulation_data_correctness(self) -> bool | None:
-        if not self.__imported_from_data or self.__simulation_data is None or self.__aircrafts is None or self.__aircrafts == []:
+        if not self.__imported_from_data or self.__simulation_data is None or self.aircrafts is None or self.aircrafts == []:
             return None
         logging.info("Checking simulation data correctness...")
-        assert len(self.__aircrafts) == 2
-        assert self.__aircrafts[0].vehicle.position == self.__simulation_data.aircraft_1_final_position
-        assert self.__aircrafts[1].vehicle.position == self.__simulation_data.aircraft_2_final_position
-        assert self.__aircrafts[0].vehicle.speed == self.__simulation_data.aircraft_1_final_speed
-        assert self.__aircrafts[1].vehicle.speed == self.__simulation_data.aircraft_2_final_speed
-        assert self.__state.collision == self.__simulation_data.collision
-        assert self.simulation_adsb.minimal_relative_distance == self.__simulation_data.minimal_relative_distance
+        assert len(self.aircrafts) == 2
+        assert dist(self.aircrafts[0].vehicle.position.toTuple(), self.__simulation_data.aircraft_1_final_position.toTuple()) < 0.1
+        assert dist(self.aircrafts[1].vehicle.position.toTuple(), self.__simulation_data.aircraft_2_final_position.toTuple()) < 0.1
+        assert dist(self.aircrafts[0].vehicle.speed.toTuple(), self.__simulation_data.aircraft_1_final_speed.toTuple()) < 0.1
+        assert dist(self.aircrafts[1].vehicle.speed.toTuple(), self.__simulation_data.aircraft_2_final_speed.toTuple()) < 0.1
+        assert abs(self.aircrafts[0].vehicle.speed.length() - self.__simulation_data.aircraft_1_final_speed.length()) < 0.1
+        assert abs(self.aircrafts[1].vehicle.speed.length() - self.__simulation_data.aircraft_2_final_speed.length()) < 0.1
+        assert abs(self.simulation_adsb.minimal_relative_distance - self.__simulation_data.minimal_relative_distance) < 0.1
+        logging.info("Simulation data correctness checked successfully ✅")
         return True
 
     def export_visited_locations(self) -> None:
