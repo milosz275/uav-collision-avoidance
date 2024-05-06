@@ -10,13 +10,11 @@ from .aircraft_fcc import AircraftFCC
 
 class Aircraft(QObject):
     """Main aircraft class"""
-    
-    __current_id : int = 0
 
-    def __init__(self, position : QVector3D, speed : QVector3D, initial_target : QVector3D | None = None, initial_roll_angle : float = 0.0) -> None:
+    def __init__(self, aircraft_id : int, position : QVector3D, speed : QVector3D, initial_target : QVector3D | None = None, initial_roll_angle : float = 0.0) -> None:
         super().__init__()
         self.__mutex : QMutex = QMutex()
-        self.__aircraft_id = self.__obtain_id()
+        self.__aircraft_id = aircraft_id
         self.__vehicle = AircraftVehicle(self.__aircraft_id, position=position, speed=speed, initial_roll_angle=initial_roll_angle)
         self.__fcc = AircraftFCC(self.__aircraft_id, initial_target, self.__vehicle)
         self.__initial_position = copy(position)
@@ -53,21 +51,8 @@ class Aircraft(QObject):
         with QMutexLocker(self.__mutex):
             return self.__initial_roll_angle
 
-    def __obtain_id(self) -> int:
-        """Gets unique id for the aircraft"""
-        with QMutexLocker(self.__mutex):
-            aircraft_id = Aircraft.__current_id
-            Aircraft.__current_id += 1
-            return aircraft_id
-    
-    def __reset_current_id(self) -> None:
-        """Resets current id"""
-        with QMutexLocker(self.__mutex):
-            Aircraft.__current_id = 0
-
     def reset(self) -> None:
         """Resets aircraft to initial state"""
-        self.__reset_current_id()
         self.__vehicle.speed = copy(self.initial_speed)
         self.__vehicle.position = copy(self.initial_position)
         self.__vehicle.roll_angle = copy(self.initial_roll_angle)
