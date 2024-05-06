@@ -77,6 +77,8 @@ def main(arg = None):
             sim = Simulation(headless = True)
             assert sim.load_simulation_data_from_file(file_path = file_path, test_id = 0, avoid_collisions = False)
             sim.run_headless(avoid_collisions = False)
+            assert sim.load_simulation_data_from_file(file_path = file_path, test_id = 0, avoid_collisions = True)
+            sim.run_headless(avoid_collisions = True)
             QApplication.shutdown(app)
             sys.exit(0)
         elif args[0] == "version":
