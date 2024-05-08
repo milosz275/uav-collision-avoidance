@@ -372,7 +372,14 @@ class Simulation(QMainWindow):
         except:
             logging.error("Failed to create data directory")
             return
-        file = open(f"data/simulation-{export_time}.csv", "w")
+        file = None
+        filename_iterator : int = 1
+        if Path(f"data/simulation-{export_time}.csv").exists():
+            while Path(f"data/simulation-{export_time}-{filename_iterator}.csv").exists():
+                filename_iterator += 1
+            file = open(f"data/simulation-{export_time}-{filename_iterator}.csv", "w")
+        else:
+            file = open(f"data/simulation-{export_time}.csv", "w")
         writer = csv.writer(file)
         writer.writerow([
             "test_id",
