@@ -1,9 +1,10 @@
 """Main module for UAV Collision Avoidance application"""
 
+import signal
 import logging
 import platform
 import datetime
-import signal
+import multiprocessing
 from pathlib import Path
 from screeninfo import get_monitors
 
@@ -24,7 +25,7 @@ except:
         format="%(asctime)s - %(levelname)s - %(filename)s - %(message)s",
         handlers=[logging.StreamHandler()])
     
-def signal_handler(sig, frame):
+def signal_handler(sig, frame) -> None:
     logging.warning("Ctrl+C keyboard interrupt. Exiting...")
     try:
         signal.default_int_handler(sig, frame)
@@ -40,7 +41,14 @@ if platform.system() == "Windows":
         f"io.github.mldxo.uav-collision-avoidance.{version}")
 logging.info("Detected platform: %s", platform.system())
 
-def main(arg = None):
+def run_simulation_tests(test_number : int) -> None:
+    sim : Simulation = Simulation(headless = True, tests = True)
+    if test_number > 0:
+        sim.run_tests(test_number)
+    else:
+        sim.run()
+
+def main(arg = None) -> None:
     """Executes main function"""
     import sys
     args = sys.argv[1:]
@@ -85,9 +93,17 @@ def main(arg = None):
             QApplication.shutdown(app)
             sys.exit(0)
         elif args[0] == "ongoing":
-            while True:
-                sim = Simulation(headless = True, tests = True)
-                sim.run()
+            processes = []
+            concurrent_tests = multiprocessing.cpu_count()
+            logging.info("Running %d concurrent tests", concurrent_tests)
+            logging.warning("Disabling logging because due to log storm")
+            logging.disable()
+            for i in range(concurrent_tests):
+                process = multiprocessing.Process(target=run_simulation_tests, args=(i,))
+                process.start()
+                processes.append(process)
+            for process in processes:
+                process.join()
         elif args[0] == "help" and len(args) > 1:
             if args[1] == "realtime":
                 print("Usage: uav_collision_avoidance realtime")
