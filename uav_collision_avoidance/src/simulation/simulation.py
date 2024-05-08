@@ -506,12 +506,19 @@ class Simulation(QMainWindow):
 
     def load_latest_simulation_data_file(self) -> bool:
         """Loads latest simulation data from file"""
-        logging.info("Loading latest simulation data from file")
+        logging.info("Loading latest simulation data")
         found_good_file : bool = False
-        latest_file_path : str = max(Path("data").iterdir(), key = lambda p: p.stat().st_ctime)
-        list_of_paths = list(Path("data").iterdir())
-        list_of_paths.sort(key = lambda x: x.stat().st_ctime, reverse = False)
-        list_length = len(list_of_paths)
+        latest_file_path : str | None = None
+        list_of_paths : List[Path] | None = None
+        list_length : int | None = None
+        try:
+            latest_file_path = max(Path("data").iterdir(), key = lambda p: p.stat().st_ctime)
+            list_of_paths = list(Path("data").iterdir())
+            list_of_paths.sort(key = lambda x: x.stat().st_ctime, reverse = False)
+            list_length = len(list_of_paths)
+        except:
+            logging.error("Failed to load latest simulation data")
+            return False
         iterator : int = 1
         while not found_good_file:
             try:
