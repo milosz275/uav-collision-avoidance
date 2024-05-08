@@ -368,10 +368,13 @@ class SimulationWidget(QWidget):
             self.draw_circle(collision_location, 2.5 / scale, scale, QColor(255, 0, 0))
         relative_distance = dist(self.__aircraft_vehicles[0].position.toTuple(), self.__aircraft_vehicles[1].position.toTuple())
         if relative_distance < self.__simulation_state.minimum_separation:
+            if not self.simulation_state.avoid_collisions:
+                self.draw_text(QVector3D(10, self.__window_height - 10, 0), 0, "Press T to avoid collisions", QColor(255, 0, 0))
+
+            separation_height : float = 10
             if detected_conflict:
-                self.draw_text(QVector3D(self.__window_width - 260, 30, 0), 0, f"MINIMUM SEPARATION EXCEEDED BY {int(self.__simulation_state.minimum_separation - relative_distance)}", QColor(255, 0, 0))
-            else:
-                self.draw_text(QVector3D(self.__window_width - 260, 10, 0), 0, f"MINIMUM SEPARATION EXCEEDED BY {int(self.__simulation_state.minimum_separation - relative_distance)}", QColor(255, 0, 0))
+                separation_height = 30
+            self.draw_text(QVector3D(self.__window_width - 260, separation_height, 0), 0, f"MINIMUM SEPARATION EXCEEDED BY {int(self.__simulation_state.minimum_separation - relative_distance)}", QColor(255, 0, 0))
     
     def draw_grid(self, x_offset : float, y_offset : float, scale : float) -> None:
         """Draws grid on the screen"""

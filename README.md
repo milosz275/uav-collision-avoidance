@@ -41,8 +41,10 @@ Application is built based on two main object types, simulation and aircraft. Si
 There are three possible arguments at the moment:
 - default (no arguments) - runs GUI simulation
 - headless - runs physical simulation with ADS-B and collision avoidance algorithm
-- tests - runs full tests comparing effectiveness of collision avoidance algorithm
-- load [filename] - loads simulation from file when specified, otherwise loads default example test case from data directory
+- tests [test_number] - runs full tests comparing effectiveness of collision avoidance algorithm, test number defaults to 10
+- ongoing - runs default test number in parallel comparing effectiveness of collision avoidance algorithm continuously till Ctrl+C
+- load [file_name] - loads simulation from file when specified, otherwise loads default example test case from data directory
+- help [argument] - prints help message for the app argument
 - version - prints version of the app
 
 ### Key shortcuts
@@ -105,11 +107,19 @@ uav-collision-avoidance headless
 ```
 
 ```bash
-uav-collision-avoidance tests
+uav-collision-avoidance tests [test_number]
 ```
 
 ```bash
-uav-collision-avoidance load [filename]
+uav-collision-avoidance ongoing
+```
+
+```bash
+uav-collision-avoidance load [file_name]
+```
+
+```bash
+uav-collision-avoidance help
 ```
 
 ```bash
@@ -155,8 +165,8 @@ One coding convention is not preserved in the scope of the project. Qt's methods
 - [x] Head-on collision avoidance
 - [x] Symmetrical bank (roll) during turn, no angle approaximation
 - [x] Altitude change with symmetrical command
-- [ ] Generating test cases and batch loading
-- [ ] Test cases comparison
+- [x] Generating test cases and batch loading
+- [x] Test cases comparison
 - [x] Aircraft 0 manual control override
 - [ ] Flight control computer angle optimization
 - [ ] Centered view optimization

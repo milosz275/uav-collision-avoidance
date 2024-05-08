@@ -141,7 +141,7 @@ class SimulationADSB(QThread):
                     QVector3D.crossProduct(relative_position, speed_difference_unit))
                 print("Miss distance at closest approach: " + "{:.2f}".format(miss_distance_vector.length()) + "m (" + "{:.2f}".format(self.aircraft_vehicles[0].size / 2 + self.aircraft_vehicles[1].size / 2) + "m is collision distance)")
 
-                if miss_distance_vector.length() == 0:
+                if miss_distance_vector.length() == 0 and self.simulation_state.avoid_collisions:
                     print("Head-on collision detected")
                     logging.info("Head-on collision detected")
 
@@ -232,3 +232,8 @@ class SimulationADSB(QThread):
             "; horizontal speed: " + "{:.2f}".format(horizontal_speed) +
             "; vertical speed: " + "{:.2f}".format(vertical_speed) +
             "; geometrical speed: " + "{:.2f}".format(geometrical_speed))
+
+    def reset_destinations(self) -> None:
+        """Resets destination for all aircrafts"""
+        for aircraft in self.aircraft_fccs:
+            aircraft.load_initial_destination()

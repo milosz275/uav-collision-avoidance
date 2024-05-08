@@ -187,24 +187,24 @@ class AircraftFCC(QObject):
         if len(self.destinations) > 0 and first:
             if dist(destination.toTuple(), self.destinations[0].toTuple()) < 1.0:
                 print("Attempted to stack same destination")
-                logging.warning(f"Attempted to stack same destination: {destination}")
+                logging.warning("Attempted to stack the same destination: (%s, %s, %s)", destination.x(), destination.y(), destination.z())
                 return None
         elif len(self.destinations) > 0 and not first:
             if dist(destination.toTuple(), self.destinations[len(self.destinations) - 1].toTuple()) < 1.0:
                 print("Attempted to stack same destination")
-                logging.warning(f"Attempted to stack same destination: {destination}")
+                logging.warning("Attempted to stack the same destination: (%s, %s, %s)", destination.x(), destination.y(), destination.z())
                 return None
         if destination.z() < 500:
             if destination.z() < 0:
                 print("Attempted to set destination below ground")
-                logging.warning(f"Attempted to set destination below ground: {destination}")
+                logging.warning("Attempted to set destination below ground: (%s, %s, %s)", destination.x(), destination.y(), destination.z())
             else:
                 print("Attempted to set destination too low")
-                logging.warning(f"Attempted to set destination too low: {destination}")
+                logging.warning("Attempted to set destination too low: (%s, %s, %s)", destination.x(), destination.y(), destination.z())
             destination = QVector3D(destination.x(), destination.y(), 500)
         elif destination.z() > 10000:
             print("Attempted to set destination too high")
-            logging.warning(f"Attempted to set destination too high: {destination}")
+            logging.warning("Attempted to set destination too high: (%s, %s, %s)", destination.x(), destination.y(), destination.z())
             destination = QVector3D(destination.x(), destination.y(), 10000)
         return destination
 
@@ -432,8 +432,6 @@ class AircraftFCC(QObject):
         self.destinations.clear()
         self.destinations_history.clear()
         self.visited.clear()
-        if self.initial_target is not None:
-            self.add_first_destination(self.initial_target)
         self.__target_yaw_angle = 0.0
         self.__target_roll_angle = 0.0
         self.__target_pitch_angle = 0.0
@@ -444,6 +442,11 @@ class AircraftFCC(QObject):
         self.__ignore_destinations = False
         self.__is_turning_right = False
         self.__is_turning_left = False
+
+    def load_initial_destination(self) -> None:
+        """Loads initial destination"""
+        if self.initial_target is not None:
+            self.add_first_destination(self.initial_target)
 
     def __str__(self) -> str:
         return f"AircraftFCC: {self.aircraft_id}"

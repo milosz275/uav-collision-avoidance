@@ -3,11 +3,11 @@
 import csv
 import logging
 import datetime
-from math import dist
 from copy import copy
 from typing import List
-from numpy import random, ndarray, clip
 from pathlib import Path
+from numpy import random, ndarray
+from math import dist, sin, cos, radians
 
 from PySide6.QtCore import QThread, QTime
 from PySide6.QtGui import QCloseEvent, QVector3D
@@ -27,7 +27,7 @@ from ..simulation.simulation_data import SimulationData
 class Simulation(QMainWindow):
     """Main simulation App"""
 
-    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 10_000_000) -> None: # 10_000_000 ms = 10_000 s = 2h 46m 40s
+    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 100_000_000) -> None: # 100_000_000 ms = 100_000 s = 27.78 h
         super().__init__()
         SimulationSettings().__init__()
         self.__headless : bool = headless
@@ -101,8 +101,10 @@ class Simulation(QMainWindow):
         else:
             self.run_gui()
 
-    def run_gui(self, avoid_collisions : bool = False) -> None:
+    def run_gui(self, avoid_collisions : bool = False, load_lastest_data_file : bool = True) -> None:
         """Executes realtime simulation"""
+        if load_lastest_data_file:
+            self.load_latest_simulation_data_file()
         if self.aircrafts is None or self.aircrafts == []:
             self.setup_debug_aircrafts()
         logging.info("Starting realtime simulation")
@@ -142,6 +144,7 @@ class Simulation(QMainWindow):
         self.state = SimulationState(SimulationSettings(), is_realtime = False, avoid_collisions = avoid_collisions)
         self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
         self.simulation_adsb = SimulationADSB(self, self.aircrafts, self.state)
+        self.simulation_adsb.reset_destinations()
         time_step : int = int(self.state.simulation_threshold)
         adsb_step : int = int(self.state.adsb_threshold)
         partial_time_counter : int = adsb_step
@@ -173,19 +176,149 @@ class Simulation(QMainWindow):
         """Generates test cases"""
         logging.info("Generating test cases")
         list_of_lists : List[List[Aircraft]] = []
+        test_average_aircraft_size : int = 20
+
+        # head-on testing
+        list_of_lists.append([ # chase test
+            Aircraft(
+                aircraft_id = 0,
+                position = QVector3D(0, -20000, 1000),
+                speed = QVector3D(0, 100, 0),
+                initial_target = QVector3D(0, 0, 1000)),
+            Aircraft(
+                aircraft_id = 1,
+                position = QVector3D(0, -10000, 1000),
+                speed = QVector3D(0, 50, 0),
+                initial_target = QVector3D(0, 0, 1000))
+        ])
+        list_of_lists.append([ # full angle collision, equal speeds
+            Aircraft(
+                aircraft_id = 0,
+                position = QVector3D(0, -5000, 1000),
+                speed = QVector3D(0, 50, 0),
+                initial_target = QVector3D(0, 0, 1000)),
+            Aircraft(
+                aircraft_id = 1,
+                position = QVector3D(0, 5000, 1000),
+                speed = QVector3D(0, -50, 0),
+                initial_target = QVector3D(0, 0, 1000))
+        ])
+        list_of_lists.append([ # full angle collision
+            Aircraft(
+                aircraft_id = 0,
+                position = QVector3D(0, -5000, 1000),
+                speed = QVector3D(0, 50, 0),
+                initial_target = QVector3D(0, 0, 1000)),
+            Aircraft(
+                aircraft_id = 1,
+                position = QVector3D(0, 10000, 1000),
+                speed = QVector3D(0, -100, 0),
+                initial_target = QVector3D(0, 0, 1000))
+        ])
+
+        # collision testing
+        list_of_lists.append([ # chase test
+            Aircraft(
+                aircraft_id = 0,
+                position = QVector3D(0, -20000, 1000),
+                speed = QVector3D(0, 100, 0),
+                initial_target = QVector3D(test_average_aircraft_size / 4.0, test_average_aircraft_size / 4.0, 1000)),
+            Aircraft(
+                aircraft_id = 1,
+                position = QVector3D(0, -10000, 1000),
+                speed = QVector3D(0, 50, 0),
+                initial_target = QVector3D(-test_average_aircraft_size / 4.0, -test_average_aircraft_size / 4.0, 1000))
+        ])
+        list_of_lists.append([ # full angle collision, equal speeds
+            Aircraft(
+                aircraft_id = 0,
+                position = QVector3D(0, -5000, 1000),
+                speed = QVector3D(0, 50, 0),
+                initial_target = QVector3D(test_average_aircraft_size / 4.0, test_average_aircraft_size / 4.0, 1000)),
+            Aircraft(
+                aircraft_id = 1,
+                position = QVector3D(0, 5000, 1000),
+                speed = QVector3D(0, -50, 0),
+                initial_target = QVector3D(-test_average_aircraft_size / 4.0, -test_average_aircraft_size / 4.0, 1000))
+        ])
+        list_of_lists.append([ # full angle collision
+            Aircraft(
+                aircraft_id = 0,
+                position = QVector3D(0, -5000, 1000),
+                speed = QVector3D(0, 50, 0),
+                initial_target = QVector3D(test_average_aircraft_size / 4.0, test_average_aircraft_size / 4.0, 1000)),
+            Aircraft(
+                aircraft_id = 1,
+                position = QVector3D(0, 10000, 1000),
+                speed = QVector3D(0, -100, 0),
+                initial_target = QVector3D(-test_average_aircraft_size / 4.0, -test_average_aircraft_size / 4.0, 1000))
+        ])
+
         test_minimal_altitude : int = 1000
         test_maximal_altitude : int = 7000
         test_minimal_speed : int = 30
         test_maximal_speed : int = 100
-        test_minimal_target_pitch_angle : int = -30
-        test_maximal_target_pitch_angle : int = 30
-        test_average_aircraft_size : int = 20
-        test_start_relative_distance : int = 10_000
+        test_start_aircrafts_relative_distance : int = 10_000 # distance between aircrafts headed to test collision target
+        test_minimal_course_difference : float = 1.0
+        test_maximal_course_difference : float = 179.0
+        # test_minimal_target_pitch_angle : int = -30
+        # test_maximal_target_pitch_angle : int = 30
+        test_minimal_trigonometric_value : float = 0.00001
+        test_course_difference_count : int = 50
+        test_random_collision_course_differences : List[float] = random.uniform(test_minimal_course_difference, test_maximal_course_difference, test_course_difference_count).tolist()
+        test_random_collision_course_differences.sort(reverse = False)
 
-        # todo: generate random parameters for test cases
+        # equal speeds and heights
+        for angle in test_random_collision_course_differences:
+            aircraft_height : float = random.uniform(test_minimal_altitude, test_maximal_altitude)
+            test_collision_target : QVector3D = QVector3D(0, 0, aircraft_height)
+            aircraft_absolute_speed : float = random.uniform(test_minimal_speed, test_maximal_speed)
+            sin_value : float = sin(radians(angle))
+            cos_value : float = cos(radians(angle))
+            if abs(sin_value) < test_minimal_trigonometric_value:
+                continue
+            if abs(cos_value) < test_minimal_trigonometric_value:
+                continue
+            distance_to_collision : float = test_start_aircrafts_relative_distance / sin_value
+
+            aircraft_1_position : QVector3D = QVector3D(0, -distance_to_collision, aircraft_height)
+            aircraft_1_speed : QVector3D = QVector3D(0, aircraft_absolute_speed, 0)
+            assert abs(aircraft_1_position.distanceToPoint(test_collision_target) - distance_to_collision) < 0.1
+            assert abs(aircraft_1_speed.length() - aircraft_absolute_speed) < 0.1
+            
+            # rotate angle to get circle equation
+            sin_value = sin(radians(90 - angle))
+            cos_value = cos(radians(90 - angle))
+            aircraft_2_position : QVector3D = QVector3D(
+                distance_to_collision * cos_value,
+                -distance_to_collision * sin_value,
+                aircraft_1_position.z())
+            aircraft_2_speed : QVector3D = QVector3D(
+                -aircraft_absolute_speed * cos_value,
+                aircraft_absolute_speed * sin_value,
+                aircraft_1_speed.z())
+
+            assert abs(aircraft_2_position.distanceToPoint(test_collision_target) - distance_to_collision) < 0.05
+            assert abs(aircraft_2_speed.length() - aircraft_absolute_speed) < 0.001
+
+            aircrafts : List[Aircraft] = [
+                Aircraft(
+                    aircraft_id = 0,
+                    position = aircraft_1_position,
+                    speed = aircraft_1_speed,
+                    initial_target = test_collision_target),
+                Aircraft(
+                    aircraft_id = 1,
+                    position = aircraft_2_position,
+                    speed = aircraft_2_speed,
+                    initial_target = test_collision_target)
+            ]
+            list_of_lists.append(aircrafts)
+
+        # todo: generate more random parameters for test cases
 
         if len(list_of_lists) == 0:
-            for i in range (0, 10, 1):
+            for i in range (0, 30, 1):
                 list_of_aircrafts : List[Aircraft] = []
                 aircraft : Aircraft = Aircraft( # detection test
                     aircraft_id = 0,
@@ -205,26 +338,18 @@ class Simulation(QMainWindow):
     
     def run_tests(self, test_number : int = 10) -> None:
         """Runs simulation tests"""
-        if test_number < 10:
-            test_number = 10
+        if test_number < 3:
+            logging.info("Changing simulation tests to 3 test cases due to too low test number")
+            test_number = 3
         elif test_number > 100:
+            logging.info("Changing simulation tests to 100 test cases due to too high test number")
             test_number = 100
         logging.info("Running simulation tests")
         list_of_lists : List[List[Aircraft]] = self.generate_test_aircrafts()
         lists_count : int = len(list_of_lists)
-        print("Generated aircrafts pairs: ", lists_count)
-        for i in range(0, lists_count, 1):
-            print("Aircrafts pair ", i)
-            for aircraft in list_of_lists[i]:
-                print("Aircraft: ", aircraft.vehicle.position, aircraft.vehicle.speed, aircraft.fcc.destination)
-        if lists_count > test_number:
-            random_indices : ndarray = random.normal(0, 1, test_number)
-            random_indices = random_indices - min(random_indices)
-            random_indices = random_indices / max(random_indices)
-            random_indices = random_indices * lists_count
-            random_indices = random_indices.astype(int)
-            random_indices = clip(random_indices, 0, lists_count - 1)
 
+        if lists_count > test_number:
+            random_indices : ndarray = random.choice(lists_count, test_number, replace = False)
             random_indices : List[int] = random_indices.tolist()
             random_indices_set : set = set(random_indices)
             random_indices = []
@@ -235,6 +360,11 @@ class Simulation(QMainWindow):
             print("Selected indices: ", random_indices)
             print("Indices count: ", len(random_indices))
             list_of_lists = [list_of_lists[i] for i in random_indices]
+            lists_count = len(list_of_lists)
+
+        print("Generated and selected aircrafts pairs: ", lists_count)
+        test_number = lists_count
+
         start_timestamp = QTime.currentTime()
         export_time = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         try:
@@ -242,7 +372,14 @@ class Simulation(QMainWindow):
         except:
             logging.error("Failed to create data directory")
             return
-        file = open(f"data/simulation-{export_time}.csv", "w")
+        file = None
+        filename_iterator : int = 1
+        if Path(f"data/simulation-{export_time}.csv").exists():
+            while Path(f"data/simulation-{export_time}-{filename_iterator}.csv").exists():
+                filename_iterator += 1
+            file = open(f"data/simulation-{export_time}-{filename_iterator}.csv", "w")
+        else:
+            file = open(f"data/simulation-{export_time}.csv", "w")
         writer = csv.writer(file)
         writer.writerow([
             "test_id",
@@ -299,18 +436,16 @@ class Simulation(QMainWindow):
         for i in range(0, test_number, 1):
             logging.info("Test %d - no collision avoidance", i)
             aircrafts : List[Aircraft] = list_of_lists[i]
-            print("Aircrafts count: ", len(aircrafts))
+            print("Current test pair aircrafts count: ", len(aircrafts))
             simulation_data_no_avoidance : SimulationData = self.run_headless(
                 avoid_collisions = False,
                 aircrafts = aircrafts)
-            # simulation_data_no_avoidance : SimulationData = self.run_headless(avoid_collisions = False)
             self.state = None
 
             logging.info("Test %d - collision avoidance", i)
             simulation_data_avoidance : SimulationData = self.run_headless(
                 avoid_collisions = True,
                 aircrafts = aircrafts)
-            # simulation_data_avoidance : SimulationData = self.run_headless(avoid_collisions = True)
             self.state = None
 
             writer.writerow([
@@ -369,9 +504,37 @@ class Simulation(QMainWindow):
         print("Total time elapsed: " + "{:.2f}".format(real_time) + "s")
         logging.info("Total time elapsed: %ss", "{:.2f}".format(real_time))
 
+    def load_latest_simulation_data_file(self) -> bool:
+        """Loads latest simulation data from file"""
+        logging.info("Loading latest simulation data from file")
+        found_good_file : bool = False
+        latest_file_path : str = max(Path("data").iterdir(), key = lambda p: p.stat().st_ctime)
+        list_of_paths = list(Path("data").iterdir())
+        list_of_paths.sort(key = lambda x: x.stat().st_ctime, reverse = False)
+        list_length = len(list_of_paths)
+        iterator : int = 1
+        while not found_good_file:
+            try:
+                file = open(latest_file_path, "r")
+                reader = csv.reader(file)
+                lines_count : int = 0
+                for line in reader:
+                    lines_count += 1
+                if lines_count > 1:
+                    found_good_file = True
+                    break
+            except:
+                pass
+            latest_file_path = list_of_paths[list_length - 1 - iterator]
+            iterator += 1
+        if found_good_file:
+            return self.load_simulation_data_from_file(latest_file_path)
+        else:
+            return False
+
     def load_simulation_data_from_file(self, file_path : str, test_id : int = 0, avoid_collisions : bool = False) -> bool:
         """Loads simulation data from file"""
-        logging.info("Loading simulation data from file")
+        logging.info("Loading simulation data from file %s", file_path)
         self.__aircrafts = []
         try:
             file = open(file_path, "r")
@@ -538,6 +701,45 @@ class Simulation(QMainWindow):
                     position = QVector3D(0, -100_000, 1000),
                     speed = QVector3D(300, 290, 0),
                     initial_target = QVector3D(75000, -27500, 1000)), # 75 km, -27.5 km
+            ]
+        elif test_case == 5:
+            aircrafts : List[Aircraft] = [
+                Aircraft( # chase test
+                    aircraft_id = 0,
+                    position = QVector3D(0, -1000, 1000),
+                    speed = QVector3D(0, 50, 0),
+                    initial_target = QVector3D(0, 0, 1000)), # 0 km, 0 km
+                Aircraft(
+                    aircraft_id = 1,
+                    position = QVector3D(0, -2000, 1000),
+                    speed = QVector3D(0, 100, 0),
+                    initial_target = QVector3D(0, 0, 1000)), # 0 km, 0 km
+            ]
+        elif test_case == 6:
+            aircrafts : List[Aircraft] = [
+                Aircraft( # full angle collision
+                    aircraft_id = 0,
+                    position = QVector3D(0, -1000, 1000),
+                    speed = QVector3D(0, 50, 0),
+                    initial_target = QVector3D(0, 0, 1000)), # 0 km, 0 km
+                Aircraft(
+                    aircraft_id = 1,
+                    position = QVector3D(0, 1000, 1000),
+                    speed = QVector3D(0, -50, 0),
+                    initial_target = QVector3D(0, 0, 1000)), # 0 km, 0 km
+            ]
+        elif test_case == 7:
+            aircrafts : List[Aircraft] = [
+                Aircraft(
+                    aircraft_id = 0,
+                    position = QVector3D(0, -5000, 1000),
+                    speed = QVector3D(0, 50, 0),
+                    initial_target = QVector3D(0, 0, 1000)),
+                Aircraft(
+                    aircraft_id = 1,
+                    position = QVector3D(0, 5000, 1000),
+                    speed = QVector3D(0, -50, 0),
+                    initial_target = QVector3D(0, 0, 1000))
             ]
         else:
             aircrafts : List[Aircraft] = []
