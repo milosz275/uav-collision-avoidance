@@ -131,7 +131,7 @@ class SimulationADSB(QThread):
                         fcc.safe_zone_occupied = False
                         self.simulation_state.avoid_collisions = False
                     print("Safe zone free")
-                    return
+                    continue
 
             if time_to_closest_approach > 0:
                 # miss distance at closest approach
@@ -149,9 +149,10 @@ class SimulationADSB(QThread):
                 unresolved_region : float = self.simulation_state.minimum_separation - abs(miss_distance_vector.length())
                 if unresolved_region > 0.0:
                     print("Conflict condition detected")
-                    if self.simulation_state.avoid_collisions:
+                    if self.simulation_state.avoid_collisions and relative_position.length() < self.simulation_state.minimum_separation:
                         for aircraft in self.aircraft_fccs:
                             if not aircraft.evade_maneuver:
+                                logging.info("Conflict condition resolution with relative distance: " + "{:.2f}".format(relative_position.length()) + "m")
                                 aircraft.apply_evade_maneuver(
                                     opponent_speed = self.aircraft_vehicles[1 - aircraft.aircraft_id].speed,
                                     miss_distance_vector = miss_distance_vector,
