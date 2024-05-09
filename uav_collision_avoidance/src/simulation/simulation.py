@@ -6,8 +6,8 @@ import datetime
 from copy import copy
 from typing import List
 from pathlib import Path
-from numpy import random, ndarray
-from math import dist, sin, cos, radians
+from numpy import random, ndarray, mean
+from math import dist, sin, cos, radians, sqrt
 
 from PySide6.QtCore import QThread, QTime
 from PySide6.QtGui import QCloseEvent, QVector3D
@@ -178,6 +178,108 @@ class Simulation(QMainWindow):
         list_of_lists : List[List[Aircraft]] = []
         test_average_aircraft_size : int = 20
 
+        test_minimal_altitude : int = 1000
+        test_maximal_altitude : int = 7000
+        test_minimal_speed : int = 30
+        test_maximal_speed : int = 100
+        test_start_aircrafts_relative_distance : int = 10_000 # distance between aircrafts headed to test collision target
+        test_minimal_course_difference : float = 1.0
+        test_maximal_course_difference : float = 179.0
+        test_minimal_trigonometric_value : float = 0.00001
+        test_course_difference_count : int = 170
+        test_random_collision_course_differences : List[float] = random.uniform(test_minimal_course_difference, test_maximal_course_difference, test_course_difference_count).tolist()
+        test_random_collision_course_differences.sort(reverse = False)
+
+        # equal speeds, equal distances to cover, both climbing or both descending
+        for angle in test_random_collision_course_differences:
+            aircraft_init_height : float = random.uniform(test_minimal_altitude, test_maximal_altitude)
+            aircraft_target_height : float = random.uniform(test_minimal_altitude, test_maximal_altitude)
+            aircraft_collision_height : float = mean([aircraft_init_height, aircraft_target_height])
+            test_collision_target : QVector3D = QVector3D(0, 0, aircraft_collision_height)
+            test_collision_target_flat : QVector3D = QVector3D(0, 0, aircraft_init_height)
+            aircraft_absolute_speed : float = random.uniform(test_minimal_speed, test_maximal_speed)
+            sin_value : float = sin(radians(angle))
+            cos_value : float = cos(radians(angle))
+            if abs(sin_value) < test_minimal_trigonometric_value:
+                continue
+            if abs(cos_value) < test_minimal_trigonometric_value:
+                continue
+            distance_to_collision : float = test_start_aircrafts_relative_distance / sin_value # projected onto 2d plane
+
+            aircraft_1_position : QVector3D = QVector3D(
+                0,
+                -distance_to_collision,
+                aircraft_init_height)
+            aircraft_1_target : QVector3D = QVector3D(
+                0,
+                distance_to_collision,
+                aircraft_target_height)
+            aircraft_1_speed : QVector3D = QVector3D(
+                0,
+                aircraft_absolute_speed,
+                0)
+            assert abs(dist(aircraft_1_position.toTuple(), test_collision_target_flat.toTuple()) - distance_to_collision) < 0.1
+            assert abs(aircraft_1_speed.length() - aircraft_absolute_speed) < 0.1
+            
+            # rotate angle to get circle equation
+            sin_value = sin(radians(90 - angle))
+            cos_value = cos(radians(90 - angle))
+            aircraft_2_position : QVector3D = QVector3D(
+                distance_to_collision * cos_value,
+                -distance_to_collision * sin_value,
+                aircraft_1_position.z())
+            aircraft_2_target : QVector3D = QVector3D(
+                -distance_to_collision * cos_value,
+                distance_to_collision * sin_value,
+                aircraft_1_target.z())
+            aircraft_2_speed : QVector3D = QVector3D(
+                -aircraft_absolute_speed * cos_value,
+                aircraft_absolute_speed * sin_value,
+                aircraft_1_speed.z())
+
+            assert abs(dist(aircraft_2_position.toTuple(), test_collision_target_flat.toTuple()) - distance_to_collision) < 0.1
+            assert abs(aircraft_2_speed.length() - aircraft_absolute_speed) < 0.1
+
+            aircrafts : List[Aircraft] = [
+                Aircraft(
+                    aircraft_id = 0,
+                    position = aircraft_1_position,
+                    speed = aircraft_1_speed,
+                    initial_target = aircraft_1_target),
+                Aircraft(
+                    aircraft_id = 1,
+                    position = aircraft_2_position,
+                    speed = aircraft_2_speed,
+                    initial_target = aircraft_2_target)
+            ]
+            list_of_lists.append(aircrafts)
+
+        # todo: generate more random parameters for test cases
+
+        if len(list_of_lists) == 0:
+            for i in range (0, 30, 1):
+                list_of_aircrafts : List[Aircraft] = []
+                aircraft : Aircraft = Aircraft( # detection test
+                    aircraft_id = 0,
+                    position = QVector3D(-800, 4000, 1000),
+                    speed = QVector3D(60, -60, 0),
+                    initial_target = QVector3D(51_900, -50_000, 10000)) # 51.9 km, -50 km
+                list_of_aircrafts.append(aircraft)
+                aircraft = Aircraft(
+                    aircraft_id = 1,
+                    position = QVector3D(4000, 6000, 1000),
+                    speed = QVector3D(0, -85, 0),
+                    initial_target = QVector3D(900, -1_001_300, 1000)) # 0.9 km, -1001.3 km
+                list_of_aircrafts.append(aircraft)
+                list_of_lists.append(list_of_aircrafts)
+
+        return list_of_lists
+    
+    def generate_consistent_list_of_aircraft_lists(self) -> List[List[Aircraft]]:
+        """Returns predefined list of aircraft lists"""
+        list_of_lists : List[List[Aircraft]] = []
+        test_average_aircraft_size : float = 20.0
+
         # head-on testing
         list_of_lists.append([ # chase test
             Aircraft(
@@ -253,90 +355,9 @@ class Simulation(QMainWindow):
                 speed = QVector3D(0, -100, 0),
                 initial_target = QVector3D(-test_average_aircraft_size / 4.0, -test_average_aircraft_size / 4.0, 1000))
         ])
-
-        test_minimal_altitude : int = 1000
-        test_maximal_altitude : int = 7000
-        test_minimal_speed : int = 30
-        test_maximal_speed : int = 100
-        test_start_aircrafts_relative_distance : int = 10_000 # distance between aircrafts headed to test collision target
-        test_minimal_course_difference : float = 1.0
-        test_maximal_course_difference : float = 179.0
-        # test_minimal_target_pitch_angle : int = -30
-        # test_maximal_target_pitch_angle : int = 30
-        test_minimal_trigonometric_value : float = 0.00001
-        test_course_difference_count : int = 50
-        test_random_collision_course_differences : List[float] = random.uniform(test_minimal_course_difference, test_maximal_course_difference, test_course_difference_count).tolist()
-        test_random_collision_course_differences.sort(reverse = False)
-
-        # equal speeds and heights
-        for angle in test_random_collision_course_differences:
-            aircraft_height : float = random.uniform(test_minimal_altitude, test_maximal_altitude)
-            test_collision_target : QVector3D = QVector3D(0, 0, aircraft_height)
-            aircraft_absolute_speed : float = random.uniform(test_minimal_speed, test_maximal_speed)
-            sin_value : float = sin(radians(angle))
-            cos_value : float = cos(radians(angle))
-            if abs(sin_value) < test_minimal_trigonometric_value:
-                continue
-            if abs(cos_value) < test_minimal_trigonometric_value:
-                continue
-            distance_to_collision : float = test_start_aircrafts_relative_distance / sin_value
-
-            aircraft_1_position : QVector3D = QVector3D(0, -distance_to_collision, aircraft_height)
-            aircraft_1_speed : QVector3D = QVector3D(0, aircraft_absolute_speed, 0)
-            assert abs(aircraft_1_position.distanceToPoint(test_collision_target) - distance_to_collision) < 0.1
-            assert abs(aircraft_1_speed.length() - aircraft_absolute_speed) < 0.1
-            
-            # rotate angle to get circle equation
-            sin_value = sin(radians(90 - angle))
-            cos_value = cos(radians(90 - angle))
-            aircraft_2_position : QVector3D = QVector3D(
-                distance_to_collision * cos_value,
-                -distance_to_collision * sin_value,
-                aircraft_1_position.z())
-            aircraft_2_speed : QVector3D = QVector3D(
-                -aircraft_absolute_speed * cos_value,
-                aircraft_absolute_speed * sin_value,
-                aircraft_1_speed.z())
-
-            assert abs(aircraft_2_position.distanceToPoint(test_collision_target) - distance_to_collision) < 0.05
-            assert abs(aircraft_2_speed.length() - aircraft_absolute_speed) < 0.001
-
-            aircrafts : List[Aircraft] = [
-                Aircraft(
-                    aircraft_id = 0,
-                    position = aircraft_1_position,
-                    speed = aircraft_1_speed,
-                    initial_target = test_collision_target),
-                Aircraft(
-                    aircraft_id = 1,
-                    position = aircraft_2_position,
-                    speed = aircraft_2_speed,
-                    initial_target = test_collision_target)
-            ]
-            list_of_lists.append(aircrafts)
-
-        # todo: generate more random parameters for test cases
-
-        if len(list_of_lists) == 0:
-            for i in range (0, 30, 1):
-                list_of_aircrafts : List[Aircraft] = []
-                aircraft : Aircraft = Aircraft( # detection test
-                    aircraft_id = 0,
-                    position = QVector3D(-800, 4000, 1000),
-                    speed = QVector3D(60, -60, 0),
-                    initial_target = QVector3D(51_900, -50_000, 10000)) # 51.9 km, -50 km
-                list_of_aircrafts.append(aircraft)
-                aircraft = Aircraft(
-                    aircraft_id = 1,
-                    position = QVector3D(4000, 6000, 1000),
-                    speed = QVector3D(0, -85, 0),
-                    initial_target = QVector3D(900, -1_001_300, 1000)) # 0.9 km, -1001.3 km
-                list_of_aircrafts.append(aircraft)
-                list_of_lists.append(list_of_aircrafts)
-
         return list_of_lists
     
-    def run_tests(self, test_number : int = 10) -> None:
+    def run_tests(self, begin_with_default_set : bool = True, test_number : int = 10) -> None:
         """Runs simulation tests"""
         if test_number < 3:
             logging.info("Changing simulation tests to 3 test cases due to too low test number")
@@ -345,11 +366,21 @@ class Simulation(QMainWindow):
             logging.info("Changing simulation tests to 100 test cases due to too high test number")
             test_number = 100
         logging.info("Running simulation tests")
-        list_of_lists : List[List[Aircraft]] = self.generate_test_aircrafts()
+        list_of_lists : List[List[Aircraft]] | None = None
+        if begin_with_default_set:
+            list_of_lists = self.generate_consistent_list_of_aircraft_lists()
+            consistent_tests_count : int = len(list_of_lists)
+            list_of_lists += self.generate_test_aircrafts()
+        else:
+            list_of_lists = self.generate_test_aircrafts()
         lists_count : int = len(list_of_lists)
 
         if lists_count > test_number:
-            random_indices : ndarray = random.choice(lists_count, test_number, replace = False)
+            random_indices : ndarray | None = None
+            if begin_with_default_set:
+                random_indices = random.choice(lists_count - consistent_tests_count, test_number - consistent_tests_count, replace = False)
+            else:
+                random_indices = random.choice(lists_count, test_number, replace = False)
             random_indices : List[int] = random_indices.tolist()
             random_indices_set : set = set(random_indices)
             random_indices = []
@@ -363,7 +394,12 @@ class Simulation(QMainWindow):
             lists_count = len(list_of_lists)
 
         print("Generated and selected aircrafts pairs: ", lists_count)
-        test_number = lists_count
+        if begin_with_default_set:
+            print("Consistent aircrafts pairs: ", consistent_tests_count)
+            test_number = lists_count + consistent_tests_count
+        else:
+            test_number = lists_count
+        print("Tests to process: ", test_number)
 
         start_timestamp = QTime.currentTime()
         export_time = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
