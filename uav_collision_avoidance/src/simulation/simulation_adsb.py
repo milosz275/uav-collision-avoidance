@@ -166,7 +166,7 @@ class SimulationADSB(QThread):
                     print("Collision detected")
             else:
                 for aircraft in self.aircraft_fccs:
-                    if aircraft.evade_maneuver:
+                    if aircraft.evade_maneuver and not aircraft.safe_zone_occupied:
                         aircraft.reset_evade_maneuver()
 
     def print_adsb_report(self, aircraft : AircraftVehicle) -> None:
