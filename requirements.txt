@@ -11,6 +11,8 @@ pyinstaller
 # UAV Collision Avoidance
 pyside6
 numpy
+pandas
+matplotlib
 
 # Tests
 pytest
