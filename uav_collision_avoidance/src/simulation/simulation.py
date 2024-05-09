@@ -3,6 +3,8 @@
 import csv
 import logging
 import datetime
+import pandas as pd
+import matplotlib.pyplot as plt
 from copy import copy
 from typing import List
 from pathlib import Path
@@ -27,7 +29,7 @@ from ..simulation.simulation_data import SimulationData
 class Simulation(QMainWindow):
     """Main simulation App"""
 
-    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 100_000_000) -> None: # 100_000_000 ms = 100_000 s = 27.78 h
+    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 25_000_000) -> None: # 25_000_000 ms = 25_000 s = 6.94 h
         super().__init__()
         SimulationSettings().__init__()
         self.__headless : bool = headless
@@ -830,16 +832,46 @@ class Simulation(QMainWindow):
         """Exports aircrafts visited location lists"""
         export_time = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         aircraft_fccs : List[AircraftFCC] = [aircraft.fcc for aircraft in self.aircrafts]
-        for aircraft in aircraft_fccs:
+
+        plt.set_loglevel("error")
+        plt.figure()
+        x_minimum : float = float("inf")
+        x_maximum : float = float("-inf")
+        y_minimum : float = float("inf")
+        y_maximum : float = float("-inf")
+
+        colors = ["b", "g", "r", "c", "m", "y", "k"]
+
+        for i, aircraft in enumerate(aircraft_fccs):
             try:
                 Path("logs/visited").mkdir(parents=True, exist_ok=True)
             except:
                 return
-            file = open(f"logs/visited/visited-aircraft-{aircraft.aircraft_id}-{export_time}.csv", "w")
-            writer = csv.writer(file)
-            writer.writerow(["x","y","z"])
-            for position in aircraft.visited:
-                writer.writerow([("{:.2f}".format(position.x())),("{:.2f}".format(position.y())),("{:.2f}".format(position.z()))])
+            file_name = f"logs/visited/visited-aircraft-{aircraft.aircraft_id}-{export_time}"
+            with open(f"{file_name}.csv", "w") as file:
+                writer = csv.writer(file)
+                writer.writerow(["x","y","z"])
+                for position in aircraft.visited:
+                    x_minimum = min(x_minimum, position.x())
+                    x_maximum = max(x_maximum, position.x())
+                    y_minimum = min(y_minimum, position.y())
+                    y_maximum = max(y_maximum, position.y())
+                    writer.writerow([("{:.2f}".format(position.x())),("{:.2f}".format(position.y())),("{:.2f}".format(position.z()))])
+            df = pd.read_csv(f"{file_name}.csv")
+            plt.scatter(df["x"], df["y"], color=colors[i % len(colors)])
+            plt.plot(df["x"], df["y"], color=colors[i % len(colors)])
+
+        x_spectrum : float = x_maximum - x_minimum
+        y_spectrum : float = y_maximum - y_minimum
+        plt.xlim(x_minimum - x_spectrum, x_maximum + x_spectrum)
+        plt.ylim(y_minimum - y_spectrum, y_maximum + y_spectrum)
+
+        try:
+            Path("path-visual").mkdir(parents=True, exist_ok=True)
+        except:
+            return
+        plt.savefig(f"path-visual/path-visual-{export_time}.png")
+        plt.close()
     
     def closeEvent(self, event: QCloseEvent) -> None:
         """Qt method performed on the main window close event"""
