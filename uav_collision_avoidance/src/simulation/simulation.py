@@ -9,7 +9,8 @@ from copy import copy
 from typing import List
 from pathlib import Path
 from numpy import random, ndarray, mean
-from math import dist, sin, cos, radians, sqrt
+from math import dist, sin, cos, radians
+from matplotlib.ticker import MaxNLocator
 
 from PySide6.QtCore import QThread, QTime
 from PySide6.QtGui import QCloseEvent, QVector3D
@@ -29,9 +30,12 @@ from ..simulation.simulation_data import SimulationData
 class Simulation(QMainWindow):
     """Main simulation App"""
 
-    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 25_000_000) -> None: # 25_000_000 ms = 25_000 s = 6.94 h
+    __current_id : int = 0
+
+    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 75_000_000) -> None: # 75_000_000 ms = 75_000 s = 20.83 h
         super().__init__()
         SimulationSettings().__init__()
+        self.__simulation_id = self.obtain_simulation_id()
         self.__headless : bool = headless
         self.__tests : bool = tests
         self.__simulation_time : int = simulation_time
@@ -39,6 +43,18 @@ class Simulation(QMainWindow):
         self.__state : SimulationState | None = None
         self.__imported_from_data : bool = False
         self.__simulation_data : SimulationData | None = None
+
+    @staticmethod
+    def obtain_simulation_id() -> int:
+        """Obtains new simulation id"""
+        simulation_id : int = Simulation.__current_id
+        Simulation.__current_id += 1
+        return simulation_id
+    
+    @property
+    def simulation_id(self) -> int:
+        """Returns simulation id"""
+        return self.__simulation_id
 
     @property
     def headless(self) -> bool:
@@ -156,6 +172,9 @@ class Simulation(QMainWindow):
                 self.simulation_adsb.cycle()
                 partial_time_counter = 0
             partial_time_counter += time_step
+            if self.simulation_adsb.relative_distance > 12_000 and self.simulation_adsb.minimal_relative_distance < self.state.minimum_separation:
+                logging.info("Headless simulation stopping due to aircrafts too far apart")
+                break
             if not self.aircrafts[0].fcc.destination and not self.aircrafts[1].fcc.destination:
                 logging.info("Headless simulation stopping due to no other destinations set")
                 break
@@ -368,21 +387,20 @@ class Simulation(QMainWindow):
             logging.info("Changing simulation tests to 100 test cases due to too high test number")
             test_number = 100
         logging.info("Running simulation tests")
+        list_of_const_lists : List[List[Aircraft]] | None = None
         list_of_lists : List[List[Aircraft]] | None = None
         if begin_with_default_set:
-            list_of_lists = self.generate_consistent_list_of_aircraft_lists()
-            consistent_tests_count : int = len(list_of_lists)
-            list_of_lists += self.generate_test_aircrafts()
-        else:
-            list_of_lists = self.generate_test_aircrafts()
+            list_of_const_lists = self.generate_consistent_list_of_aircraft_lists()
+            consistent_tests_count : int = len(list_of_const_lists)
+            if test_number - consistent_tests_count > 0:
+                test_number -= consistent_tests_count
+            
+        list_of_lists = self.generate_test_aircrafts()
         lists_count : int = len(list_of_lists)
 
         if lists_count > test_number:
             random_indices : ndarray | None = None
-            if begin_with_default_set:
-                random_indices = random.choice(lists_count - consistent_tests_count, test_number - consistent_tests_count, replace = False)
-            else:
-                random_indices = random.choice(lists_count, test_number, replace = False)
+            random_indices = random.choice(lists_count, test_number, replace = False)
             random_indices : List[int] = random_indices.tolist()
             random_indices_set : set = set(random_indices)
             random_indices = []
@@ -390,18 +408,14 @@ class Simulation(QMainWindow):
                 random_indices.append(random_indices_set.pop())
             random_indices.sort(reverse = False)
             assert len(random_indices) <= test_number
-            print("Selected indices: ", random_indices)
-            print("Indices count: ", len(random_indices))
             list_of_lists = [list_of_lists[i] for i in random_indices]
             lists_count = len(list_of_lists)
 
-        print("Generated and selected aircrafts pairs: ", lists_count)
         if begin_with_default_set:
-            print("Consistent aircrafts pairs: ", consistent_tests_count)
-            test_number = lists_count + consistent_tests_count
-        else:
+            list_of_lists = list_of_const_lists + list_of_lists
+            lists_count = len(list_of_lists)
             test_number = lists_count
-        print("Tests to process: ", test_number)
+        logging.info("Test cases to process: %d", test_number)
 
         start_timestamp = QTime.currentTime()
         export_time = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
@@ -830,23 +844,36 @@ class Simulation(QMainWindow):
 
     def export_visited_locations(self) -> None:
         """Exports aircrafts visited location lists"""
-        export_time = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
         aircraft_fccs : List[AircraftFCC] = [aircraft.fcc for aircraft in self.aircrafts]
 
         plt.set_loglevel("error")
         plt.figure()
+        plt.title("Aircrafts visited locations")
+        plt.suptitle("Miłosz Maculewicz")
+        plt.subplots_adjust(left = 0.15, right = 0.85, top = 0.85, bottom = 0.15)
+        plt.subplots_adjust(hspace = 0.5, wspace = 0.5)
+        plt.grid(True)
+        plt.xlabel("x")
+        plt.ylabel("y")
+        plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
+        plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
+
         x_minimum : float = float("inf")
         x_maximum : float = float("-inf")
         y_minimum : float = float("inf")
         y_maximum : float = float("-inf")
-
         colors = ["b", "g", "r", "c", "m", "y", "k"]
 
+        export_time = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        try:
+            Path("logs/visited").mkdir(parents=True, exist_ok=True)
+            Path("path-visual").mkdir(parents=True, exist_ok=True)
+            Path(f"path-visual/simulation-id-{self.simulation_id}-{hash(self)}").mkdir(parents=True, exist_ok=True)
+        except:
+            logging.error("Failed to create directories for visited logs")
+            return
+
         for i, aircraft in enumerate(aircraft_fccs):
-            try:
-                Path("logs/visited").mkdir(parents=True, exist_ok=True)
-            except:
-                return
             file_name = f"logs/visited/visited-aircraft-{aircraft.aircraft_id}-{export_time}"
             with open(f"{file_name}.csv", "w") as file:
                 writer = csv.writer(file)
@@ -865,12 +892,7 @@ class Simulation(QMainWindow):
         y_spectrum : float = y_maximum - y_minimum
         plt.xlim(x_minimum - x_spectrum, x_maximum + x_spectrum)
         plt.ylim(y_minimum - y_spectrum, y_maximum + y_spectrum)
-
-        try:
-            Path("path-visual").mkdir(parents=True, exist_ok=True)
-        except:
-            return
-        plt.savefig(f"path-visual/path-visual-{export_time}.png")
+        plt.savefig(f"path-visual/simulation-id-{self.simulation_id}-{hash(self)}/path-visual-{export_time}.png")
         plt.close()
     
     def closeEvent(self, event: QCloseEvent) -> None:
