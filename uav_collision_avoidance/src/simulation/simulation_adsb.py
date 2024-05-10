@@ -67,6 +67,11 @@ class SimulationADSB(QThread):
         """Sets minimal miss distance"""
         self.__minimal_relative_distance = minimal_relative_distance
 
+    @property
+    def relative_distance(self) -> float:
+        """Returns relative distance between aircrafts"""
+        return (self.aircraft_vehicles[0].position - self.aircraft_vehicles[1].position).length()
+
     def run(self) -> None:
         """Runs ADS-B simulation thread with precise timeout"""
         while not self.isInterruptionRequested():
