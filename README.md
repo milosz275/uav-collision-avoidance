@@ -161,16 +161,9 @@ One coding convention is not preserved in the scope of the project. Qt's methods
 
 ## Current Work / TODOs
 
-- [x] Reimplement safe zone
-- [x] Head-on collision avoidance
-- [x] Symmetrical bank (roll) during turn, no angle approaximation
-- [x] Altitude change with symmetrical command
-- [x] Generating test cases and batch loading
-- [x] Test cases comparison
-- [x] Aircraft 0 manual control override
-- [ ] Flight control computer angle optimization
-- [ ] Centered view optimization
-- [ ] Documentation
+- [ ] ADS-B: FCC angle optimization
+- [ ] Rendering: Aircraft centered view optimization
+- [ ] Wiki: Documentation
 
 ## Authors
 
