@@ -867,7 +867,7 @@ class Simulation(QMainWindow):
 
         plt.set_loglevel("error")
         plt.figure()
-        plt.suptitle("Aircrafts visited locations")
+        plt.suptitle("Aircraft paths visualization")
         plt.title("author: Miłosz Maculewicz")
         plt.subplots_adjust(left = 0.15, right = 0.85, top = 0.85, bottom = 0.15)
         plt.subplots_adjust(hspace = 0.5, wspace = 0.5)
