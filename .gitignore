@@ -177,13 +177,14 @@ simulation-*.csv
 
 # Simulation's visualization directories
 path-visual/*
-!path-visual/simulation-0-0-52885/
-!path-visual/simulation-0-1-52885/
-!path-visual/simulation-0-2-52885/
-!path-visual/simulation-0-3-52885/
-!path-visual/simulation-0-4-52885/
-!path-visual/simulation-0-5-52885/
-!path-visual/simulation-0-6-52885/
-!path-visual/simulation-0-7-52885/
-!path-visual/simulation-0-8-52885/
-!path-visual/simulation-0-9-52885/
+!path-visual/README.md
+!path-visual/simulation-0-0-1155563594/
+!path-visual/simulation-0-1-1155563594/
+!path-visual/simulation-0-2-1155563594/
+!path-visual/simulation-0-3-1155563594/
+!path-visual/simulation-0-4-1155563594/
+!path-visual/simulation-0-5-1155563594/
+!path-visual/simulation-0-6-1155563594/
+!path-visual/simulation-0-7-1155563594/
+!path-visual/simulation-0-8-1155563594/
+!path-visual/simulation-0-9-1155563594/
