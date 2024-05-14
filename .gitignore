@@ -159,9 +159,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 
-# VS Code
-.vscode/
-
 # Private notes
 .notes/
 
@@ -171,7 +168,8 @@ logs/
 # Linting
 .pylintrc
 
-# Simulation's data simulation-*.csv files except example file
+# Simulation's data simulation-*.csv files and latest simulation except example file
+simulation.csv
 simulation-*.csv
 !simulation-2024-05-14-11-42-37.csv
 

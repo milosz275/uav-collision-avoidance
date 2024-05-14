@@ -583,29 +583,38 @@ class Simulation(QMainWindow):
         latest_file_path : str | None = None
         list_of_paths : List[Path] | None = None
         list_length : int | None = None
-        try:
-            latest_file_path = max(Path("data").iterdir(), key = lambda p: p.stat().st_ctime)
-            list_of_paths = list(Path("data").iterdir())
-            list_of_paths.sort(key = lambda x: x.stat().st_ctime, reverse = False)
-            list_length = len(list_of_paths)
-        except:
-            logging.error("Failed to load latest simulation data")
+        if not Path("data").exists():
+            logging.error("No data directory found")
             return False
-        iterator : int = 1
-        while not found_good_file:
+        if Path("data/simulation.csv").exists():
+            latest_file_path = Path("data/simulation.csv")
+            list_of_paths = [latest_file_path]
+            list_length = 1
+            found_good_file = True
+        else:
             try:
-                file = open(latest_file_path, "r")
-                reader = csv.reader(file)
-                lines_count : int = 0
-                for line in reader:
-                    lines_count += 1
-                if lines_count > 1:
-                    found_good_file = True
-                    break
+                latest_file_path = max(Path("data").iterdir(), key = lambda p: p.stat().st_ctime)
+                list_of_paths = list(Path("data").iterdir())
+                list_of_paths.sort(key = lambda x: x.stat().st_ctime, reverse = False)
+                list_length = len(list_of_paths)
             except:
-                pass
-            latest_file_path = list_of_paths[list_length - 1 - iterator]
-            iterator += 1
+                logging.error("Failed to load latest simulation data")
+                return False
+            iterator : int = 1
+            while not found_good_file:
+                try:
+                    file = open(latest_file_path, "r")
+                    reader = csv.reader(file)
+                    lines_count : int = 0
+                    for line in reader:
+                        lines_count += 1
+                    if lines_count > 1:
+                        found_good_file = True
+                        break
+                except:
+                    pass
+                latest_file_path = list_of_paths[list_length - 1 - iterator]
+                iterator += 1
         if found_good_file:
             return self.load_simulation_data_from_file(latest_file_path)
         else:
