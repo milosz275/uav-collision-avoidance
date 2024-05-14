@@ -22,3 +22,7 @@ These images serve as a visual comparison to assess the effectiveness of the col
 ## Directory Structure
 
 The directories are named sequentially from `simulation-0-id-hash` to `simulation-9-id-hash`. Inside each of these directories, you will find:
+
+## Example
+![Example](simulation-0-8-4203984693/path-visual-2024-05-14-11-46-59.png)
+![Example](simulation-0-8-4203984693/path-visual-2024-05-14-11-47-14.png)
