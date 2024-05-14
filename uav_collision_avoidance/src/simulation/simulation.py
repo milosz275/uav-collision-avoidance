@@ -187,7 +187,7 @@ class Simulation(QMainWindow):
                 self.simulation_adsb.cycle()
                 partial_time_counter = 0
             partial_time_counter += time_step
-            if self.simulation_adsb.relative_distance > 30_000 and self.simulation_adsb.minimal_relative_distance < self.state.minimum_separation:
+            if self.simulation_adsb.relative_distance > self.state.minimum_separation * 3 and self.simulation_adsb.minimal_relative_distance < self.state.minimum_separation:
                 logging.info("Headless simulation stopping due to aircrafts too far apart")
                 break
             if not self.aircrafts[0].fcc.destination and not self.aircrafts[1].fcc.destination:
@@ -573,6 +573,7 @@ class Simulation(QMainWindow):
         file.close()
         real_time : float = start_timestamp.msecsTo(QTime.currentTime()) / 1000
         print("Total time elapsed: " + "{:.2f}".format(real_time) + "s")
+        print("Average time per test: " + "{:.2f}".format(real_time / test_number) + "s")
         logging.info("Total time elapsed: %ss", "{:.2f}".format(real_time))
 
     def load_latest_simulation_data_file(self) -> bool:
@@ -867,7 +868,7 @@ class Simulation(QMainWindow):
 
         plt.set_loglevel("error")
         plt.figure()
-        plt.suptitle("Aircrafts visited locations")
+        plt.suptitle("Aircraft paths visualization")
         plt.title("author: Miłosz Maculewicz")
         plt.subplots_adjust(left = 0.15, right = 0.85, top = 0.85, bottom = 0.15)
         plt.subplots_adjust(hspace = 0.5, wspace = 0.5)
@@ -895,6 +896,9 @@ class Simulation(QMainWindow):
             logging.error("Failed to create directories for visited logs")
             return
 
+        aircraft_1_init = []
+        aircraft_2_init = []
+
         for i, aircraft in enumerate(aircraft_fccs):
             file_name = f"logs/visited/visited-aircraft-{aircraft.aircraft_id}-{export_time}"
             with open(f"{file_name}.csv", "w") as file:
@@ -906,14 +910,23 @@ class Simulation(QMainWindow):
                     y_minimum = min(y_minimum, position.y())
                     y_maximum = max(y_maximum, position.y())
                     writer.writerow([("{:.2f}".format(position.x())),("{:.2f}".format(position.y())),("{:.2f}".format(position.z()))])
+                    
             df = pd.read_csv(f"{file_name}.csv")
-            plt.scatter(df["x"], df["y"], color=colors[i % len(colors)], s = 10)
+            plt.scatter(df["x"], df["y"], color=colors[i % len(colors)], s = 5)
             plt.plot(df["x"], df["y"], color=colors[i % len(colors)])
+
+            if not df.empty:
+                if i == 0:
+                    aircraft_1_init = [df.iloc[0]["x"],  df.iloc[0]["y"]]
+                elif i == 1:
+                    aircraft_2_init = [df.iloc[0]["x"],  df.iloc[0]["y"]]
 
         x_spectrum : float = x_maximum - x_minimum
         y_spectrum : float = y_maximum - y_minimum
         plt.xlim(x_minimum - x_spectrum, x_maximum + x_spectrum)
         plt.ylim(y_minimum - y_spectrum, y_maximum + y_spectrum)
+        plt.text(aircraft_1_init[0] + 0.05 * x_spectrum, aircraft_1_init[1] - 0.05 * y_spectrum, f"Initial position\nof Aircraft 1", color = colors[0 % len(colors)], fontsize = 9, ha = "left")
+        plt.text(aircraft_2_init[0] + 0.05 * x_spectrum, aircraft_2_init[1] - 0.05 * y_spectrum, f"Initial position\nof Aircraft 2", color = colors[1 % len(colors)], fontsize = 9, ha = "left")
         if test_index is not None:
             plt.savefig(f"path-visual/simulation-{self.simulation_id}-{test_index}-{self.hash}/path-visual-{export_time}.png")
         else:
