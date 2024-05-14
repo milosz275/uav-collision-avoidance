@@ -226,7 +226,7 @@ class Simulation(QMainWindow):
         test_minimal_trigonometric_value : float = 0.00001
         test_course_difference_count : int = 170
         test_random_collision_course_differences : List[float] = random.uniform(test_minimal_course_difference, test_maximal_course_difference, test_course_difference_count).tolist()
-        test_random_collision_course_differences.sort(reverse = False)
+        # test_random_collision_course_differences.sort(reverse = False)
 
         # equal speeds, equal distances to cover, both climbing or both descending
         for angle in test_random_collision_course_differences:
