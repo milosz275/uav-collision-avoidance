@@ -17,3 +17,6 @@ matplotlib
 # Tests
 pytest
 screeninfo
+
+# Linting
+pylint
