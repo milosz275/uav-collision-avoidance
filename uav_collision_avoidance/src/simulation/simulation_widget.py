@@ -589,12 +589,20 @@ class SimulationWidget(QWidget):
             self.__simulation_state.toggle_draw_safezones()
         elif event.key() == Qt.Key.Key_Left:
             self.__moving_view_left = True
+            if self.simulation_state.follow_aircraft:
+                self.simulation_state.toggle_follow_aircraft()
         elif event.key() == Qt.Key.Key_Right:
             self.__moving_view_right = True
+            if self.simulation_state.follow_aircraft:
+                self.simulation_state.toggle_follow_aircraft()
         elif event.key() == Qt.Key.Key_Up:
             self.__moving_view_up = True
+            if self.simulation_state.follow_aircraft:
+                self.simulation_state.toggle_follow_aircraft()
         elif event.key() == Qt.Key.Key_Down:
             self.__moving_view_down = True
+            if self.simulation_state.follow_aircraft:
+                self.simulation_state.toggle_follow_aircraft()
         if self.aircrafts[0]:
             if event.key() == Qt.Key.Key_A:
                 self.__steering_left = True
