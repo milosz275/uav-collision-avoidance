@@ -82,13 +82,16 @@ def main(arg = None) -> None:
             file_path : str = "data/simulation-2024-05-14-11-42-37.csv"
             if len(args) > 1:
                 file_path = args[1]
-                if len(args) > 2:
+                test_id : int = 0
+                if len(args) == 2:
+                    test_id = int(args[2])
+                if len(args) > 3:
                     print(f"Invalid arguments: {args}")
                     logging.warning("Invalid arguments: %s", args)
             sim = Simulation(headless = True)
-            assert sim.load_simulation_data_from_file(file_path = file_path, test_id = 0, avoid_collisions = False)
+            assert sim.load_simulation_data_from_file(file_path = file_path, test_id = test_id, avoid_collisions = False)
             sim.run_headless(avoid_collisions = False)
-            assert sim.load_simulation_data_from_file(file_path = file_path, test_id = 0, avoid_collisions = True)
+            assert sim.load_simulation_data_from_file(file_path = file_path, test_id = test_id, avoid_collisions = True)
             sim.run_headless(avoid_collisions = True)
             QApplication.shutdown(app)
             sys.exit(0)
