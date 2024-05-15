@@ -198,10 +198,7 @@ class Simulation(QMainWindow):
                 logging.info("Headless simulation stopping due to collision detected")
                 simulation_data.collision = True
                 break
-        if simulation_data.collision:
-            simulation_data.minimal_relative_distance = 0
-        else:
-            simulation_data.minimal_relative_distance = copy(self.simulation_adsb.minimal_relative_distance)
+        simulation_data.minimal_relative_distance = copy(self.simulation_adsb.minimal_relative_distance)
         simulation_data.aircraft_1_final_position = copy(self.aircrafts[0].vehicle.position)
         simulation_data.aircraft_2_final_position = copy(self.aircrafts[1].vehicle.position)
         simulation_data.aircraft_1_final_speed = copy(self.aircrafts[0].vehicle.speed)
