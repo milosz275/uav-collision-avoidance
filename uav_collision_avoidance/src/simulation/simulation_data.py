@@ -8,6 +8,7 @@ class SimulationData(QObject):
 
     def __init__(self) -> None:
         super().__init__()
+        self.__aircraft_angle : float = 0.0
         self.__aircraft_1_initial_position : QVector3D = QVector3D(0, 0, 0)
         self.__aircraft_2_initial_position : QVector3D = QVector3D(0, 0, 0)
         self.__aircraft_1_final_position : QVector3D = QVector3D(0, 0, 0)
@@ -22,6 +23,16 @@ class SimulationData(QObject):
         self.__aircraft_2_initial_roll_angle : float = 0.0
         self.__collision : bool | None = None
         self.__minimal_relative_distance : float | None = None
+
+    @property
+    def aircraft_angle(self) -> float:
+        """Returns initial angle between aircrafts"""
+        return self.__aircraft_angle
+    
+    @aircraft_angle.setter
+    def aircraft_angle(self, angle : float) -> None:
+        """Sets initial angle between aircrafts"""
+        self.__aircraft_angle = angle
 
     @property
     def aircraft_1_initial_position(self) -> QVector3D:

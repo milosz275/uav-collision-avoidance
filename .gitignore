@@ -171,18 +171,28 @@ logs/
 # Simulation's data simulation-*.csv files and latest simulation except example file
 simulation.csv
 simulation-*.csv
-!simulation-2024-05-14-11-42-37.csv
+!simulation-2024-05-15-17-37-59.csv
 
 # Simulation's visualization directories
 path-visual/*
 !path-visual/README.md
-!path-visual/simulation-0-0-4203984693/
-!path-visual/simulation-0-1-4203984693/
-!path-visual/simulation-0-2-4203984693/
-!path-visual/simulation-0-3-4203984693/
-!path-visual/simulation-0-4-4203984693/
-!path-visual/simulation-0-5-4203984693/
-!path-visual/simulation-0-6-4203984693/
-!path-visual/simulation-0-7-4203984693/
-!path-visual/simulation-0-8-4203984693/
-!path-visual/simulation-0-9-4203984693/
+!path-visual/2024-05-15/simulation-0-0-741784179/
+!path-visual/2024-05-15/simulation-0-1-741784179/
+!path-visual/2024-05-15/simulation-0-2-741784179/
+!path-visual/2024-05-15/simulation-0-3-741784179/
+!path-visual/2024-05-15/simulation-0-4-741784179/
+!path-visual/2024-05-15/simulation-0-5-741784179/
+!path-visual/2024-05-15/simulation-0-6-741784179/
+!path-visual/2024-05-15/simulation-0-7-741784179/
+!path-visual/2024-05-15/simulation-0-8-741784179/
+!path-visual/2024-05-15/simulation-0-9-741784179/
+!path-visual/2024-05-15/simulation-0-10-741784179/
+!path-visual/2024-05-15/simulation-0-11-741784179/
+!path-visual/2024-05-15/simulation-0-12-741784179/
+!path-visual/2024-05-15/simulation-0-13-741784179/
+!path-visual/2024-05-15/simulation-0-14-741784179/
+!path-visual/2024-05-15/simulation-0-15-741784179/
+!path-visual/2024-05-15/simulation-0-16-741784179/
+!path-visual/2024-05-15/simulation-0-17-741784179/
+!path-visual/2024-05-15/simulation-0-18-741784179/
+!path-visual/2024-05-15/simulation-0-19-741784179/

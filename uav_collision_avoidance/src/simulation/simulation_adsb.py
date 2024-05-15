@@ -60,7 +60,10 @@ class SimulationADSB(QThread):
     @property
     def minimal_relative_distance(self) -> float:
         """Returns minimal miss distance"""
-        return self.__minimal_relative_distance
+        if self.__simulation_state.collision:
+            return 0
+        else:
+            return self.__minimal_relative_distance
     
     @minimal_relative_distance.setter
     def minimal_relative_distance(self, minimal_relative_distance : float) -> None:

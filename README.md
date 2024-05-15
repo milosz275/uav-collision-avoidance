@@ -119,7 +119,7 @@ uav-collision-avoidance load [file_name]
 ```
 
 ```bash
-uav-collision-avoidance help
+uav-collision-avoidance help [argument]
 ```
 
 ```bash
