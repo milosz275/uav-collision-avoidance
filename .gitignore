@@ -176,7 +176,6 @@ simulation-*.csv
 # Simulation's visualization directories
 path-visual/*
 !path-visual/README.md
-!path-visual/2024-05-15/
 !path-visual/2024-05-15/simulation-0-0-741784179/
 !path-visual/2024-05-15/simulation-0-1-741784179/
 !path-visual/2024-05-15/simulation-0-2-741784179/
