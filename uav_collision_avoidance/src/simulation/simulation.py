@@ -219,12 +219,12 @@ class Simulation(QMainWindow):
 
         test_minimal_altitude : int = 1000
         test_maximal_altitude : int = 5000
-        test_minimal_speed : int = 30
-        test_maximal_speed : int = 100
+        test_minimal_speed : int = 40
+        test_maximal_speed : int = 130
         test_start_aircrafts_relative_distance : int = 10_000 # distance between aircrafts headed to test collision target
-        test_minimal_course_difference : float = 1.0
-        test_maximal_course_difference : float = 179.0
-        test_minimal_trigonometric_value : float = 0.00001
+        test_minimal_course_difference : float = 0.5
+        test_maximal_course_difference : float = 179.5
+        test_minimal_trigonometric_value : float = 0.0001
         test_course_difference_count : int = 400
         test_random_collision_course_differences : List[float] = random.uniform(test_minimal_course_difference, test_maximal_course_difference, test_course_difference_count).tolist()
         test_random_collision_course_differences.sort(reverse = False)
@@ -895,7 +895,7 @@ class Simulation(QMainWindow):
 
         plt.set_loglevel("error")
         plt.figure()
-        plt.suptitle("Aircraft paths visualization")
+        plt.title("Aircraft paths visualization")
         plt.subplots_adjust(left = 0.15, right = 0.85, top = 0.85, bottom = 0.15)
         plt.subplots_adjust(hspace = 0.5, wspace = 0.5)
         plt.grid(True)
