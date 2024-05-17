@@ -404,7 +404,7 @@ class Simulation(QMainWindow):
         list_of_lists.append([aircrafts, 180.001])
         return list_of_lists
     
-    def run_tests(self, begin_with_default_set : bool = True, test_number : int = 10) -> None:
+    def run_tests(self, begin_with_default_set : bool = True, test_number : int = 15) -> None:
         """Runs simulation tests"""
         if test_number < 3:
             logging.info("Changing simulation tests to 3 test cases due to too low test number")
@@ -426,8 +426,8 @@ class Simulation(QMainWindow):
 
         if lists_count > test_number:
             random_indices : ndarray | None = None
-            random_indices = random.choice(lists_count, test_number, replace = False)
-            random_indices : List[int] = random_indices.tolist()
+            random_indices = random.choice(lists_count, test_number - 1, replace = False)
+            random_indices : List[int] = [0] + random_indices.tolist() # we specifically want to include first test
             random_indices_set : set = set(random_indices)
             random_indices = []
             while random_indices_set:
