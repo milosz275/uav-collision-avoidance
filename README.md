@@ -2,6 +2,7 @@
 
 [![Build](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/python-app.yml/badge.svg)](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/python-app.yml)
 [![CodeQL](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/github-code-scanning/codeql)
+[![PyPI version](https://badge.fury.io/py/uav-collision-avoidance.svg)](https://badge.fury.io/py/uav-collision-avoidance)
 
 Python project regarding implementation of two UAVs simulation with collision avoidance system based on geometrical approach.
 - [Github](https://github.com/mldxo/uav-collision-avoidance)
