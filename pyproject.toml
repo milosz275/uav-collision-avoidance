@@ -8,7 +8,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "uav-collision-avoidance"
-version = "0.8.3"
+version = "0.8.4"
 authors = [
   { name="mldxo", email="miloszmaculewicz@gmail.com" },
 ]
