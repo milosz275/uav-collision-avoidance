@@ -60,10 +60,26 @@ def main(arg = None) -> None:
     sim : Simulation | None = None
     if len(args) > 0 or arg is not None:
         if args[0] == "realtime" or args[0] == "default" or args[0] == "gui":
-            if len(get_monitors) == 0:
+            if len(get_monitors()) == 0:
                 logging.warning("Launching GUI Application without monitors detected")
             sim = Simulation()
-            sim.run()
+            if len(args) > 1:
+                file_path : str = args[1]
+                test_id : int = 0
+                avoid_collisions : bool = False
+                if len(args) >= 2:
+                    test_id = int(args[2])
+                if len(args) >= 3:
+                    avoidance : str = str(args[2])
+                    if avoidance == "true" or avoidance == "True" or avoidance == "t" or avoidance == "T" or avoidance == "yes" or avoidance == "1":
+                        avoid_collisions = True
+                if len(args) > 4:
+                    print(f"Invalid arguments: {args}")
+                    logging.warning("Invalid arguments: %s", args)
+                sim.load_simulation_data_from_file(file_path = file_path, test_id = test_id, avoid_collisions = avoid_collisions)
+                sim.run_gui(avoid_collisions = avoid_collisions, load_lastest_data_file = False)
+            else:
+                sim.run()
             sys.exit(app.exec())
         elif args[0] == "headless" or arg == "headless":
             sim = Simulation(headless = True)

@@ -32,7 +32,7 @@ class Simulation(QMainWindow):
 
     __current_id : int = 0
 
-    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 75_000_000) -> None: # 75_000_000 ms = 75_000 s = 20.83 h
+    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 86_400_000) -> None: # 86_400_000 = 86_400 s = 24h
         super().__init__()
         SimulationSettings().__init__()
         self.__simulation_id = self.obtain_simulation_id()
@@ -219,12 +219,12 @@ class Simulation(QMainWindow):
 
         test_minimal_altitude : int = 1000
         test_maximal_altitude : int = 5000
-        test_minimal_speed : int = 30
-        test_maximal_speed : int = 100
+        test_minimal_speed : int = 40
+        test_maximal_speed : int = 130
         test_start_aircrafts_relative_distance : int = 10_000 # distance between aircrafts headed to test collision target
-        test_minimal_course_difference : float = 1.0
-        test_maximal_course_difference : float = 179.0
-        test_minimal_trigonometric_value : float = 0.00001
+        test_minimal_course_difference : float = 0.5
+        test_maximal_course_difference : float = 179.5
+        test_minimal_trigonometric_value : float = 0.0001
         test_course_difference_count : int = 400
         test_random_collision_course_differences : List[float] = random.uniform(test_minimal_course_difference, test_maximal_course_difference, test_course_difference_count).tolist()
         test_random_collision_course_differences.sort(reverse = False)
@@ -404,7 +404,7 @@ class Simulation(QMainWindow):
         list_of_lists.append([aircrafts, 180.001])
         return list_of_lists
     
-    def run_tests(self, begin_with_default_set : bool = True, test_number : int = 10) -> None:
+    def run_tests(self, begin_with_default_set : bool = True, test_number : int = 15) -> None:
         """Runs simulation tests"""
         if test_number < 3:
             logging.info("Changing simulation tests to 3 test cases due to too low test number")
@@ -426,8 +426,8 @@ class Simulation(QMainWindow):
 
         if lists_count > test_number:
             random_indices : ndarray | None = None
-            random_indices = random.choice(lists_count, test_number, replace = False)
-            random_indices : List[int] = random_indices.tolist()
+            random_indices = random.choice(lists_count, test_number - 1, replace = False)
+            random_indices : List[int] = [0] + random_indices.tolist() # we specifically want to include first test
             random_indices_set : set = set(random_indices)
             random_indices = []
             while random_indices_set:
@@ -895,8 +895,7 @@ class Simulation(QMainWindow):
 
         plt.set_loglevel("error")
         plt.figure()
-        plt.suptitle("Aircraft paths visualization")
-        plt.title("author: Miłosz Maculewicz")
+        plt.title("Aircraft paths visualization")
         plt.subplots_adjust(left = 0.15, right = 0.85, top = 0.85, bottom = 0.15)
         plt.subplots_adjust(hspace = 0.5, wspace = 0.5)
         plt.grid(True)
@@ -941,26 +940,26 @@ class Simulation(QMainWindow):
             plt.scatter(df["x"], df["y"], color=colors[i % len(colors)], s = 2)
             plt.plot(df["x"], df["y"], color=colors[i % len(colors)])
 
-        x_spectrum : float = x_maximum - x_minimum
-        y_spectrum : float = y_maximum - y_minimum
-        plt.xlim(x_minimum - x_spectrum / 2, x_maximum + x_spectrum / 2)
-        plt.ylim(y_minimum - y_spectrum / 2, y_maximum + y_spectrum / 2)
+        x_range : float = x_maximum - x_minimum
+        y_range : float = y_maximum - y_minimum
+        plt.xlim(x_minimum - x_range / 2, x_maximum + x_range / 2)
+        plt.ylim(y_minimum - y_range / 2, y_maximum + y_range / 2)
 
         if simulation_data is not None:
             import matplotlib.patches as mpatches
             aircraft_1_init = [simulation_data.aircraft_1_initial_position.x(), simulation_data.aircraft_1_initial_position.y()]
             aircraft_2_init = [simulation_data.aircraft_2_initial_position.x(), simulation_data.aircraft_2_initial_position.y()]
-            plt.text(aircraft_1_init[0] + 0.05 * x_spectrum, aircraft_1_init[1] - 0.05 * y_spectrum, "Initial position\nof Aircraft 1", color = colors[0 % len(colors)], fontsize = 9, ha = "left")
-            plt.text(aircraft_2_init[0] + 0.05 * x_spectrum, aircraft_2_init[1] - 0.05 * y_spectrum, "Initial position\nof Aircraft 2", color = colors[1 % len(colors)], fontsize = 9, ha = "left")
+            plt.text(aircraft_1_init[0] + 0.05 * x_range, aircraft_1_init[1] - 0.05 * y_range, "Initial position\nof Aircraft 1", color = colors[0 % len(colors)], fontsize = 9, ha = "left")
+            plt.text(aircraft_2_init[0] + 0.05 * x_range, aircraft_2_init[1] - 0.05 * y_range, "Initial position\nof Aircraft 2", color = colors[1 % len(colors)], fontsize = 9, ha = "left")
             if simulation_data.collision:
                 aircraft_final = [simulation_data.aircraft_1_final_position.x(), simulation_data.aircraft_1_final_position.y()]
-                plt.text(aircraft_final[0] + 0.05 * x_spectrum, aircraft_final[1] - 0.05 * y_spectrum, "Collision", color = "r", fontsize = 9, ha = "left")
+                plt.text(aircraft_final[0] + 0.05 * x_range, aircraft_final[1] - 0.05 * y_range, "Collision", color = "r", fontsize = 9, ha = "left")
             angle_patch = mpatches.Patch(
                 color = "none",
-                label = "Init angle: " + "{:.2f}".format(simulation_data.aircraft_angle))
+                label = "Init angle: " + "{:.3f}".format(simulation_data.aircraft_angle))
             min_relative_dist_patch = mpatches.Patch(
                 color = "none",
-                label = "Min relative dist: " + "{:.2f}".format(simulation_data.minimal_relative_distance))
+                label = "Min relative dist: " + "{:.3f}".format(simulation_data.minimal_relative_distance))
             plt.legend(handles=[angle_patch, min_relative_dist_patch])
         
         if test_index is not None:
