@@ -15,7 +15,7 @@ Python project regarding implementation of two UAVs simulation with collision av
 
 ### Introduction
 
-UAV Collision Avoidance is my Bachelor's thesis project meeting problem of UAVs safe cooperation in the 3D space. Project implements functional physics calculations, scalable GUI, realistic ADS-B probable collision avoidance systems and on-board flight planning. Application offers multithreaded realtime simulation presenting simulated aircrafts as well as linearly pre-rendered simulation allowing for quick algorithm effectiveness testing.
+`UAV Collision Avoidance` is my Bachelor's thesis project meeting problem of UAVs safe cooperation in the 3D space. Project implements functional physics calculations, scalable GUI, realistic ADS-B probable collision avoidance systems and on-board flight planning. Application offers multithreaded realtime simulation presenting simulated aircrafts as well as linearly pre-rendered simulation allowing for quick algorithm effectiveness testing.
 
 ### Documentation
 
@@ -28,8 +28,8 @@ UAV Collision Avoidance is my Bachelor's thesis project meeting problem of UAVs 
 2. Physics Simulation: Physics are simulated by differentiating parts of the second according to appropriate formulas. The physics of Unmanned Aerial Vehicles (UAVs) are considered relative to the Earth's frame, separated from the aircraft's frame and wind relative frame. 3D space is flat, and the Earth's curvature is not considered. Gaining or losing altitude preserves the aircraft's speed.
 3. Aircraft Characteristics: The aircraft are considered Horizontal Take-off and Landing (HTOL) drones. They can only move in the direction of their speed vectors. The form of the aircraft is approximated to a simple solid sphere.
 4. Environment: The space is shared by two or three UAVs. There are no other objects or wind gusts assumed in this environment.
-5. Aerodynamics: No aerodynamic lift force is assumed at this moment. When turning, aircraft always take the maximum angle change that physics allow, respecting mass inertia. The angles are not approximated to meet exact courses.
-6. Units of Measurement: The default distance units are meters (m), speed is measured in meters per second (m/s), and frame times are represented in milliseconds (ms).
+5. Aerodynamics: No aerodynamic lift force is assumed at this moment. When turning, aircraft always take the maximum angle change that physics allow, respecting its mass inertia. Maximum pitch and roll angles are considered `-45°, 45°` and `-90°, 90°` respectively, where positive pitch angle means climbing and positive roll angle means banking right. Angles are not approximated for realism preservation.
+6. Units of Measurement: The default distance units are meters $\pu{m}$, speed is measured in meters per second $\pu{m/s}$, and frame times are represented in milliseconds $\pu{ms}$.
 
 ### Algorithms
 
@@ -47,17 +47,17 @@ Python3[^1] project is wrapped as a PyPi package[^2]. PySide6[^3] (Qt's Python Q
 
 ### Structures
 
-Application is built based on two main object types, simulation and aircraft. Simulation is created up to initial settings, allowing for concurrent realtime variant and linear pre-rendering. Aircraft consists of two elements, physical representation of the UAV and Flight Control Computer, which is controlled by the physics thread. Research among the UAV systems was possible thanks to second paper[^5].
+Application is built based on two main object types, simulation and aircraft. Simulation is created up to initial settings, allowing for concurrent realtime variant and linear pre-rendering. Aircraft consists of two elements, physical representation of the UAV and Flight Control Computer, which is controlled by the ADS-B thread. Research among the UAV systems was drawn on from second cited paper[^5].
 
 ### App arguments
 
-There are three possible arguments at the moment:
+There are eight possible arguments at the moment:
 - default (no arguments) - runs GUI simulation; avoiding collision can be achieved by pressing T, when aircrafts have their safe zones occupied
 - realtime [file_name] [test_index] [collision_avoidance] - runs GUI simulation; file name can be specified and defaults to latest simulation data found; test index can be specified and defaults to 0; collision avoidance can be specified and defaults to off
 - headless - runs physical simulation with ADS-B and collision avoidance algorithm
 - tests [test_number] - runs full tests comparing effectiveness of collision avoidance algorithm, test number defaults to 15
 - ongoing - runs default test number in parallel comparing effectiveness of collision avoidance algorithm continuously till Ctrl+C
-- load [file_name] [test_index] - loads and conducts headless simulation from file when specified, otherwise loads default example test case from data directory; test index can be specified and defaults to 0
+- load [file_name] [test_index] - loads and conducts headless simulation from file when specified, otherwise loads default example test case from data directory `/data`; test index can be specified and defaults to 0
 - help [argument] - prints help message for the app argument; defaults to all arguments list
 - version - prints version of the app
 
@@ -198,3 +198,4 @@ All used references are listed below.
 [^3]: [PyQt6](https://doc.qt.io/qtforpython-6/)
 [^4]: [UAV Collision Avoidance Based on Geometric Approach](https://ieeexplore.ieee.org/document/4655013/)
 [^5]: [Energy Efficient UAV Flight Control Method in an Environment with Obstacles and Gusts of Wind](https://www.mdpi.com/1638452/)
+[^6]: [Aircraft principal axes](https://en.wikipedia.org/wiki/Aircraft_principal_axes)
