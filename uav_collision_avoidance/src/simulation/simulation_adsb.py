@@ -153,7 +153,7 @@ class SimulationADSB(QThread):
                     print("Head-on collision detected")
                     logging.info("Head-on collision detected")
 
-                # resolve confict condition
+                # resolve conflict condition
                 unresolved_region : float = self.simulation_state.minimum_separation - abs(miss_distance_vector.length())
                 if unresolved_region > 0.0:
                     print("Conflict condition detected")

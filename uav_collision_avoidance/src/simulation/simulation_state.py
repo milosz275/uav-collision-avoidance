@@ -52,7 +52,7 @@ class SimulationState(QSettings):
             self.__draw_grid : bool = False
             self.__draw_path : bool = True
             self.__draw_speed_vectors : bool = True
-            self.__draw_safezones : bool = True
+            self.__draw_safe_zones : bool = True
             self.__draw_collision_detection : bool = True
             self.__optimize_drawing : bool = False
             self.__follow_aircraft : bool = False
@@ -212,12 +212,12 @@ class SimulationState(QSettings):
     
     @property
     def adsb_report(self) -> None:
-        """Returns ADS-B commandline info reporting flag"""
+        """Returns ADS-B command-line info reporting flag"""
         with QMutexLocker(self.__mutex):
             return self.__adsb_report
 
     def toggle_adsb_report(self) -> None:
-        """Toggles ADS-B commandline info report"""
+        """Toggles ADS-B command-line info report"""
         with QMutexLocker(self.__mutex):
             self.__adsb_report = not self.__adsb_report
 
@@ -334,15 +334,15 @@ class SimulationState(QSettings):
             self.__draw_speed_vectors = not self.__draw_speed_vectors
 
     @property
-    def draw_safezones(self) -> bool:
-        """Returns safezone display flag"""
+    def draw_safe_zones(self) -> bool:
+        """Returns safe_zone display flag"""
         with QMutexLocker(self.__mutex):
-            return self.__draw_safezones
+            return self.__draw_safe_zones
         
-    def toggle_draw_safezones(self) -> None:
-        """Toggles safezone display"""
+    def toggle_draw_safe_zones(self) -> None:
+        """Toggles safe_zone display"""
         with QMutexLocker(self.__mutex):
-            self.__draw_safezones = not self.__draw_safezones
+            self.__draw_safe_zones = not self.__draw_safe_zones
 
     @property
     def draw_collision_detection(self) -> bool:

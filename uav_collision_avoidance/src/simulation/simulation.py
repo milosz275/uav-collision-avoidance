@@ -134,9 +134,9 @@ class Simulation(QMainWindow):
         else:
             self.run_gui()
 
-    def run_gui(self, avoid_collisions : bool = False, load_lastest_data_file : bool = True) -> None:
+    def run_gui(self, avoid_collisions : bool = False, load_latest_data_file : bool = True) -> None:
         """Executes realtime simulation"""
-        if load_lastest_data_file:
+        if load_latest_data_file:
             self.load_latest_simulation_data_file()
         if self.aircrafts is None or self.aircrafts == []:
             self.setup_debug_aircrafts()

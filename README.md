@@ -15,7 +15,7 @@ Python project regarding implementation of two UAVs simulation with collision av
 
 ### Introduction
 
-UAV Collision Avoidance is my Bachelor's thesis project meeting problem of UAVs safe cooperation in the 3D space. Project implements functional physics calculations, scalable GUI, realistic ADS-B probable collision avoidance systems and on-board flight planning. Application offers multithreaded realtime simulation presenting simulated aircrafts as well as linearly prerendered simulation allowing for quick algorithm effectiveness testing.
+UAV Collision Avoidance is my Bachelor's thesis project meeting problem of UAVs safe cooperation in the 3D space. Project implements functional physics calculations, scalable GUI, realistic ADS-B probable collision avoidance systems and on-board flight planning. Application offers multithreaded realtime simulation presenting simulated aircrafts as well as linearly pre-rendered simulation allowing for quick algorithm effectiveness testing.
 
 ### Documentation
 
@@ -47,7 +47,7 @@ Python3[^1] project is wrapped as a PyPi package[^2]. PySide6[^3] (Qt's Python Q
 
 ### Structures
 
-Application is built based on two main object types, simulation and aircraft. Simulation is created up to initial settings, allowing for concurrent realtime variant and linear prerendering. Aircraft consists of two elements, physical representation of the UAV and Flight Control Computer, which is controlled by the physics thread. Research among the UAV systems was possible thanks to second paper[^5].
+Application is built based on two main object types, simulation and aircraft. Simulation is created up to initial settings, allowing for concurrent realtime variant and linear pre-rendering. Aircraft consists of two elements, physical representation of the UAV and Flight Control Computer, which is controlled by the physics thread. Research among the UAV systems was possible thanks to second paper[^5].
 
 ### App arguments
 
@@ -102,7 +102,7 @@ For Debian 12, you need to install the following dependencies:
 sudo apt-get install libgl1 libxcb-xinerama0
 ```
 
-To run the app headlessly, you need to run the following export:
+To run the app headless, you need to run the following export:
 
 ```bash
 export QT_QPA_PLATFORM=offscreen
