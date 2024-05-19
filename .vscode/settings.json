@@ -7,12 +7,15 @@
     "python.analysis.extraPaths": [
         "./uav_collision_avoidance"
     ],
+    "cSpell.language": "en,pl",
     "cSpell.words": [
         "adsb",
         "aircrafts",
         "Antialiasing",
         "appendleft",
         "Codespaces",
+        "dronów",
+        "drony",
         "fccs",
         "fontsize",
         "Forem",
