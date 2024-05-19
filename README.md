@@ -37,7 +37,7 @@ Both collision detection and avoidance algorithms rely on geometrical approach. 
 
 ### Results
 
-[ ] Fill in the results (Geometrical approach...)
+- [ ] Fill in the results (Geometrical approach...)
 
 ## Python Project
 
