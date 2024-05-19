@@ -13,7 +13,7 @@ Python project regarding implementation of two UAVs simulation with collision av
 
 ### Introduction
 
-UAV Collision Avoidance is my Bachelor's thesis project meeting problem of UAVs safe cooperation in the 3D space. Project implements functional physics calculations, scalable GUI, realistic ADS-B probable collision avoidance systems and on-board flight planning. Application offers multithreaded realtime simulation presenting simulated aircrafts as well as linearly prerendered simulation allowing for quick algorithm effectiveness testing. The project is based on two research papers[^4][^5].
+UAV Collision Avoidance is my Bachelor's thesis project meeting problem of UAVs safe cooperation in the 3D space. Project implements functional physics calculations, scalable GUI, realistic ADS-B probable collision avoidance systems and on-board flight planning. Application offers multithreaded realtime simulation presenting simulated aircrafts as well as linearly prerendered simulation allowing for quick algorithm effectiveness testing.
 
 ### Premises
 
