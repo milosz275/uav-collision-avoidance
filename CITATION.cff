@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Maculewicz"
+  given-names: "Miłosz"
+  orcid: "https://orcid.org/0009-0005-1309-9200"
+title: "UAV Collision Avoidance - Physics, ADS-B simulation"
+version: 1.0.0
+date-released: 2024-05-01
+url: "https://github.com/mldxo/uav-collision-avoidance"
