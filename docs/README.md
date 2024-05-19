@@ -64,7 +64,7 @@ The `Simulation` class is responsible for generating test cases, conducting seri
 - `obtain_simulation_hash() -> str`: Obtains unique hash for the simulation.
 - `run() -> None`: Starts appropriate type of simulation.
 - `run_gui(avoid_collisions : bool, load_latest_data_file : bool) -> None`: Explicitly runs simulation with graphical user interface (GUI).
-- `run_headless(avoid_collisions : bool, aircrafts : List[Aircraft], test_index : int, aircraft_angle : float) -> SimulationData`: Explicitly runs simulation headlessly. Returns simulation data structure for perfoming checks.
+- `run_headless(avoid_collisions : bool, aircrafts : List[Aircraft], test_index : int, aircraft_angle : float) -> SimulationData`: Explicitly runs simulation headless. Returns simulation data structure for performing checks.
 - `generate_test_aircrafts() -> List[Tuple[List[Aircraft], float]]`: Generates random list of lists of Aircrafts (paired with start angle between them) ready to be iterated through and used in test simulation.
 - `generate_consistent_list_of_aircraft_lists() -> List[Tuple[List[Aircraft], float]]`: Returns predefined set of aircrafts
 - `run_tests(begin_with_default_set : bool, test_number : int)`: Runs headless simulation sequentially using test cases generation. Exports simulation data.
@@ -76,7 +76,7 @@ The `Simulation` class is responsible for generating test cases, conducting seri
 - `add_aircraft(aircraft : Aircraft) -> None`: Appends given aircraft to initialized aircraft list.
 - `remove_aircraft(aircraft : Aircraft) -> None`: Tries to remove given aircraft from aircraft list.
 - `setup_aircrafts(self, aircrafts : List[Aircraft]) -> None`: Initializes new aircraft list using given aircraft list.
-- `setup_debug_aircrafts(self, test_case : int) -> None`: Overriddes aircraft list with predefined aircraft set.
+- `setup_debug_aircrafts(self, test_case : int) -> None`: Overrides aircraft list with predefined aircraft set.
 - `import_simulation_data(data : SimulationData) -> None`: Attempts to load simulation data from given data structure.
 - `check_simulation_data_correctness() -> bool`: Runs check of current simulation state with loaded, expected simulation data. Returns true if correct.
 - `export_visited_locations(simulation_data : SimulationData, test_index : int)`: Exports locations marked as visited from aircrafts' FCCs. Attempts to create visual representations of aircraft paths.
@@ -90,6 +90,26 @@ The `Simulation` class is responsible for generating test cases, conducting seri
 **Description**: 
 Enables the creation of a thread responsible for simulating physics, tracking vehicle locations, and performing operations on them over time. It imitates physical laws affecting physical bodies through the use of differentiation.
 
+#### Properties:
+- `aircrafts`: List of simulated aircrafts.
+- `aircraft_vehicles`: List of simulated aircraft vehicles.
+- `aircraft_fccs`: List of simulated aircraft FCCs.
+- `simulation_state`: State of the simulation.
+- `cycles`: Number of counted cycles.
+
+#### Methods:
+
+- `__init__(aircrafts : List[Aircraft], simulation_state : SimulationState) -> None`: Initializes a new physics simulation instance.
+- `count_cycles() -> None`: Increments the number of counted cycles and updates simulation state.
+- `run() -> None`: Starts the physics simulation.
+- `mark_start_time() -> None`: Marks the start time of the simulation.
+- `mark_stop_time() -> None`: Marks the end time of the simulation.
+- `cycle(elapsed_time : float) -> None`: Performs a single cycle of the simulation.
+- `reset_aircrafts() -> None`: Resets the positions of all aircrafts.
+- `update_aircrafts_positions() -> bool`: Updates the positions of all aircrafts. Returns true if any of the aircrafts have collided.
+- `update_aircrafts_speed_angles() -> None`: Updates the speed and angle of all aircrafts.
+- `test_speed() -> None`: Tests the correctness of the speed of all aircrafts.
+
 ---
 
 ## File: `src/simulation/simulation_adsb.py`
@@ -99,6 +119,22 @@ Enables the creation of a thread responsible for simulating physics, tracking ve
 **Description**: 
 Enables the creation of a thread responsible for simulating the ADS-B (Automatic Dependent Surveillance-Broadcast) system. Manages the onboard computers (FCC) of UAVs to send collision avoidance data when necessary.
 
+#### Properties:
+- `aircrafts`: List of simulated aircrafts.
+- `aircraft_vehicles`: List of simulated aircraft vehicles.
+- `aircraft_fccs`: List of simulated aircraft FCCs.
+- `simulation_state`: State of the simulation.
+- `adsb_cycles`: Number of counted ADS-B system cycles.
+- `minimal_relative_distance`: Minimal known relative distance between two aircrafts.
+
+#### Methods:
+- `__init__(aircrafts : List[Aircraft], simulation_state : SimulationState) -> None`: Initializes a new ADS-B simulation instance.
+- `count_adsb_cycles() -> None`: Increments the number of counted ADS-B system cycles.
+- `run() -> None`: Starts the ADS-B simulation.
+- `cycle() -> None`: Performs a single cycle of the ADS-B simulation.
+- `print_adsb_report() -> None`: Prints the ADS-B data of all aircrafts.
+- `reset_destinations() -> None`: Resets the destinations of all aircrafts to initial state.
+
 ---
 
 ## File: `src/simulation/simulation_state.py`
@@ -107,6 +143,30 @@ Enables the creation of a thread responsible for simulating the ADS-B (Automatic
 
 **Description**: 
 Stores the current state of the simulation - variables accessible to all components of the program. It supports both realtime and headless simulations.
+
+#### Properties:
+- `simulation_settings`: Simulation settings.
+- `is_realtime`: Flag representing if the simulation is running in real-time.
+- `avoid_collisions`: Flag representing if the simulation should avoid collisions.
+- `override_avoid_collisions`: Flag representing if the collision avoidance should be overridden.
+- `minimum_separation`: Minimum separation between aircrafts.
+- `physics_cycles`: Number of counted physics cycles.
+- `is_paused`: Flag representing if the simulation is paused.
+- `is_running`: Flag representing if the simulation is running.
+- `reset_demanded`: Flag representing if the simulation should be reset.
+- `pause_start_timestamp`: Time when the simulation was paused.
+- `time_paused`: Time the simulation was paused.
+- `adsb_report`: Flag representing if the ADS-B report should be printed.
+- `collision`: Flag representing if a collision has occurred.
+- `first_cause_collision`: Flag representing if the first aircraft caused a collision.
+- `second_cause_collision`: Flag representing if the second aircraft caused a collision.
+- `fps`: Number of frames per second (if GUI is initialized).
+
+> [!WARNING]
+> Documentation below is still in progress.
+
+#### Methods:
+- `__init__(simulation_settings : SimulationSettings, is_realtime : bool, avoid_collisions : bool) -> None`: Initializes a new simulation state instance.
 
 ---
 
