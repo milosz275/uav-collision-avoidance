@@ -4,9 +4,11 @@
 [![CodeQL](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/github-code-scanning/codeql)
 [![PyPI version](https://badge.fury.io/py/uav-collision-avoidance.svg)](https://badge.fury.io/py/uav-collision-avoidance)
 
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/mldxo/uav-collision-avoidance)
+
 Python project regarding implementation of two UAVs simulation with collision avoidance system based on geometrical approach.
+
 - [Github](https://github.com/mldxo/uav-collision-avoidance)
-- [Documentation](https://github.com/mldxo/uav-collision-avoidance/wiki/Docs)
 - [PyPi](https://pypi.org/project/uav-collision-avoidance)
 
 ## Research work
@@ -14,6 +16,11 @@ Python project regarding implementation of two UAVs simulation with collision av
 ### Introduction
 
 UAV Collision Avoidance is my Bachelor's thesis project meeting problem of UAVs safe cooperation in the 3D space. Project implements functional physics calculations, scalable GUI, realistic ADS-B probable collision avoidance systems and on-board flight planning. Application offers multithreaded realtime simulation presenting simulated aircrafts as well as linearly prerendered simulation allowing for quick algorithm effectiveness testing.
+
+### Documentation
+
+- [Docs](/docs/README.md)
+- [Wiki](https://github.com/mldxo/uav-collision-avoidance/wiki/Docs)
 
 ### Premises
 
@@ -27,6 +34,10 @@ UAV Collision Avoidance is my Bachelor's thesis project meeting problem of UAVs 
 ### Algorithms
 
 Both collision detection and avoidance algorithms rely on geometrical approach. They were presented in referenced paper[^4]. Collision detection differentiates between collision and head-on collision. The second one applies when UAVs have no distance between their projected center of masses collision, and the first one when it is every other type of contact.
+
+### Results
+
+[] Fill in the results (Geometrical approach...)
 
 ## Python Project
 
