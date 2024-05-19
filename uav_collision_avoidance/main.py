@@ -164,6 +164,7 @@ def main(arg = None) -> None:
             sys.exit(1)
         else:
             print(f"Invalid argument: {args[0]}")
+            print("Usage: uav_collision_avoidance [realtime|headless|tests|load|ongoing|help|version]")
             logging.error("Invalid argument: %s", args[0])
             sys.exit(1)
     else:
