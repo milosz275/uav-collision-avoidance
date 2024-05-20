@@ -53,7 +53,7 @@ def main(arg = None) -> None:
     import sys
     args = sys.argv[1:]
     app = QApplication(args)
-    app.setApplicationName("UAV Collsion Avoidance")
+    app.setApplicationName("UAV Collision Avoidance")
     app.setApplicationVersion(version)
     SimulationSettings.screen_resolution = app.primaryScreen().size()
     logging.info("%s %s", app.applicationName(), app.applicationVersion())
@@ -77,7 +77,7 @@ def main(arg = None) -> None:
                     print(f"Invalid arguments: {args}")
                     logging.warning("Invalid arguments: %s", args)
                 sim.load_simulation_data_from_file(file_path = file_path, test_id = test_id, avoid_collisions = avoid_collisions)
-                sim.run_gui(avoid_collisions = avoid_collisions, load_lastest_data_file = False)
+                sim.run_gui(avoid_collisions = avoid_collisions, load_latest_data_file = False)
             else:
                 sim.run()
             sys.exit(app.exec())
@@ -164,6 +164,7 @@ def main(arg = None) -> None:
             sys.exit(1)
         else:
             print(f"Invalid argument: {args[0]}")
+            print("Usage: uav_collision_avoidance [realtime|headless|tests|load|ongoing|help|version]")
             logging.error("Invalid argument: %s", args[0])
             sys.exit(1)
     else:

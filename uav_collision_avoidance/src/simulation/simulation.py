@@ -134,9 +134,9 @@ class Simulation(QMainWindow):
         else:
             self.run_gui()
 
-    def run_gui(self, avoid_collisions : bool = False, load_lastest_data_file : bool = True) -> None:
+    def run_gui(self, avoid_collisions : bool = False, load_latest_data_file : bool = True) -> None:
         """Executes realtime simulation"""
-        if load_lastest_data_file:
+        if load_latest_data_file:
             self.load_latest_simulation_data_file()
         if self.aircrafts is None or self.aircrafts == []:
             self.setup_debug_aircrafts()
@@ -697,7 +697,7 @@ class Simulation(QMainWindow):
         self.simulation_physics.wait()
 
         if self.state.is_paused:
-            self.state.append_paused_time()
+            self.state.append_time_paused()
         simulated_time : float = self.state.physics_cycles / (1000 / self.state.simulation_threshold)
         real_time_pauses : float = self.simulation_physics.global_start_timestamp.msecsTo(self.simulation_physics.global_stop_timestamp) / 1000
         real_time : float = real_time_pauses - (self.state.time_paused / 1000)

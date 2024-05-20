@@ -48,10 +48,10 @@ class SimulationWidget(QWidget):
         self.__moving_view_down : bool = False
         self.__moving_view_left : bool = False
         self.__moving_view_right : bool = False
-        self.__steering_left : bool = False
-        self.__steering_right : bool = False
         self.__steering_up : bool = False
         self.__steering_down : bool = False
+        self.__steering_left : bool = False
+        self.__steering_right : bool = False
 
         self.center_offsets()
 
@@ -499,7 +499,7 @@ class SimulationWidget(QWidget):
                 self.draw_destinations(aircraft, scale)
             if self.__simulation_state.draw_speed_vectors:
                 self.draw_vector(aircraft.position, aircraft.position + aircraft.speed, scale)
-            if self.__simulation_state.draw_safezones:
+            if self.__simulation_state.draw_safe_zones:
                 self.draw_circle(aircraft.position, self.__simulation_state.minimum_separation, scale)
         return super().paintEvent(event)
 
@@ -586,7 +586,7 @@ class SimulationWidget(QWidget):
         elif event.key() == Qt.Key.Key_M:
             self.__simulation_state.toggle_focus_aircraft()
         elif event.key() == Qt.Key.Key_Z:
-            self.__simulation_state.toggle_draw_safezones()
+            self.__simulation_state.toggle_draw_safe_zones()
         elif event.key() == Qt.Key.Key_Left:
             self.__moving_view_left = True
         elif event.key() == Qt.Key.Key_Right:
