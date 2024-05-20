@@ -106,10 +106,10 @@ class AircraftVehicle(QObject):
             self.__position.setY(self.__position.y() + dy)
             self.__position.setZ(self.__position.z() + dz)
     
-    def roll(self, dy) -> None:
+    def roll(self, d_angle) -> None:
         """Applies roll angle delta of the aircraft"""
         with QMutexLocker(self.__mutex):
-            self.__roll_angle += dy
+            self.__roll_angle += d_angle
     
     @property
     def absolute_speed(self) -> float:
