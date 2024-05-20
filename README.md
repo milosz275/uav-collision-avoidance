@@ -202,12 +202,3 @@ All used references are listed below.
 [^4]: [UAV Collision Avoidance Based on Geometric Approach](https://ieeexplore.ieee.org/document/4655013/)
 [^5]: [Energy Efficient UAV Flight Control Method in an Environment with Obstacles and Gusts of Wind](https://www.mdpi.com/1638452/)
 [^6]: [Aircraft principal axes](https://en.wikipedia.org/wiki/Aircraft_principal_axes)
-
-[]: # (README.md)
-[]: # (2024; Miłosz Maculewicz; MIT License)
-```
-
-[]: # (README.pl.md)
-# Unikanie Kolizji UAV
-
-[![en](https://img.shields.io/badge/lang-en-blue.svg)](https://github.com/mldxo/uav-collision-avoidance/blob/master/README)
