@@ -304,8 +304,13 @@ Enables the creation of a user interface - an interactive window that visualizes
 **Description**: 
 Enables the creation of a thread responsible for refreshing the simulation window in the `SimulationWidget`.
 
-> [!WARNING]
-> Documentation below is still in progress.
+#### Properties:
+- `simulation_widget`: Simulation widget.
+- `simulation_state`: State of the simulation.
+
+#### Methods:
+- `__init__(simulation_widget : SimulationWidget, simulation_state : SimulationState) -> None`: Initializes a new simulation render instance.
+- `run() -> None`: Starts the simulation render.
 
 ---
 
@@ -316,6 +321,18 @@ Enables the creation of a thread responsible for refreshing the simulation windo
 **Description**: 
 Provides an interface for counting and displaying the number of frames generated per second during a realtime simulation.
 
+#### Properties:
+- `simulation_state`: State of the simulation.
+- `counted_frames`: Number of counted frames.
+- `previous_timestamp`: Previous timestamp of run cycle.
+
+#### Methods:
+- `__init__(simulation_state : SimulationState) -> None`: Initializes a new simulation FPS instance.
+- `run() -> None`: Starts the FPS counting.
+- `count_frame() -> None`: Increments the number of counted frames.
+- `reset_frames() -> None`: Resets the number of counted frames.
+- `counted_frames -> int`: Returns the number of counted frames.
+
 ---
 
 ## File: `src/simulation/simulation_data.py`
@@ -324,6 +341,27 @@ Provides an interface for counting and displaying the number of frames generated
 
 **Description**: 
 Allows tracking of data related to the simulation, which is necessary for loading and generating tests.
+
+#### Properties:
+- `aircraft_angle`: Angle between the two aircrafts.
+- `aircraft_1_initial_position`: Initial position of the first aircraft.
+- `aircraft_2_initial_position`: Initial position of the second aircraft.
+- `aircraft_1_final_position`: Final position of the first aircraft.
+- `aircraft_2_final_position`: Final position of the second aircraft.
+- `aircraft_1_initial_speed`: Initial speed of the first aircraft.
+- `aircraft_2_initial_speed`: Initial speed of the second aircraft.
+- `aircraft_1_final_speed`: Final speed of the first aircraft.
+- `aircraft_2_final_speed`: Final speed of the second aircraft.
+- `aircraft_1_initial_target`: Initial target of the first aircraft.
+- `aircraft_2_initial_target`: Initial target of the second aircraft.
+- `aircraft_1_initial_roll_angle`: Initial roll angle of the first aircraft.
+- `aircraft_2_initial_roll_angle`: Initial roll angle of the second aircraft.
+- `collision`: Flag representing if a collision has occurred.
+- `minimal_relative_distance`: Minimal known relative distance between two aircrafts.
+
+#### Methods:
+- `__init__() -> None`: Initializes a new simulation data instance.
+- `reset() -> None`: Resets the simulation data.
 
 ---
 
@@ -334,6 +372,19 @@ Allows tracking of data related to the simulation, which is necessary for loadin
 **Description**: 
 Represents a simulated UAV. It creates its components using composition - objects of the `AircraftFCC` and `AircraftVehicle` classes.
 
+#### Properties:
+- `aircraft_id`: Identifier of the aircraft.
+- `vehicle`: Physical representation of the aircraft.
+- `fcc`: Onboard computer of the aircraft.
+- `initial_position`: Initial position of the aircraft.
+- `initial_target`: Initial target of the aircraft.
+- `initial_speed`: Initial speed of the aircraft.
+- `initial_roll_angle`: Initial roll angle of the aircraft.
+
+#### Methods:
+- `__init__(aircraft_id : int, position : QVector3D, speed : float, initial_target : QVector3D, initial_roll_angle : float) -> None`: Initializes a new aircraft instance.
+- `reset() -> None`: Resets the aircraft to its initial state.
+
 ---
 
 ## File: `src/aircraft/aircraft_fcc.py`
@@ -343,6 +394,47 @@ Represents a simulated UAV. It creates its components using composition - object
 **Description**: 
 Represents the onboard computer of a UAV. Tracks its planned route and sets the appropriate flight parameters.
 
+#### Properties:
+- `aircraft_id`: Identifier of the aircraft.
+- `aircraft`: Parent aircraft object.
+- `destinations`: Dequeue of destinations.
+- `destinations_history`: List of previous destinations.
+- `visited`: List of visited locations.
+- `autopilot`: Flag representing if the autopilot is enabled.
+- `ignore_destinations`: Flag representing if the destinations should be ignored.
+- `initial_target`: Initial target of the aircraft.
+- `target_yaw_angle`: Target yaw angle of the aircraft.
+- `target_roll_angle`: Target roll/bank angle of the aircraft.
+- `target_pitch_angle`: Target pitch angle of the aircraft.
+- `target_speed`: Target speed of the aircraft.
+- `is_turning_right`: Flag representing if the aircraft is turning right.
+- `is_turning_left`: Flag representing if the aircraft is turning left.
+- `safe_zone_occupied`: Flag representing if the safe zone is occupied.
+- `evade_maneuver`: Flag representing if the aircraft is performing an evade maneuver.
+- `vector_sharing_resolution`: Resolution of the vector sharing.
+
+#### Methods:
+- `__init__(aircraft_id : int, initial_target : QVector3D) -> None`: Initializes a new aircraft FCC instance.
+- `toggle_autopilot() -> None`: Toggles the autopilot flag.
+- `accelerate(acceleration : float) -> None`: Accelerates/decelerates the target speed.
+- `check_new_destination(destination : QVector3D, first : bool) -> QVector3D`: Checks if the new destination is valid and returns it/corrects it.
+- `add_last_destination(destination : QVector3D) -> None`: Adds new destination to the end of the destinations list.
+- `add_first_destination(destination : QVector3D) -> None`: Adds new destination to the beginning of the destinations list.
+- `append_visited() -> None`: Appends the current position to the visited locations list.
+- `normalize_angle(angle : float) -> float`: Normalizes the angle to the range `[0, 360]`.
+- `format_yaw_angle(angle : float) -> float`: Formats the yaw angle to the range `[-180, 180]`.
+- `apply_evade_maneuver(opponent_speed : QVector3D, miss_distance_vector : QVector3D, unresolved_region : float, time_to_closest_approach : float) -> None`: Applies the evade maneuver using geometrical approach.
+- `reset_evade_maneuver() -> None`: Resets the evade maneuver.
+- `find_best_roll_angle(current_yaw_angle : float, target_yaw_angle : float) -> float`: Finds the best roll angle for the aircraft.
+- `find_best_yaw_angle(position : QVector3D, destination : QVector3D) -> float`: Finds the best yaw angle for the aircraft.
+- `find_best_pitch_angle(position : QVector3D, destination : QVector3D) -> float`: Finds the best pitch angle for the aircraft.
+- `update_target_yaw_pitch_angles() -> None`: Updates the target yaw and pitch angles.
+- `update_target_roll_angle() -> None`: Updates the target roll angle.
+- `update() -> None`: Updates all aircraft angles.
+- `update_target(target : QVector3D) -> None`: Updates the target of the aircraft.
+- `reset() -> None`: Resets the aircraft FCC to its initial state.
+- `load_initial_destination() -> None`: Loads the initial target as the first destination of the aircraft.
+
 ---
 
 ## File: `src/aircraft/aircraft_vehicle.py`
@@ -351,6 +443,26 @@ Represents the onboard computer of a UAV. Tracks its planned route and sets the 
 
 **Description**: 
 Represents the UAV as a physical object. Stores information about its position in space and speed, as well as the size of the UAV and its inertia.
+
+#### Static properties:
+- `roll_dynamic_delay`: Delay of the roll/bank dynamic [ms].
+- `pitch_dynamic_delay`: Delay of the pitch dynamic [ms].
+- `max_acceleration`: Maximum acceleration of the aircraft [m/s^2].
+
+#### Properties:
+- `aircraft_id`: Identifier of the aircraft.
+- `position`: Position of the aircraft.
+- `speed`: Speed of the aircraft.
+- `size`: Size of the aircraft.
+- `roll_angle`: Yaw angle of the aircraft.
+- `initial_roll_angle`: Initial roll angle of the aircraft.
+- `distance_covered`: Distance covered by the aircraft.
+
+#### Methods:
+- `__init__(aircraft_id : int, position : QVector3D, speed : float, size : float, roll_angle : float) -> None`: Initializes a new aircraft vehicle instance.
+- `reset_distance_covered() -> None`: Resets the distance covered by the aircraft.
+- `move(dx : float, dy : float, dz : float) -> None`: Moves the aircraft by the given distances.
+- `roll(d_angle : float)`: Rolls the aircraft by the given angle delta.
 
 ---
 
