@@ -64,6 +64,8 @@ There are eight possible arguments at the moment:
 
 ### Key shortcuts
 
+Realtime version of the app has several key shortcuts allowing user interaction with the environment.
+
 > [!NOTE]
 > Aircraft 0 is the first one, Aircraft 1 is the second one.
 
@@ -76,7 +78,7 @@ There are several key shortcuts for realtime version of the app that allow full-
 - Plus/minus keys (+/-) - zooms in/out the simulation render quickly
 - Arrow keys (↑ ↓ → ←) - moves the view
 - F1 key - toggles ADS-B Aircraft 0 info reporting
-- F2/F3 keys - speed up/down target speed of Aircraft 0
+- F2/F3 keys - speed down/up target speed of Aircraft 0
 - N key - toggles Aircraft 0/1 view following (default off)
 - M key - switches between Aircraft 0/1 view following (default 0)
 - O key - toggles Aircraft 0 targeting Aircraft 1's speed vector (default off)
@@ -174,7 +176,7 @@ python main.py [argument]
 
 ### Remarks
 
-3-dimensional (3D) world is projected on 2D screen by flattening height (z coordinate). On the program start, the view is centered on the first aircraft. The view can be moved with arrow keys.
+3-dimensional (3D) world is projected on 2D screen by flattening height (z coordinate). On the program start, the view is not centered on any of the aircrafts. The view can be moved with arrow keys or centered on the aircraft using `N` key.
 
 One coding convention is not preserved in the scope of the project. Qt's methods are CamelCase formatted and the rest is default Python naming convention including snake_case for variable and member names.
 
@@ -182,7 +184,7 @@ One coding convention is not preserved in the scope of the project. Qt's methods
 
 - [ ] ADS-B: FCC angle optimization
 - [ ] Rendering: Aircraft centered view optimization
-- [ ] Wiki: Documentation
+- [x] Wiki: Documentation
 
 ## Authors
 
@@ -200,3 +202,12 @@ All used references are listed below.
 [^4]: [UAV Collision Avoidance Based on Geometric Approach](https://ieeexplore.ieee.org/document/4655013/)
 [^5]: [Energy Efficient UAV Flight Control Method in an Environment with Obstacles and Gusts of Wind](https://www.mdpi.com/1638452/)
 [^6]: [Aircraft principal axes](https://en.wikipedia.org/wiki/Aircraft_principal_axes)
+
+[]: # (README.md)
+[]: # (2024; Miłosz Maculewicz; MIT License)
+```
+
+[]: # (README.pl.md)
+# Unikanie Kolizji UAV
+
+[![en](https://img.shields.io/badge/lang-en-blue.svg)](https://github.com/mldxo/uav-collision-avoidance/blob/master/README)
