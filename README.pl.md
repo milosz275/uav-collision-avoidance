@@ -21,7 +21,7 @@ Implementacja algorytmu unikania kolizji dla dronów w przestrzeni 3D bazująca 
 ### Dokumentacja
 
 - [Dokumentacja](/docs/README.md)
-- [Wiki](https://github.com/mldxo/uav-collision-avoidance/wiki/Docs)
+- [Wiki](https://github.com/mldxo/uav-collision-avoidance/wiki)
 
 ### Założenia
 
