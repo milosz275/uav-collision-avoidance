@@ -64,12 +64,138 @@ Obecnie dostępne jest osiem możliwych argumentów wywołania aplikacji:
 
 ### Skróty klawiszowe
 
-> [!WARNING]
-> Reszta instrukcji nie została wypełniona.
+Program w wersji real-time wyposażono w sposób interakcji użytkownika z symulowanym środowiskiem.
 
-## References
+> [!NOTE]
+> Samolot 0 oznacza pierwszy samolot, a samolot 1 oznacza drugi samolot.
 
-All used references are listed below.
+- Lewy przycisk myszy (LPM) - dodaje nowy punkt na początek trasy samolotu 0 w lokalizacji kursora
+- Prawy przycisk myszy (PPM) - dodaje nowy punkt na koniec trasy samolotu 0 w lokalizacji kursora
+- Środowy przycisk myszy (ŚPM) - teleportuje samolot 0 w lokalizację kursora
+- Koło myszy - przybliża i oddala widok
+- Klawisze plus/minus (+/-) - przybliża i oddala widok (szybciej niż koło myszy)
+- Strzałki (↑ ↓ → ←) - przesuwa widok w zadaną stronę
+- F1 - przełącza raportowanie informacji ADS-B samolotu 0
+- F2/F3 - zwalnia/przyspiesza docelową prędkość samolotu 0
+- Klawisz N - przełącza śledzenie widoku samolotu 0/1 (domyślnie wyłączone)
+- Klawisz M - przełącza widok śledzonego samolotu 0/1 (domyślnie samolot 0)
+- Klawisz O - przełącza tryb powodowania kolizji dla samolotu 0 z samolotem 1 (domyślnie wyłączone)
+- Klawisz P - przełącza tryb powodowania kolizji dla samolotu 1 z samolotem 0 (domyślnie wyłączone)
+- Klawisz T - uruchamia procedurę unikania kolizji dla samolotów 0 i 1 (domyślnie wyłączone)
+- Klawisze WSAD - nadpisują chwilowy kurs samolotu 0 - odpowiednio 0, 180, 270 i 90 stopni
+- Klawisz R - resetuje symulację do stanu początkowego
+- Ukośnik (/) - pauzuje symulację
+- Klawisz Esc - kończy symulację i zamyka aplikację
+
+### Instalacja
+
+Zainstaluj pakiet z PyPi:
+
+```bash
+pip install uav-collision-avoidance
+```
+
+#### Zależności Debian 12
+
+Dla systemu Debian 12 wymagane jest zainstalowanie pakietów:
+
+```bash
+sudo apt-get install libgl1 libxcb-xinerama0
+```
+
+Przed uruchomieniem aplikacji w tle, wykonaj następującą instrukcję:
+
+```bash
+export QT_QPA_PLATFORM=offscreen
+```
+
+### Użycie
+
+Uruchom aplikację za pomocą jednego z poniższych poleceń:
+
+```bash
+uav-collision-avoidance
+```
+
+```bash
+uav-collision-avoidance realtime [nazwa_pliku] [indeks_testu] [unikanie_kolizji]
+```
+
+```bash
+uav-collision-avoidance headless
+```
+
+```bash
+uav-collision-avoidance tests [liczba_testów]
+```
+
+```bash
+uav-collision-avoidance ongoing
+```
+
+```bash
+uav-collision-avoidance load [nazwa_pliku] [indeks_testu]
+```
+
+```bash
+uav-collision-avoidance help [argument_aplikacji]
+```
+
+>[!NOTE]
+> Pomoc jest wyświetlana w języku angielskim.
+
+```bash
+uav-collision-avoidance version
+```
+
+### Budowanie (build)
+
+Aby zbudować aplikację, wykonaj poniższe grupy poleceń zależnie od systemu:
+
+<p align="left">
+    <img width="30px" alt="Bash" style="padding-right:10px;" src="https://skillicons.dev/icons?i=bash" />
+</p>
+
+```bash
+#!/bin/bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+python main.py [argument]
+```
+
+<p align="left">
+    <img width="30px" alt="Powershell" style="padding-right:10px;" src="https://skillicons.dev/icons?i=powershell" />
+</p>
+
+```powershell
+python -m venv venv
+.\venv\Scripts\activate
+pip install -r requirements.txt
+python main.py [argument]
+```
+
+### Uwagi
+
+Trójwymiarowa (3D) przestrzeń świata jest rzutowana na płaską powierzchnię poprzez spłaszczenie osi Z (wysokość). Przy starcie programu, widok jest niezależny od symulowanych pojazdów latających i może być przesuwany strzałkami. W celu wyśrodkowania widoku na samolocie, należy nacisnąć przycisk `N`.
+
+Nie została zachowana jedna konwencja nazewnictwa, ponieważ biblioteka PySide6 jest sformatowana w stylu Qt6, a nie w stylu Pythona.
+
+## Nadchodzące aktualizacje
+
+- [ ] ADS-B: Optymalizacja dobierania kątów przez FCC (komputer pokładowy)
+- [ ] Renderowanie: Optymalizacja wyśrodkowanego widoku
+- [x] Wiki: Dokumentacja
+
+## Autorzy
+
+[Miłosz Maculewicz](https://github.com/mldxo)
+
+`© 2024 Miłosz Maculewicz. Wszystkie prawa zastrzeżone.`
+
+## Referencje
+
+Wszystkie odnośniki do prac badawczych i wykorzystanych materiałów znajdują się poniżej.
 
 [^1]: [Python3](https://www.python.org/)
 [^2]: [PyPi](https://pypi.org/)
@@ -77,3 +203,9 @@ All used references are listed below.
 [^4]: [UAV Collision Avoidance Based on Geometric Approach](https://ieeexplore.ieee.org/document/4655013/)
 [^5]: [Energy Efficient UAV Flight Control Method in an Environment with Obstacles and Gusts of Wind](https://www.mdpi.com/1638452/)
 [^6]: [Kąty RPY](https://pl.wikipedia.org/wiki/K%C4%85ty_RPY)
+```
+
+[]: # (README.pl.md)
+[]: # (2024; Miłosz Maculewicz)
+[]: # (2024; Miłosz Maculewicz. All rights reserved.)
+[]: # (Miłosz Maculewicz)
