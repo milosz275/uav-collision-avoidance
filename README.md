@@ -21,7 +21,7 @@ Python project regarding implementation of two UAVs simulation with collision av
 ### Documentation
 
 - [Docs](/docs/README.md)
-- [Wiki](https://github.com/mldxo/uav-collision-avoidance/wiki/Docs)
+- [Wiki](https://github.com/mldxo/uav-collision-avoidance/wiki)
 
 ### Premises
 
