@@ -1,5 +1,6 @@
 # UAV Collision Avoidance
 
+[![en](https://img.shields.io/badge/lang-en-red.svg)](https://github.com/mldxo/uav-collision-avoidance/blob/master/README.md)
 [![Build](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/python-app.yml/badge.svg)](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/python-app.yml)
 [![CodeQL](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/github-code-scanning/codeql)
 [![wersja PyPI](https://badge.fury.io/py/uav-collision-avoidance.svg)](https://badge.fury.io/py/uav-collision-avoidance)
@@ -20,7 +21,7 @@ Implementacja algorytmu unikania kolizji dla dronów w przestrzeni 3D bazująca 
 ### Dokumentacja
 
 - [Dokumentacja](/docs/README.md)
-- [Wiki](https://github.com/mldxo/uav-collision-avoidance/wiki/Docs)
+- [Wiki](https://github.com/mldxo/uav-collision-avoidance/wiki)
 
 ### Założenia
 
