@@ -39,7 +39,7 @@ All classes make use of Python's properties and setters utilizing mutexes and mu
 
 ### Function: `main()`
 
-**Description**: 
+**Description**:
 Entry point of the application. Acts as outer runner for the app.
 
 ---
@@ -48,7 +48,7 @@ Entry point of the application. Acts as outer runner for the app.
 
 ### Function: `main()`
 
-**Description**: 
+**Description**:
 Proper entry point of the application. Begins QtApplication. Parses arguments and starts the appropriate simulation mode.
 
 #### Methods:
@@ -60,7 +60,7 @@ Proper entry point of the application. Begins QtApplication. Parses arguments an
 
 ### Function: `get_version()`
 
-**Description**: 
+**Description**:
 Parses current app version from `pyproject.toml` file.
 
 ---
@@ -69,7 +69,7 @@ Parses current app version from `pyproject.toml` file.
 
 ### Class: `Simulation`
 
-**Description**: 
+**Description**:
 The primary class responsible for conducting simulations. It can operate in two basic modes:
 - **realtime**: Creates a user interface and conducts a simulation that mimics real-time conditions.
 - **headless**: Conducts a simulation without real-time imitation.
@@ -116,7 +116,7 @@ The `Simulation` class is responsible for generating test cases, conducting seri
 
 ### Class: `SimulationPhysics`
 
-**Description**: 
+**Description**:
 Enables the creation of a thread responsible for simulating physics, tracking vehicle locations, and performing operations on them over time. It imitates physical laws affecting physical bodies through the use of differentiation.
 
 #### Properties:
@@ -145,7 +145,7 @@ Enables the creation of a thread responsible for simulating physics, tracking ve
 
 ### Class: `SimulationADSB`
 
-**Description**: 
+**Description**:
 Enables the creation of a thread responsible for simulating the ADS-B (Automatic Dependent Surveillance-Broadcast) system. Manages the onboard computers (FCC) of UAVs to send collision avoidance data when necessary.
 
 #### Properties:
@@ -170,7 +170,7 @@ Enables the creation of a thread responsible for simulating the ADS-B (Automatic
 
 ### Class: `SimulationState`
 
-**Description**: 
+**Description**:
 Stores the current state of the simulation - variables accessible to all components of the program. It supports both realtime and headless simulations.
 
 #### Properties:
@@ -223,7 +223,7 @@ Stores the current state of the simulation - variables accessible to all compone
 
 ### Class: `SimulationSettings`
 
-**Description**: 
+**Description**:
 A static class that stores constants used in the program and the initial simulation data.
 
 #### Static members:
@@ -245,7 +245,7 @@ A static class that stores constants used in the program and the initial simulat
 
 ### Class: `SimulationWidget`
 
-**Description**: 
+**Description**:
 Enables the creation of a user interface - an interactive window that visualizes the simulation process, allowing the tracking of a selected vehicle and modification of its flight plan.
 
 #### Properties:
@@ -301,7 +301,7 @@ Enables the creation of a user interface - an interactive window that visualizes
 
 ### Class: `SimulationRender`
 
-**Description**: 
+**Description**:
 Enables the creation of a thread responsible for refreshing the simulation window in the `SimulationWidget`.
 
 #### Properties:
@@ -318,7 +318,7 @@ Enables the creation of a thread responsible for refreshing the simulation windo
 
 ### Class: `SimulationFPS`
 
-**Description**: 
+**Description**:
 Provides an interface for counting and displaying the number of frames generated per second during a realtime simulation.
 
 #### Properties:
@@ -339,7 +339,7 @@ Provides an interface for counting and displaying the number of frames generated
 
 ### Class: `SimulationData`
 
-**Description**: 
+**Description**:
 Allows tracking of data related to the simulation, which is necessary for loading and generating tests.
 
 #### Properties:
@@ -369,7 +369,7 @@ Allows tracking of data related to the simulation, which is necessary for loadin
 
 ### Class: `Aircraft`
 
-**Description**: 
+**Description**:
 Represents a simulated UAV. It creates its components using composition - objects of the `AircraftFCC` and `AircraftVehicle` classes.
 
 #### Properties:
@@ -391,7 +391,7 @@ Represents a simulated UAV. It creates its components using composition - object
 
 ### Class: `AircraftFCC`
 
-**Description**: 
+**Description**:
 Represents the onboard computer of a UAV. Tracks its planned route and sets the appropriate flight parameters.
 
 #### Properties:
@@ -441,7 +441,7 @@ Represents the onboard computer of a UAV. Tracks its planned route and sets the 
 
 ### Class: `AircraftVehicle`
 
-**Description**: 
+**Description**:
 Represents the UAV as a physical object. Stores information about its position in space and speed, as well as the size of the UAV and its inertia.
 
 #### Static properties:
