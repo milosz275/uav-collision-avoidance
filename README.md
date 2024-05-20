@@ -58,7 +58,7 @@ There are eight possible arguments at the moment:
 - headless - runs physical simulation with ADS-B and collision avoidance algorithm
 - tests [test_number] - runs full tests comparing effectiveness of collision avoidance algorithm, test number defaults to 15
 - ongoing - runs default test number in parallel comparing effectiveness of collision avoidance algorithm continuously till Ctrl+C
-- load [file_name] [test_index] - loads and conducts headless simulation from file when specified, otherwise loads default example test case from data directory `/data`; test index can be specified and defaults to 0
+- load [file_name] [test_index] - loads and conducts headless simulation from file when specified, otherwise loads default example test case from data directory [data](/data); test index can be specified and defaults to 0
 - help [argument] - prints help message for the app argument; defaults to all arguments list
 - version - prints version of the app
 
