@@ -48,10 +48,10 @@ class SimulationWidget(QWidget):
         self.__moving_view_down : bool = False
         self.__moving_view_left : bool = False
         self.__moving_view_right : bool = False
-        self.__steering_left : bool = False
-        self.__steering_right : bool = False
         self.__steering_up : bool = False
         self.__steering_down : bool = False
+        self.__steering_left : bool = False
+        self.__steering_right : bool = False
 
         self.center_offsets()
 
