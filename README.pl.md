@@ -203,9 +203,3 @@ Wszystkie odnośniki do prac badawczych i wykorzystanych materiałów znajdują 
 [^4]: [UAV Collision Avoidance Based on Geometric Approach](https://ieeexplore.ieee.org/document/4655013/)
 [^5]: [Energy Efficient UAV Flight Control Method in an Environment with Obstacles and Gusts of Wind](https://www.mdpi.com/1638452/)
 [^6]: [Kąty RPY](https://pl.wikipedia.org/wiki/K%C4%85ty_RPY)
-```
-
-[]: # (README.pl.md)
-[]: # (2024; Miłosz Maculewicz)
-[]: # (2024; Miłosz Maculewicz. All rights reserved.)
-[]: # (Miłosz Maculewicz)
