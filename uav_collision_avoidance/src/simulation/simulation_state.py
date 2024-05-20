@@ -144,7 +144,7 @@ class SimulationState(QSettings):
     def toggle_pause(self) -> None:
         """Pauses the simulation"""
         if self.is_paused:
-            self.append_paused_time()
+            self.append_time_paused()
             self.is_paused = False
         else:
             if not self.is_running:
@@ -192,7 +192,7 @@ class SimulationState(QSettings):
         with QMutexLocker(self.__mutex):
             self.__pause_start_timestamp = pause_start_timestamp
         
-    def append_paused_time(self) -> None:
+    def append_time_paused(self) -> None:
         """Appends time elapsed during recent pause"""
         with QMutexLocker(self.__mutex):
             if self.__pause_start_timestamp is not None:
@@ -238,7 +238,7 @@ class SimulationState(QSettings):
         with QMutexLocker(self.__mutex):
             return self.__first_cause_collision
     
-    def toggle_first_causing_collision(self) -> None:
+    def toggle_first_cause_collision(self) -> None:
         """Toggles causing collision state"""
         with QMutexLocker(self.__mutex):
             self.__first_cause_collision = not self.__first_cause_collision
@@ -249,7 +249,7 @@ class SimulationState(QSettings):
         with QMutexLocker(self.__mutex):
             return self.__second_cause_collision
     
-    def toggle_second_causing_collision(self) -> None:
+    def toggle_second_cause_collision(self) -> None:
         """Toggles causing collision state"""
         with QMutexLocker(self.__mutex):
             self.__second_cause_collision = not self.__second_cause_collision
