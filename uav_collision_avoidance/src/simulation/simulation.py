@@ -697,7 +697,7 @@ class Simulation(QMainWindow):
         self.simulation_physics.wait()
 
         if self.state.is_paused:
-            self.state.append_paused_time()
+            self.state.append_time_paused()
         simulated_time : float = self.state.physics_cycles / (1000 / self.state.simulation_threshold)
         real_time_pauses : float = self.simulation_physics.global_start_timestamp.msecsTo(self.simulation_physics.global_stop_timestamp) / 1000
         real_time : float = real_time_pauses - (self.state.time_paused / 1000)
