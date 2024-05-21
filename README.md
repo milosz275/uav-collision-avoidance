@@ -194,6 +194,12 @@ One coding convention is not preserved in the scope of the project. Qt's methods
 
 ## References
 
+<p align="left">
+    <img width="30px" alt="Aircraft icon" style="padding-right:10px;" src="/assets/aircraft.png" />
+</p>
+
+Drone by Anthony Lui from <a href="https://thenounproject.com/browse/icons/term/drone/" target="_blank" title="Drone Icons">Noun Project</a> (CC BY 3.0)
+
 All used references are listed below.
 
 [^1]: [Python3](https://www.python.org/)
