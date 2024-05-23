@@ -3,24 +3,25 @@
 ### Table of Contents
 
 1. [Overview](#overview)
-2. [File: `main.py`](#file-mainpy)
-3. [File: `src/main.py`](#file-srcmainpy)
-4. [File: `src/version.py`](#file-srcversionpy)
-5. [File: `src/simulation/simulation.py`](#file-srcsimulationsimulationpy)
-6. [File: `src/simulation/simulation_physics.py`](#file-srcsimulationsimulation_physicspy)
-7. [File: `src/simulation/simulation_adsb.py`](#file-srcsimulationsimulation_adsbpy)
-8. [File: `src/simulation/simulation_state.py`](#file-srcsimulationsimulation_statepy)
-9. [File: `src/simulation/simulation_settings.py`](#file-srcsimulationsimulation_settingspy)
-10. [File: `src/simulation/simulation_widget.py`](#file-srcsimulationsimulation_widgetpy)
-11. [File: `src/simulation/simulation_render.py`](#file-srcsimulationsimulation_renderpy)
-12. [File: `src/simulation/simulation_fps.py`](#file-srcsimulationsimulation_fpspy)
-13. [File: `src/simulation/simulation_data.py`](#file-srcsimulationsimulation_datapy)
-14. [File: `src/aircraft/aircraft.py`](#file-srcaircraftaircraftpy)
-15. [File: `src/aircraft/aircraft_fcc.py`](#file-srcaircraftaircraft_fccpy)
-16. [File: `src/aircraft/aircraft_vehicle.py`](#file-srcaircraftaircraft_vehiclepy)
-17. [Contribution Guidelines](#contribution-guidelines)
-18. [License](#license)
-19. [References](#references)
+2. [Constants](#constants)
+3. [File: `main.py`](#file-mainpy)
+4. [File: `src/main.py`](#file-srcmainpy)
+5. [File: `src/version.py`](#file-srcversionpy)
+6. [File: `src/simulation/simulation.py`](#file-srcsimulationsimulationpy)
+7. [File: `src/simulation/simulation_physics.py`](#file-srcsimulationsimulation_physicspy)
+8. [File: `src/simulation/simulation_adsb.py`](#file-srcsimulationsimulation_adsbpy)
+9. [File: `src/simulation/simulation_state.py`](#file-srcsimulationsimulation_statepy)
+10. [File: `src/simulation/simulation_settings.py`](#file-srcsimulationsimulation_settingspy)
+11. [File: `src/simulation/simulation_widget.py`](#file-srcsimulationsimulation_widgetpy)
+12. [File: `src/simulation/simulation_render.py`](#file-srcsimulationsimulation_renderpy)
+13. [File: `src/simulation/simulation_fps.py`](#file-srcsimulationsimulation_fpspy)
+14. [File: `src/simulation/simulation_data.py`](#file-srcsimulationsimulation_datapy)
+15. [File: `src/aircraft/aircraft.py`](#file-srcaircraftaircraftpy)
+16. [File: `src/aircraft/aircraft_fcc.py`](#file-srcaircraftaircraft_fccpy)
+17. [File: `src/aircraft/aircraft_vehicle.py`](#file-srcaircraftaircraft_vehiclepy)
+18. [Contribution Guidelines](#contribution-guidelines)
+19. [License](#license)
+20. [References](#references)
 
 ## Overview
 
@@ -32,6 +33,16 @@ The classes are organized into the following categories:
 - `aircraft`: Classes representing UAVs.
 
 All classes make use of Python's properties and setters utilizing mutexes and mutex locks to ensure encapsulation and data integrity.
+
+## Constants
+
+- Gravitational acceleration: `9.81 m/s^2`
+- Simulation frequency: `100 Hz`
+- Simulation render frequency: `100 Hz`
+- ADS-B system frequency: `1 Hz`
+- Aircraft roll angle change delay: `1000 ms`
+- Aircraft pitch angle change delay: `2000 ms`
+- Maximum instantaneous aircraft acceleration: `2 m/s^2`
 
 ---
 
@@ -228,7 +239,7 @@ A static class that stores constants used in the program and the initial simulat
 
 #### Static members:
 - `screen_resolution`: Screen resolution (QSize).
-- `resolution`: Resolution of the simulation (float).
+- `resolution`: Resolution of the simulation (tuple).
 - `g_acceleration`: Gravitational acceleration (float = 9.81).
 - `simulation_frequency`: Frequency of the simulation (float = 100.0).
 - `simulation_threshold`: Threshold of the simulation (float = 1000 / 100.0).
@@ -370,7 +381,7 @@ Allows tracking of data related to the simulation, which is necessary for loadin
 ### Class: `Aircraft`
 
 **Description**:
-Represents a simulated UAV. It creates its components using composition - objects of the `AircraftFCC` and `AircraftVehicle` classes.
+Represents a simulated UAV. It creates its members using composition - objects of the `AircraftFCC` and `AircraftVehicle` classes.
 
 #### Properties:
 - `aircraft_id`: Identifier of the aircraft.
@@ -454,7 +465,7 @@ Represents the UAV as a physical object. Stores information about its position i
 - `position`: Position of the aircraft.
 - `speed`: Speed of the aircraft.
 - `size`: Size of the aircraft.
-- `roll_angle`: Yaw angle of the aircraft.
+- `roll_angle`: Roll angle of the aircraft.
 - `initial_roll_angle`: Initial roll angle of the aircraft.
 - `distance_covered`: Distance covered by the aircraft.
 
@@ -468,12 +479,12 @@ Represents the UAV as a physical object. Stores information about its position i
 
 ## Contribution Guidelines
 
-Before contributing, please check [CONTRIBUTING.md](https://github.com/mldxo/uav-collision-avoidance/blob/main/CONTRIBUTING.md).
+Before contributing, please check [CONTRIBUTING.md](/CONTRIBUTING.md).
 
 Contributions to the project are welcome. Please follow these steps:
 1. Fork the repository.
 2. Create a new branch for your feature or bugfix.
-3. Submit a pull request with a clear description of your changes.
+3. Submit a pull request with a clear description of your changes using [PULL_REQUEST_TEMPLATE.md](/PULL_REQUEST_TEMPLATE.md).
 
 ---
 

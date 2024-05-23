@@ -195,6 +195,12 @@ Nie została zachowana jedna konwencja nazewnictwa, ponieważ biblioteka PySide6
 
 ## Referencje
 
+<p align="left">
+    <img width="30px" alt="Aircraft icon" style="padding-right:10px;" src="/assets/aircraft.png" />
+</p>
+
+Ikona drona wykonana przez Anthony Lui <a href="https://thenounproject.com/browse/icons/term/drone/" target="_blank" title="Drone Icons">Noun Project</a> (CC BY 3.0)
+
 Wszystkie odnośniki do prac badawczych i wykorzystanych materiałów znajdują się poniżej.
 
 [^1]: [Python3](https://www.python.org/)
