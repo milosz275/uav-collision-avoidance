@@ -23,6 +23,8 @@
         "Gitter",
         "hspace",
         "HTOL",
+        "Inicjalizuje",
+        "Inkrementuje",
         "levelname",
         "libgl",
         "libxcb",
@@ -38,6 +40,7 @@
         "orcid",
         "Pixmap",
         "popleft",
+        "predefiniowany",
         "pyproject",
         "screeninfo",
         "setterów",
@@ -45,6 +48,8 @@
         "Styleguides",
         "Traceback",
         "venv",
+        "Widżet",
+        "widżetu",
         "WSAD",
         "wspace",
         "xaxis",
@@ -53,6 +58,7 @@
         "xlim",
         "yaxis",
         "ylabel",
-        "ylim"
+        "ylim",
+        "zainicjalizowanej"
     ]
 }
