@@ -1,14 +1,10 @@
 [build-system]
-requires = [
-    "PySide6==6.7.0",
-    "setuptools>=61.0",
-    "toml>=0.10",
-]
+requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "uav-collision-avoidance"
-version = "0.8.4"
+version = "0.8.5"
 authors = [
   { name="mldxo", email="miloszmaculewicz@gmail.com" },
 ]
@@ -19,6 +15,21 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
+]
+dependencies = [
+  "setuptools",
+  "wheel",
+  "twine>=5.0.0",
+  "toml>=0.10.2",
+  "build>=1.2.1",
+  "pyinstaller>=6.6.0",
+  "PySide6==6.7.0",
+  "numpy>=1.26.4",
+  "pandas>=2.2.2",
+  "matplotlib>=3.8.4",
+  "pytest>=8.1.1",
+  "screeninfo>=0.8.1",
+  "pylint>=3.2.0",
 ]
 
 [project.scripts]
