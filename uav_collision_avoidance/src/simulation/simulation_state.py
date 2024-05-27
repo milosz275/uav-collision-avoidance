@@ -31,6 +31,7 @@ class SimulationState(QSettings):
         self.__collision : bool = False
         self.__first_cause_collision : bool = False
         self.__second_cause_collision : bool = False
+        self.__focused_aircraft_id : int = 0
         self.update_settings()
 
         # render state
@@ -56,7 +57,6 @@ class SimulationState(QSettings):
             self.__draw_collision_detection : bool = True
             self.__optimize_drawing : bool = False
             self.__follow_aircraft : bool = False
-            self.__focused_aircraft_id : int = 0
 
             # assets
             self.__aircraft_pixmap : QPixmap = QPixmap()
