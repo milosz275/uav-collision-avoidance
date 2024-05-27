@@ -60,7 +60,7 @@ Plik `main.py` jest punktem wejścia aplikacji. Uruchamia on główne okno aplik
 ### Funkcja: `main()`
 
 **Opis**:
-Właściwy punkt wejścia aplikacji. Rozpoczyna instancję QtApplication. Parsuje argumenty i uruchamia symulację w odpowiednik trybie.
+Właściwy punkt wejścia aplikacji. Rozpoczyna instancję QtApplication. Parsuje argumenty i uruchamia symulację w odpowiednim trybie.
 
 #### Metody:
 - `run_simulation_tests(test_number : int)`: Obsługuje równolegle uruchamiane symulacje.
@@ -72,7 +72,7 @@ Właściwy punkt wejścia aplikacji. Rozpoczyna instancję QtApplication. Parsuj
 ### Funkcja: `get_version()`
 
 **Opis**:
-Parsuje aktualną wersję aplikacji z pliku `pyproject.toml`.
+Parsuje aktualną wersję aplikacji z pliku [pyproject.toml](/pyproject.toml).
 
 ---
 
@@ -351,7 +351,7 @@ Udostępnia interfejs do zliczania i wyświetlania liczby klatek generowanych na
 ### Klasa: `SimulationData`
 
 **Opis**:
-Pozwala na śledzenie danych związanych z symulacją, które są niezbędne do wczytywania i generowania testów. Przechowuje informacje o samolotach, ich lokalizacjach, prędkościach, celach, kątach i innych parametrach.
+Pozwala na śledzenie danych związanych z symulacją, które są niezbędne do wczytywania i generowania testów. Przechowuje informacje o samolotach, ich lokalizacjach, prędkościach, celach, kątach i innych parametrach z początku i końca symulacji.
 
 #### Właściwości:
 - `aircraft_angle`: Kąt pomiędzy samolotami.
