@@ -124,7 +124,7 @@ class SimulationADSB(QThread):
                     print("Collision avoidance: " + str(self.simulation_state.avoid_collisions))
 
                 # console report output
-                if self.simulation_state.adsb_report and aircraft.aircraft_id == 0 and self.simulation_state.is_realtime:
+                if self.simulation_state.adsb_report and aircraft.aircraft_id == self.__simulation_state.focused_aircraft_id and self.simulation_state.is_realtime:
                     self.print_adsb_report(aircraft)
 
                 # safe zone occupancy check
