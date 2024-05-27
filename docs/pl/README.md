@@ -97,6 +97,11 @@ Klasa `Simulation` jest odpowiedzialna za tworzenie przypadków testowych, przep
 - `state`: Stan symulacji.
 - `imported_from_data`: Flaga reprezentująca czy symulacja została wczytana z pliku.
 - `simulation_data`: Zawiera strukturę danych wczytanej symulacji.
+- `simulation_physics`: Obiekt symulacji fizycznej.
+- `simulation_adsb`: Obiekt symulacji systemu ADS-B.
+- `simulation_widget`: Obiekt widżetu symulacji.
+- `simulation_render`: Obiekt renderowania symulacji.
+- `simulation_fps`: Obiekt liczenia klatek na sekundę.
 
 #### Metody:
 - `__init__(headless : bool, tests : bool, simulation_time : int) -> None`: Inicjalizuje nową instancję symulacji bez tworzenia obiektu jej stanu ani samolotów bezzałogowych.

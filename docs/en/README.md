@@ -97,6 +97,11 @@ The `Simulation` class is responsible for generating test cases, conducting seri
 - `state`: State of the simulation.
 - `imported_from_data`: Flag representing if the simulation was loaded from file.
 - `simulation_data`: Contains simulation data structure if loaded from file.
+- `simulation_physics`: Simulation physics object.
+- `simulation_adsb`: Simulation ADS-B object.
+- `simulation_widget`: Simulation widget object.
+- `simulation_render`: Simulation render object.
+- `simulation_fps`: Simulation FPS object.
 
 #### Methods:
 - `__init__(headless : bool, tests : bool, simulation_time : int) -> None`: Initializes a new simulation instance without initializing state and aircrafts.
