@@ -1,0 +1,13 @@
+{
+    "verboseOutput": true,
+    "exclude": [
+            "**/node_modules",
+            "**/__pycache__",
+            "src/experimental",
+            "src/typestubs",
+            ".pytest_cache",
+            ".pytest_cache/*",
+            "*.sqlite",
+            "*.sqlite-journal"
+    ]
+}
