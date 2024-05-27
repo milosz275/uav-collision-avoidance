@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from copy import copy
 from pathlib import Path
 from typing import List, Tuple
-from numpy import random, ndarray, mean
+from numpy import random, ndarray
 from math import dist, sin, cos, radians
 from matplotlib.ticker import MaxNLocator
 
@@ -44,6 +44,12 @@ class Simulation(QMainWindow):
         self.__state : SimulationState | None = None
         self.__imported_from_data : bool = False
         self.__simulation_data : SimulationData | None = None
+
+        self.__simulation_physics : SimulationPhysics | None = None
+        self.__simulation_adsb : SimulationADSB | None = None
+        self.__simulation_fps : SimulationFPS | None = None
+        self.__simulation_widget : SimulationWidget | None = None
+        self.__simulation_render : SimulationRender | None = None
 
     @staticmethod
     def obtain_simulation_id() -> int:
@@ -120,6 +126,56 @@ class Simulation(QMainWindow):
     def simulation_data(self, data : SimulationData) -> None:
         """Sets simulation data"""
         self.__simulation_data = data
+
+    @property
+    def simulation_physics(self) -> SimulationPhysics:
+        """Returns simulation physics"""
+        return self.__simulation_physics
+    
+    @simulation_physics.setter
+    def simulation_physics(self, physics : SimulationPhysics) -> None:
+        """Sets simulation physics"""
+        self.__simulation_physics = physics
+
+    @property
+    def simulation_adsb(self) -> SimulationADSB:
+        """Returns simulation adsb"""
+        return self.__simulation_adsb
+    
+    @simulation_adsb.setter
+    def simulation_adsb(self, adsb : SimulationADSB) -> None:
+        """Sets simulation adsb"""
+        self.__simulation_adsb = adsb
+
+    @property
+    def simulation_fps(self) -> SimulationFPS:
+        """Returns simulation fps"""
+        return self.__simulation_fps
+    
+    @simulation_fps.setter
+    def simulation_fps(self, fps : SimulationFPS) -> None:
+        """Sets simulation fps"""
+        self.__simulation_fps = fps
+
+    @property
+    def simulation_widget(self) -> SimulationWidget:
+        """Returns simulation widget"""
+        return self.__simulation_widget
+    
+    @simulation_widget.setter
+    def simulation_widget(self, widget : SimulationWidget) -> None:
+        """Sets simulation widget"""
+        self.__simulation_widget = widget
+
+    @property
+    def simulation_render(self) -> SimulationRender:
+        """Returns simulation render"""
+        return self.__simulation_render
+
+    @simulation_render.setter
+    def simulation_render(self, render : SimulationRender) -> None:
+        """Sets simulation render"""
+        self.__simulation_render = render
     
     def run(self) -> None:
         """Executes simulation"""
@@ -234,9 +290,7 @@ class Simulation(QMainWindow):
         for angle in test_random_collision_course_differences:
             aircraft_init_height : float = random.uniform(test_minimal_altitude, test_maximal_altitude)
             aircraft_target_height : float = random.uniform(test_minimal_altitude, test_maximal_altitude)
-            aircraft_collision_height : float = mean([aircraft_init_height, aircraft_target_height])
-            test_collision_target : QVector3D = QVector3D(0, 0, aircraft_collision_height)
-            test_collision_target_flat : QVector3D = QVector3D(0, 0, aircraft_init_height)
+            test_collision_target_projected : QVector3D = QVector3D(0, 0, aircraft_init_height)
             aircraft_absolute_speed : float = random.uniform(test_minimal_speed, test_maximal_speed)
             sin_value : float = sin(radians(angle))
             cos_value : float = cos(radians(angle))
@@ -258,7 +312,7 @@ class Simulation(QMainWindow):
                 0,
                 aircraft_absolute_speed,
                 0)
-            assert abs(dist(aircraft_1_position.toTuple(), test_collision_target_flat.toTuple()) - distance_to_collision) < 0.05
+            assert abs(dist(aircraft_1_position.toTuple(), test_collision_target_projected.toTuple()) - distance_to_collision) < 0.05
             assert abs(aircraft_1_speed.length() - aircraft_absolute_speed) < 0.05
             
             # rotate angle to get circle equation
@@ -277,7 +331,7 @@ class Simulation(QMainWindow):
                 aircraft_absolute_speed * sin_value,
                 aircraft_1_speed.z())
 
-            assert abs(dist(aircraft_2_position.toTuple(), test_collision_target_flat.toTuple()) - distance_to_collision) < 0.05
+            assert abs(dist(aircraft_2_position.toTuple(), test_collision_target_projected.toTuple()) - distance_to_collision) < 0.05
             assert abs(aircraft_2_speed.length() - aircraft_absolute_speed) < 0.05
 
             aircrafts : List[Aircraft] = [
@@ -524,6 +578,8 @@ class Simulation(QMainWindow):
                 aircrafts = aircrafts,
                 test_index = i,
                 aircraft_angle = angle)
+            if not simulation_data_no_avoidance.collision:
+                logging.info("Test %d - no collision avoidance - no collision detected, marking ❌", i)
             self.state = None
 
             logging.info("Test %d - collision avoidance", i)
@@ -532,6 +588,8 @@ class Simulation(QMainWindow):
                 aircrafts = aircrafts,
                 test_index = i,
                 aircraft_angle = angle)
+            if not simulation_data_avoidance.collision:
+                logging.info("Test %d - collision avoidance - no collision detected, success ✔️", i)
             self.state = None
 
             writer.writerow([
@@ -886,7 +944,7 @@ class Simulation(QMainWindow):
         assert abs(self.aircrafts[0].vehicle.speed.length() - self.__simulation_data.aircraft_1_final_speed.length()) < 0.1
         assert abs(self.aircrafts[1].vehicle.speed.length() - self.__simulation_data.aircraft_2_final_speed.length()) < 0.1
         assert abs(self.simulation_adsb.minimal_relative_distance - self.__simulation_data.minimal_relative_distance) < 0.1
-        logging.info("Simulation data correctness checked successfully ✅")
+        logging.info("Simulation data correctness checked successfully ✔️")
         return True
 
     def export_visited_locations(self, simulation_data : SimulationData | None = None, test_index : int | None = None) -> None:
