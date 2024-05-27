@@ -56,7 +56,7 @@ class SimulationState(QSettings):
             self.__draw_collision_detection : bool = True
             self.__optimize_drawing : bool = False
             self.__follow_aircraft : bool = False
-            self.__focus_aircraft_id : int = 0
+            self.__focused_aircraft_id : int = 0
 
             # assets
             self.__aircraft_pixmap : QPixmap = QPixmap()
@@ -378,15 +378,15 @@ class SimulationState(QSettings):
             self.__follow_aircraft = not self.__follow_aircraft
 
     @property
-    def focus_aircraft_id(self) -> int:
+    def focused_aircraft_id(self) -> int:
         """Returns aircraft id to focus on"""
         with QMutexLocker(self.__mutex):
-            return self.__focus_aircraft_id
+            return self.__focused_aircraft_id
         
     def toggle_focus_aircraft(self) -> None:
         """Toggles aircraft focus"""
         with QMutexLocker(self.__mutex):
-            self.__focus_aircraft_id = int(not self.__focus_aircraft_id)
+            self.__focused_aircraft_id = int(not self.__focused_aircraft_id)
 
     @property
     def gui_render_threshold(self) -> int:

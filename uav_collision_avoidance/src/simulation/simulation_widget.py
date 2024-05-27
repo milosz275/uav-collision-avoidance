@@ -433,7 +433,7 @@ class SimulationWidget(QWidget):
     def center_offsets(self) -> None:
         """Updates screen offsets centering on selected aircraft"""
         scale : float = self.__simulation_state.gui_scale
-        id = self.__simulation_state.focus_aircraft_id
+        id = self.__simulation_state.focused_aircraft_id
         self.__screen_offset_x = (self.__window_width / 2.0) / scale - self.__aircraft_vehicles[id].position.x()
         self.__screen_offset_y = (self.__window_height / 2.0) / scale - self.__aircraft_vehicles[id].position.y()
 
@@ -491,9 +491,9 @@ class SimulationWidget(QWidget):
             if not anything_to_draw:
                 return super().paintEvent(event)
 
-        if self.__simulation_state.focus_aircraft_id == 0:
+        if self.__simulation_state.focused_aircraft_id == 0:
             self.draw_text(QVector3D(self.__window_width - 120, self.__window_height - 10, 0), 0, "Selected Aircraft 0", QColor(0, 0, 255))
-        elif self.__simulation_state.focus_aircraft_id == 1:
+        elif self.__simulation_state.focused_aircraft_id == 1:
             self.draw_text(QVector3D(self.__window_width - 120, self.__window_height - 10, 0), 0, "Selected Aircraft 1", QColor(0, 0, 255))
         if self.__simulation_state.draw_collision_detection:
             self.draw_collision_detection(scale)
