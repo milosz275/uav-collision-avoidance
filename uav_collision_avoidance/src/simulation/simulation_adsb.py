@@ -280,4 +280,5 @@ class SimulationADSB(QThread):
     def reset_destinations(self) -> None:
         """Resets destination for all aircrafts"""
         for aircraft in self.aircraft_fccs:
+            aircraft.clear_destinations()
             aircraft.load_initial_destination()
