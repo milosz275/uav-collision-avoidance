@@ -366,6 +366,9 @@ class SimulationWidget(QWidget):
             aircraft = self.__aircraft_vehicles[0]
             collision_location = aircraft.position + aircraft.speed * time_to_closest_approach
             self.draw_circle(collision_location, 2.5 / scale, scale, QColor(255, 0, 0))
+            aircraft = self.__aircraft_vehicles[1]
+            collision_location = aircraft.position + aircraft.speed * time_to_closest_approach
+            self.draw_circle(collision_location, 2.5 / scale, scale, QColor(255, 0, 0))
         relative_distance = dist(self.__aircraft_vehicles[0].position.toTuple(), self.__aircraft_vehicles[1].position.toTuple())
         if relative_distance < self.__simulation_state.minimum_separation:
             if not self.simulation_state.avoid_collisions:
@@ -406,10 +409,11 @@ class SimulationWidget(QWidget):
 
     def update_steering(self) -> None:
         """Updates aircraft steering based on current input"""
-        if self.aircrafts[0] and (self.__steering_up or self.__steering_down or self.__steering_left or self.__steering_right):
+        focused_aircraft_id = self.simulation_state.focused_aircraft_id
+        if self.aircrafts[focused_aircraft_id] and (self.__steering_up or self.__steering_down or self.__steering_left or self.__steering_right):
             if sum([self.__steering_up, self.__steering_down, self.__steering_left, self.__steering_right]) >= 3:
                 return
-            self.__aircraft_fccs[0].ignore_destinations = True
+            self.__aircraft_fccs[focused_aircraft_id].ignore_destinations = True
             target_yaw_angle : float | None = None
             if self.__steering_up and self.__steering_left:
                 target_yaw_angle = -45.0
@@ -428,10 +432,10 @@ class SimulationWidget(QWidget):
             elif self.__steering_right:
                 target_yaw_angle = 90.0
             if target_yaw_angle is not None:
-                self.__aircraft_fccs[0].target_yaw_angle = target_yaw_angle
+                self.__aircraft_fccs[focused_aircraft_id].target_yaw_angle = target_yaw_angle
 
     def center_offsets(self) -> None:
-        """Updates screen offsets centering on selected aircraft"""
+        """Updates screen offsets centering on focused aircraft"""
         scale : float = self.__simulation_state.gui_scale
         id = self.__simulation_state.focused_aircraft_id
         self.__screen_offset_x = (self.__window_width / 2.0) / scale - self.__aircraft_vehicles[id].position.x()
@@ -519,18 +523,19 @@ class SimulationWidget(QWidget):
             "; y: " + "{:.2f}".format(real_y) +
             " | window coords: x: " + "{:.2f}".format(click_x) +
             "; y: " + "{:.2f}".format(click_y))
+        focused_aircraft_id = self.simulation_state.focused_aircraft_id
         if event.button() == Qt.MouseButton.LeftButton:
-            self.__aircraft_fccs[0].add_first_destination(QVector3D(
+            self.__aircraft_fccs[focused_aircraft_id].add_first_destination(QVector3D(
                 real_x,
                 real_y,
                 1000.0))
         elif event.button() == Qt.MouseButton.RightButton:
-            self.__aircraft_fccs[0].add_last_destination(QVector3D(
+            self.__aircraft_fccs[focused_aircraft_id].add_last_destination(QVector3D(
                 real_x,
                 real_y,
                 1000.0))
         elif event.button() == Qt.MouseButton.MiddleButton:
-            self.__aircraft_vehicles[0].position = QVector3D(
+            self.__aircraft_vehicles[focused_aircraft_id].position = QVector3D(
                 real_x,
                 real_y,
                 1000.0)
@@ -555,6 +560,7 @@ class SimulationWidget(QWidget):
 
     def keyPressEvent(self, event: QKeyEvent) -> None:
         """Qt method controlling keyboard input"""
+        focused_aircraft_id = self.simulation_state.focused_aircraft_id
         if event.key() == Qt.Key.Key_Escape:
             self.close()
         elif event.key() == Qt.Key.Key_Slash:
@@ -576,9 +582,9 @@ class SimulationWidget(QWidget):
         elif event.key() == Qt.Key.Key_F1:
             self.__simulation_state.toggle_adsb_report()
         elif event.key() == Qt.Key.Key_F2:
-            self.__aircraft_fccs[0].accelerate(-10.0)
+            self.__aircraft_fccs[focused_aircraft_id].accelerate(-10.0)
         elif event.key() == Qt.Key.Key_F3:
-            self.__aircraft_fccs[0].accelerate(10.0)
+            self.__aircraft_fccs[focused_aircraft_id].accelerate(10.0)
         elif event.key() == Qt.Key.Key_O:
             self.__simulation_state.toggle_first_cause_collision()
         elif event.key() == Qt.Key.Key_P:
@@ -599,7 +605,7 @@ class SimulationWidget(QWidget):
             self.__moving_view_up = True
         elif event.key() == Qt.Key.Key_Down:
             self.__moving_view_down = True
-        if self.aircrafts[0]:
+        if self.aircrafts[focused_aircraft_id]:
             if event.key() == Qt.Key.Key_A:
                 self.__steering_left = True
             elif event.key() == Qt.Key.Key_D:
@@ -622,8 +628,9 @@ class SimulationWidget(QWidget):
             self.__moving_view_up = False
         elif event.key() == Qt.Key.Key_Down:
             self.__moving_view_down = False
-        if self.aircrafts[0]:
-            self.__aircraft_fccs[0].ignore_destinations = False
+        focused_aircraft_id = self.simulation_state.focused_aircraft_id
+        if self.aircrafts[focused_aircraft_id]:
+            self.__aircraft_fccs[focused_aircraft_id].ignore_destinations = False
             if event.key() == Qt.Key.Key_A:
                 self.__steering_left = False
             elif event.key() == Qt.Key.Key_D:
