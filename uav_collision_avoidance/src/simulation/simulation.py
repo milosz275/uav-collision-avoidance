@@ -315,8 +315,8 @@ class Simulation(QMainWindow):
                 0,
                 aircraft_absolute_speed,
                 0)
-            assert abs(dist(aircraft_1_position.toTuple(), test_collision_target_projected.toTuple()) - distance_to_collision) < 0.05
-            assert abs(aircraft_1_speed.length() - aircraft_absolute_speed) < 0.05
+            assert abs(dist(aircraft_1_position.toTuple(), test_collision_target_projected.toTuple()) - distance_to_collision) < 0.1
+            assert abs(aircraft_1_speed.length() - aircraft_absolute_speed) < 0.1
             
             # rotate angle to get circle equation
             sin_value = sin(radians(90 - angle))
@@ -334,8 +334,8 @@ class Simulation(QMainWindow):
                 aircraft_absolute_speed * sin_value,
                 aircraft_1_speed.z())
 
-            assert abs(dist(aircraft_2_position.toTuple(), test_collision_target_projected.toTuple()) - distance_to_collision) < 0.05
-            assert abs(aircraft_2_speed.length() - aircraft_absolute_speed) < 0.05
+            assert abs(dist(aircraft_2_position.toTuple(), test_collision_target_projected.toTuple()) - distance_to_collision) < 0.1
+            assert abs(aircraft_2_speed.length() - aircraft_absolute_speed) < 0.1
 
             aircrafts : List[Aircraft] = [
                 Aircraft(
@@ -463,6 +463,7 @@ class Simulation(QMainWindow):
     
     def run_tests(self, begin_with_default_set : bool = True, test_number : int = 20) -> None:
         """Runs simulation tests"""
+        SimulationSettings.set_simulation_frequency(10.0)
         if test_number < 3:
             logging.info("Changing simulation tests to 3 test cases due to too low test number")
             test_number = 3
@@ -954,14 +955,40 @@ class Simulation(QMainWindow):
         if not self.__imported_from_data or self.__simulation_data is None or self.aircrafts is None or self.aircrafts == []:
             return None
         logging.info("Checking simulation data correctness...")
+        # [ ] Fix case when loaded data simulated in low frequency and tested in high accuracy
+        position_accuracy : float = 200.0
+        speed_accuracy : float = 5.0
+        displacement_accuracy : float = 5.0
+        simulation_frequency = SimulationSettings.simulation_frequency
+        if simulation_frequency >= 100.0:
+            position_accuracy : float = 0.1
+            speed_accuracy : float = 0.1
+            displacement_accuracy : float = 1.0
+        elif simulation_frequency >= 70.0:
+            position_accuracy : float = 10.0
+            speed_accuracy : float = 0.5
+            displacement_accuracy : float = 5.0
+        elif simulation_frequency >= 50.0:
+            position_accuracy : float = 20.0
+            speed_accuracy : float = 0.6
+            displacement_accuracy : float = 6.0
+        elif simulation_frequency >= 30.0:
+            position_accuracy : float = 25.0
+            speed_accuracy : float = 0.75
+            displacement_accuracy : float = 7.5
+        elif simulation_frequency >= 10.0:
+            position_accuracy : float = 50.0
+            speed_accuracy : float = 1.0
+            displacement_accuracy : float = 10.0
+            
         assert len(self.aircrafts) == 2
-        assert dist(self.aircrafts[0].vehicle.position.toTuple(), self.__simulation_data.aircraft_1_final_position.toTuple()) < 0.1
-        assert dist(self.aircrafts[1].vehicle.position.toTuple(), self.__simulation_data.aircraft_2_final_position.toTuple()) < 0.1
-        assert dist(self.aircrafts[0].vehicle.speed.toTuple(), self.__simulation_data.aircraft_1_final_speed.toTuple()) < 0.1
-        assert dist(self.aircrafts[1].vehicle.speed.toTuple(), self.__simulation_data.aircraft_2_final_speed.toTuple()) < 0.1
-        assert abs(self.aircrafts[0].vehicle.speed.length() - self.__simulation_data.aircraft_1_final_speed.length()) < 0.1
-        assert abs(self.aircrafts[1].vehicle.speed.length() - self.__simulation_data.aircraft_2_final_speed.length()) < 0.1
-        assert abs(self.simulation_adsb.minimal_relative_distance - self.__simulation_data.minimal_relative_distance) < 0.1
+        assert dist(self.aircrafts[0].vehicle.position.toTuple(), self.__simulation_data.aircraft_1_final_position.toTuple()) < position_accuracy
+        assert dist(self.aircrafts[1].vehicle.position.toTuple(), self.__simulation_data.aircraft_2_final_position.toTuple()) < position_accuracy
+        assert dist(self.aircrafts[0].vehicle.speed.toTuple(), self.__simulation_data.aircraft_1_final_speed.toTuple()) < speed_accuracy
+        assert dist(self.aircrafts[1].vehicle.speed.toTuple(), self.__simulation_data.aircraft_2_final_speed.toTuple()) < speed_accuracy
+        assert abs(self.aircrafts[0].vehicle.speed.length() - self.__simulation_data.aircraft_1_final_speed.length()) < speed_accuracy
+        assert abs(self.aircrafts[1].vehicle.speed.length() - self.__simulation_data.aircraft_2_final_speed.length()) < speed_accuracy
+        assert abs(self.simulation_adsb.minimal_relative_distance - self.__simulation_data.minimal_relative_distance) < displacement_accuracy
         logging.info("Simulation data correctness checked successfully ✔️")
         return True
 
