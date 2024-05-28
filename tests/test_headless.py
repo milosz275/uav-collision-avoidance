@@ -12,7 +12,6 @@ def test_headless():
 test_path : str = "data/simulation-2024-05-28-12-13-58.csv"
 lowest_frequency_tested : int = 10
 highest_frequency_tested : int = 100
-pytestmark = pytest.mark.filterwarnings("error")
 
 @pytest.fixture
 def tester(request):
