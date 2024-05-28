@@ -1,6 +1,7 @@
 """Simulation ADS-B system simulation thread module"""
 
 import logging
+import numpy as np
 from typing import List
 from math import sqrt
 
@@ -24,7 +25,8 @@ class SimulationADSB(QThread):
         self.__simulation_state = simulation_state
         self.__adsb_cycles : int = 0
         self.__minimal_relative_distance : float = float("inf")
-        self.__is_silent : bool = False
+        self.__is_silent : bool = True
+        self.__miss_distance_at_closest_approach : float | np.nan = np.nan
         
     @property
     def aircrafts(self) -> List[Aircraft]:
@@ -80,6 +82,16 @@ class SimulationADSB(QThread):
     def is_silent(self, is_silent : bool) -> None:
         """Sets silent mode flag"""
         self.__is_silent = is_silent
+        
+    @property
+    def miss_distance_at_closest_approach(self) -> float:
+        """Returns miss distance at closest approach"""
+        return self.__miss_distance_at_closest_approach
+    
+    @miss_distance_at_closest_approach.setter
+    def miss_distance_at_closest_approach(self, miss_distance_at_closest_approach : float) -> None:
+        """Sets miss distance at closest approach"""
+        self.__miss_distance_at_closest_approach = miss_distance_at_closest_approach
 
     @property
     def relative_distance(self) -> float:
@@ -182,6 +194,7 @@ class SimulationADSB(QThread):
                         for aircraft in self.aircraft_fccs:
                             if not aircraft.evade_maneuver:
                                 logging.info("Conflict condition resolution with relative distance: " + "{:.2f}".format(relative_position.length()) + "m")
+                                self.miss_distance_at_closest_approach = miss_distance_vector.length()
                                 aircraft.apply_evade_maneuver(
                                     opponent_speed = self.aircraft_vehicles[1 - aircraft.aircraft_id].speed,
                                     miss_distance_vector = miss_distance_vector,

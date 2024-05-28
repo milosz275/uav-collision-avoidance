@@ -261,6 +261,7 @@ class Simulation(QMainWindow):
         simulation_data.aircraft_2_final_position = copy(self.aircrafts[1].vehicle.position)
         simulation_data.aircraft_1_final_speed = copy(self.aircrafts[0].vehicle.speed)
         simulation_data.aircraft_2_final_speed = copy(self.aircrafts[1].vehicle.speed)
+        simulation_data.miss_distance_at_closest_approach = copy(self.simulation_adsb.miss_distance_at_closest_approach)
         if self.imported_from_data:
             self.check_simulation_data_correctness()
         if test_index is not None:
@@ -479,7 +480,7 @@ class Simulation(QMainWindow):
             
         list_of_lists = self.generate_test_aircrafts()
         lists_count : int = len(list_of_lists)
-        print("List of lists: ", lists_count)
+        print("Generated list of pairs: ", lists_count)
 
         if lists_count > test_number:
             random_indices : ndarray | None = None
@@ -565,12 +566,15 @@ class Simulation(QMainWindow):
             "collision_if_no_avoidance",
             "collision_if_avoidance",
             "minimal_relative_distance_if_no_avoidance",
-            "minimal_relative_distance_if_avoidance"])
+            "minimal_relative_distance_if_avoidance",
+            "miss_distance_at_closest_approach_if_no_avoidance",
+            "miss_distance_at_closest_approach_if_avoidance"])
         file.close()
         file = open(f"data/simulation-{export_time}.csv", "a")
         writer = csv.writer(file)
         
         for i in range(0, test_number, 1):
+            print("Test " + str(i) + " - no collision avoidance")
             logging.info("Test %d - no collision avoidance", i)
             aircraft_tuple : List[List[Aircraft], float] = list_of_lists[i]
             aircrafts : List[Aircraft] = aircraft_tuple[0]
@@ -585,6 +589,7 @@ class Simulation(QMainWindow):
                 logging.info("Test %d - no collision avoidance - no collision detected, marking ❌", i)
             self.state = None
 
+            print("Test " + str(i) + " - collision avoidance")
             logging.info("Test %d - collision avoidance", i)
             simulation_data_avoidance : SimulationData = self.run_headless(
                 avoid_collisions = True,
@@ -643,7 +648,9 @@ class Simulation(QMainWindow):
                 simulation_data_no_avoidance.collision,
                 simulation_data_avoidance.collision,
                 simulation_data_no_avoidance.minimal_relative_distance,
-                simulation_data_avoidance.minimal_relative_distance])
+                simulation_data_avoidance.minimal_relative_distance,
+                simulation_data_no_avoidance.miss_distance_at_closest_approach,
+                simulation_data_avoidance.miss_distance_at_closest_approach])
             file.close()
             file = open(f"data/simulation-{export_time}.csv", "a")
             writer = csv.writer(file)
@@ -707,7 +714,7 @@ class Simulation(QMainWindow):
             for i, row in enumerate(reader):
                 if i == test_id + 1:
                     simulation_data : SimulationData = SimulationData()
-                    assert len(row) == 48
+                    assert len(row) == 50
                     assert row[0] == str(test_id)
                     simulation_data.aircraft_angle = float(row[1])
                     simulation_data.aircraft_1_initial_position = QVector3D(float(row[2]), float(row[3]), float(row[4]))
@@ -723,6 +730,10 @@ class Simulation(QMainWindow):
                         simulation_data.aircraft_2_final_speed = QVector3D(float(row[35]), float(row[36]), float(row[37]))
                         simulation_data.collision = row[44] == "True"
                         simulation_data.minimal_relative_distance = float(row[46])
+                        if str(row[48]) == "nan":
+                            simulation_data.miss_distance_at_closest_approach = None
+                        else:
+                            simulation_data.miss_distance_at_closest_approach = float(row[48])
                     else:
                         simulation_data.aircraft_1_final_position = QVector3D(float(row[26]), float(row[27]), float(row[28]))
                         simulation_data.aircraft_2_final_position = QVector3D(float(row[29]), float(row[30]), float(row[31]))
@@ -730,6 +741,10 @@ class Simulation(QMainWindow):
                         simulation_data.aircraft_2_final_speed = QVector3D(float(row[41]), float(row[42]), float(row[43]))
                         simulation_data.collision = row[45] == "True"
                         simulation_data.minimal_relative_distance = float(row[47])
+                        if str(row[49]) == "nan":
+                            simulation_data.miss_distance_at_closest_approach = None
+                        else:
+                            simulation_data.miss_distance_at_closest_approach = float(row[49])
                     self.import_simulation_data(simulation_data)
                     return True
         except:
