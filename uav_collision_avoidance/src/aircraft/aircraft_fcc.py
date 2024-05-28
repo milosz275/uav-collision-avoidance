@@ -285,10 +285,10 @@ class AircraftFCC(QObject):
 
     def apply_evade_maneuver(self, opponent_speed : QVector3D, miss_distance_vector : QVector3D, unresolved_region : float, time_to_closest_approach : float) -> None:
         """Applies evade maneuver"""
-        print(str(self.aircraft.aircraft_id) + ": opponent speed: " + "{:.2f}".format(opponent_speed.x()) + " " + "{:.2f}".format(opponent_speed.y()) + " " + "{:.2f}".format(opponent_speed.z()))
-        print(str(self.aircraft.aircraft_id) + ": miss distance vector: " + "{:.2f}".format(miss_distance_vector.x()) + " " + "{:.2f}".format(miss_distance_vector.y()) + " " + "{:.2f}".format(miss_distance_vector.z()))
-        print(str(self.aircraft.aircraft_id) + ": unresolved region: " + "{:.2f}".format(unresolved_region))
-        print(str(self.aircraft.aircraft_id) + ": time to closest approach: " + "{:.2f}".format(time_to_closest_approach))
+        print("FCC " + str(self.aircraft.aircraft_id) + ": Opponent speed: " + "{:.2f}".format(opponent_speed.x()) + " " + "{:.2f}".format(opponent_speed.y()) + " " + "{:.2f}".format(opponent_speed.z()))
+        print("FCC " + str(self.aircraft.aircraft_id) + ": Miss distance vector: " + "{:.2f}".format(miss_distance_vector.x()) + " " + "{:.2f}".format(miss_distance_vector.y()) + " " + "{:.2f}".format(miss_distance_vector.z()))
+        print("FCC " + str(self.aircraft.aircraft_id) + ": Unresolved region: " + "{:.2f}".format(unresolved_region))
+        print("FCC " + str(self.aircraft.aircraft_id) + ": Time to closest approach: " + "{:.2f}".format(time_to_closest_approach))
 
         if self.__evade_maneuver:
             logging.warning("Another evade maneuver in progress")
