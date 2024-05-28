@@ -442,6 +442,11 @@ class AircraftFCC(QObject):
         self.__ignore_destinations = False
         self.__is_turning_right = False
         self.__is_turning_left = False
+        
+    def clear_destinations(self) -> None:
+        """Clears destinations list"""
+        with QMutexLocker(self.__mutex):
+            self.__destinations.clear()
 
     def load_initial_destination(self) -> None:
         """Loads initial destination"""
