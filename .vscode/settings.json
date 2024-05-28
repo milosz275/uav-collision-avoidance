@@ -51,6 +51,7 @@
         "pylint",
         "pyproject",
         "pytest",
+        "pytestmark",
         "screeninfo",
         "setterów",
         "setuptools",
