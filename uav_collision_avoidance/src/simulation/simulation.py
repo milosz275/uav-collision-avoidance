@@ -5,6 +5,8 @@ import logging
 import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+
 from copy import copy
 from pathlib import Path
 from typing import List, Tuple
@@ -32,7 +34,7 @@ class Simulation(QMainWindow):
 
     __current_id : int = 0
 
-    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 86_400_000) -> None: # 86_400_000 = 86_400 s = 24h
+    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 172_800_000) -> None: # 172_800_000 = 172_800 s = 48 h
         super().__init__()
         SimulationSettings().__init__()
         self.__simulation_id = self.obtain_simulation_id()
@@ -477,11 +479,12 @@ class Simulation(QMainWindow):
             
         list_of_lists = self.generate_test_aircrafts()
         lists_count : int = len(list_of_lists)
+        print("List of lists: ", lists_count)
 
         if lists_count > test_number:
             random_indices : ndarray | None = None
-            random_indices = random.choice(lists_count, test_number - 1, replace = False)
-            random_indices : List[int] = [0] + random_indices.tolist() # we specifically want to include first test
+            random_indices = random.choice(lists_count, test_number - 2, replace = False)
+            random_indices : List[int] = [0] + random_indices.tolist() + [lists_count - 1] # we specifically want to include first and last test
             random_indices_set : set = set(random_indices)
             random_indices = []
             while random_indices_set:
@@ -1000,11 +1003,12 @@ class Simulation(QMainWindow):
 
         x_range : float = x_maximum - x_minimum
         y_range : float = y_maximum - y_minimum
-        plt.xlim(x_minimum - x_range / 2, x_maximum + x_range / 2)
-        plt.ylim(y_minimum - y_range / 2, y_maximum + y_range / 2)
+        if x_range != 0:
+            plt.xlim(x_minimum - x_range / 2, x_maximum + x_range / 2)
+        if y_range != 0:    
+            plt.ylim(y_minimum - y_range / 2, y_maximum + y_range / 2)
 
         if simulation_data is not None:
-            import matplotlib.patches as mpatches
             aircraft_1_init = [simulation_data.aircraft_1_initial_position.x(), simulation_data.aircraft_1_initial_position.y()]
             aircraft_2_init = [simulation_data.aircraft_2_initial_position.x(), simulation_data.aircraft_2_initial_position.y()]
             plt.text(aircraft_1_init[0] + 0.05 * x_range, aircraft_1_init[1] - 0.05 * y_range, "Initial position\nof Aircraft 1", color = colors[0 % len(colors)], fontsize = 9, ha = "left")
