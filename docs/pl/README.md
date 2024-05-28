@@ -171,6 +171,7 @@ Pozwala na utworzenie wątku odpowiedzialnego za symulację systemu ADS-B (Autom
 - `simulation_state`: Stan symulacji.
 - `adsb_cycles`: Liczbę zliczonych cykli systemu ADS-B.
 - `minimal_relative_distance`: Najmniejsza znana względna odległość między dwoma samolotami.
+- `silent`: Flaga reprezentująca czy system ADS-B jest w trybie cichego działania (bez wysyłania informacji do wiersza poleceń).
 
 #### Metody:
 - `__init__(aircrafts : List[Aircraft], simulation_state : SimulationState) -> None`: Inicjalizuje nową instancję symulacji ADS-B.

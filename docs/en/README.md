@@ -171,6 +171,7 @@ Enables the creation of a thread responsible for simulating the ADS-B (Automatic
 - `simulation_state`: State of the simulation.
 - `adsb_cycles`: Number of counted ADS-B system cycles.
 - `minimal_relative_distance`: Minimal known relative distance between two aircrafts.
+- `silent`: Flag representing if the ADS-B system is silent and provides no command-line output.
 
 #### Methods:
 - `__init__(aircrafts : List[Aircraft], simulation_state : SimulationState) -> None`: Initializes a new ADS-B simulation instance.
