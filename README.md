@@ -39,7 +39,9 @@ Both collision detection and avoidance algorithms rely on geometrical approach. 
 
 ### Results
 
-- [ ] Fill in the results (Geometrical approach...)
+Geometrical approach proves useful in collision detection and avoidance. The system is capable of avoiding collisions in most cases. The system is not perfect and can fail in some scenarios, especially when the aircrafts are too close to each other when conflict is detected. The system is energy-efficient and can be used in real-life scenarios.
+
+Proposed test cases generation and evaluation system is simple and effective. It allows for quick testing of the system's effectiveness in various scenarios. The system can be further developed to include more complex scenarios and additional parameters.
 
 ## Python Project
 
