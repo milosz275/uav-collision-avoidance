@@ -34,7 +34,8 @@ class Simulation(QMainWindow):
 
     __current_id : int = 0
 
-    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 172_800_000) -> None: # 172_800_000 = 172_800 s = 48 h
+    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 1_209_600_000) -> None: # 1_209_600_000 ms = 1_209_600 s = 336 h = 14 days
+        """Initializes simulation"""
         super().__init__()
         SimulationSettings().__init__()
         self.__simulation_id = self.obtain_simulation_id()
