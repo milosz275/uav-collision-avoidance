@@ -24,5 +24,5 @@ These images serve as a visual comparison to assess the effectiveness of the col
 The simulation directories are named sequentially through simulation id 0-9 `simulation-[simulation-id]-[test_id]-[simulation_hash]` and are enclosed by the date directory. Inside each of these directories, you will find:
 
 ## Example
-![No avoidance](2024-05-27/simulation-0-9-152094729/path-visual-2024-05-27-22-54-27.png)
-![Avoidance](2024-05-27/simulation-0-9-152094729/path-visual-2024-05-27-22-54-50.png)
+![No avoidance](2024-05-28/simulation-0-11-2647369837/path-visual-2024-05-28-17-17-17.png)
+![Avoidance](2024-05-28/simulation-0-11-2647369837/path-visual-2024-05-28-17-17-27.png)
