@@ -1021,9 +1021,9 @@ class Simulation(QMainWindow):
             Path("path-visual").mkdir(parents=True, exist_ok=True)
             Path(f"path-visual/{export_date}").mkdir(parents=True, exist_ok=True)
             if test_index is not None:
-                Path(f"path-visual/{export_date}/simulation-{self.simulation_id}-{test_index}-{self.hash}").mkdir(parents=True, exist_ok=True)
+                Path(f"path-visual/{export_date}/simulation-{"{:02d}".format(self.simulation_id)}-{test_index}-{self.hash}").mkdir(parents=True, exist_ok=True)
             else:
-                Path(f"path-visual/{export_date}/simulation-{self.simulation_id}-{self.hash}").mkdir(parents=True, exist_ok=True)
+                Path(f"path-visual/{export_date}/simulation-{"{:02d}".format(self.simulation_id)}-{self.hash}").mkdir(parents=True, exist_ok=True)
         except:
             logging.error("Failed to create directories for visited logs")
             return
@@ -1068,9 +1068,9 @@ class Simulation(QMainWindow):
             plt.legend(handles=[angle_patch, min_relative_dist_patch])
         
         if test_index is not None:
-            plt.savefig(f"path-visual/{export_date}/simulation-{self.simulation_id}-{test_index}-{self.hash}/path-visual-{export_time}.png")
+            plt.savefig(f"path-visual/{export_date}/simulation-{"{:02d}".format(self.simulation_id)}-{test_index}-{self.hash}/path-visual-{export_time}.png")
         else:
-            plt.savefig(f"path-visual/{export_date}/simulation-{self.simulation_id}-{self.hash}/path-visual-{export_time}.png")
+            plt.savefig(f"path-visual/{export_date}/simulation-{"{:02d}".format(self.simulation_id)}-{self.hash}/path-visual-{export_time}.png")
         plt.close()
     
     def closeEvent(self, event: QCloseEvent) -> None:
