@@ -23,6 +23,7 @@ class SimulationData(QObject):
         self.__aircraft_2_initial_roll_angle : float = 0.0
         self.__collision : bool | None = None
         self.__minimal_relative_distance : float | None = None
+        self.__miss_distance_at_closest_approach : float | None = None
 
     @property
     def aircraft_angle(self) -> float:
@@ -173,6 +174,16 @@ class SimulationData(QObject):
     def minimal_relative_distance(self, distance : float) -> None:
         """Sets minimal miss distance"""
         self.__minimal_relative_distance = distance
+        
+    @property
+    def miss_distance_at_closest_approach(self) -> float | None:
+        """Returns miss distance at closest approach"""
+        return self.__miss_distance_at_closest_approach
+    
+    @miss_distance_at_closest_approach.setter
+    def miss_distance_at_closest_approach(self, distance : float) -> None:
+        """Sets miss distance at closest approach"""
+        self.__miss_distance_at_closest_approach = distance
 
     def reset(self) -> None:
         """Resets simulation data"""

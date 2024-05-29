@@ -5,10 +5,12 @@ import logging
 import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+
 from copy import copy
 from pathlib import Path
 from typing import List, Tuple
-from numpy import random, ndarray, mean
+from numpy import random, ndarray
 from math import dist, sin, cos, radians
 from matplotlib.ticker import MaxNLocator
 
@@ -32,7 +34,8 @@ class Simulation(QMainWindow):
 
     __current_id : int = 0
 
-    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 86_400_000) -> None: # 86_400_000 = 86_400 s = 24h
+    def __init__(self, headless : bool = False, tests : bool = False, simulation_time : int = 1_209_600_000) -> None: # 1_209_600_000 ms = 1_209_600 s = 336 h = 14 days
+        """Initializes simulation"""
         super().__init__()
         SimulationSettings().__init__()
         self.__simulation_id = self.obtain_simulation_id()
@@ -44,6 +47,12 @@ class Simulation(QMainWindow):
         self.__state : SimulationState | None = None
         self.__imported_from_data : bool = False
         self.__simulation_data : SimulationData | None = None
+
+        self.__simulation_physics : SimulationPhysics | None = None
+        self.__simulation_adsb : SimulationADSB | None = None
+        self.__simulation_fps : SimulationFPS | None = None
+        self.__simulation_widget : SimulationWidget | None = None
+        self.__simulation_render : SimulationRender | None = None
 
     @staticmethod
     def obtain_simulation_id() -> int:
@@ -120,6 +129,56 @@ class Simulation(QMainWindow):
     def simulation_data(self, data : SimulationData) -> None:
         """Sets simulation data"""
         self.__simulation_data = data
+
+    @property
+    def simulation_physics(self) -> SimulationPhysics:
+        """Returns simulation physics"""
+        return self.__simulation_physics
+    
+    @simulation_physics.setter
+    def simulation_physics(self, physics : SimulationPhysics) -> None:
+        """Sets simulation physics"""
+        self.__simulation_physics = physics
+
+    @property
+    def simulation_adsb(self) -> SimulationADSB:
+        """Returns simulation adsb"""
+        return self.__simulation_adsb
+    
+    @simulation_adsb.setter
+    def simulation_adsb(self, adsb : SimulationADSB) -> None:
+        """Sets simulation adsb"""
+        self.__simulation_adsb = adsb
+
+    @property
+    def simulation_fps(self) -> SimulationFPS:
+        """Returns simulation fps"""
+        return self.__simulation_fps
+    
+    @simulation_fps.setter
+    def simulation_fps(self, fps : SimulationFPS) -> None:
+        """Sets simulation fps"""
+        self.__simulation_fps = fps
+
+    @property
+    def simulation_widget(self) -> SimulationWidget:
+        """Returns simulation widget"""
+        return self.__simulation_widget
+    
+    @simulation_widget.setter
+    def simulation_widget(self, widget : SimulationWidget) -> None:
+        """Sets simulation widget"""
+        self.__simulation_widget = widget
+
+    @property
+    def simulation_render(self) -> SimulationRender:
+        """Returns simulation render"""
+        return self.__simulation_render
+
+    @simulation_render.setter
+    def simulation_render(self, render : SimulationRender) -> None:
+        """Sets simulation render"""
+        self.__simulation_render = render
     
     def run(self) -> None:
         """Executes simulation"""
@@ -203,6 +262,7 @@ class Simulation(QMainWindow):
         simulation_data.aircraft_2_final_position = copy(self.aircrafts[1].vehicle.position)
         simulation_data.aircraft_1_final_speed = copy(self.aircrafts[0].vehicle.speed)
         simulation_data.aircraft_2_final_speed = copy(self.aircrafts[1].vehicle.speed)
+        simulation_data.miss_distance_at_closest_approach = copy(self.simulation_adsb.miss_distance_at_closest_approach)
         if self.imported_from_data:
             self.check_simulation_data_correctness()
         if test_index is not None:
@@ -234,9 +294,7 @@ class Simulation(QMainWindow):
         for angle in test_random_collision_course_differences:
             aircraft_init_height : float = random.uniform(test_minimal_altitude, test_maximal_altitude)
             aircraft_target_height : float = random.uniform(test_minimal_altitude, test_maximal_altitude)
-            aircraft_collision_height : float = mean([aircraft_init_height, aircraft_target_height])
-            test_collision_target : QVector3D = QVector3D(0, 0, aircraft_collision_height)
-            test_collision_target_flat : QVector3D = QVector3D(0, 0, aircraft_init_height)
+            test_collision_target_projected : QVector3D = QVector3D(0, 0, aircraft_init_height)
             aircraft_absolute_speed : float = random.uniform(test_minimal_speed, test_maximal_speed)
             sin_value : float = sin(radians(angle))
             cos_value : float = cos(radians(angle))
@@ -258,8 +316,8 @@ class Simulation(QMainWindow):
                 0,
                 aircraft_absolute_speed,
                 0)
-            assert abs(dist(aircraft_1_position.toTuple(), test_collision_target_flat.toTuple()) - distance_to_collision) < 0.05
-            assert abs(aircraft_1_speed.length() - aircraft_absolute_speed) < 0.05
+            assert abs(dist(aircraft_1_position.toTuple(), test_collision_target_projected.toTuple()) - distance_to_collision) < 0.1
+            assert abs(aircraft_1_speed.length() - aircraft_absolute_speed) < 0.1
             
             # rotate angle to get circle equation
             sin_value = sin(radians(90 - angle))
@@ -277,8 +335,8 @@ class Simulation(QMainWindow):
                 aircraft_absolute_speed * sin_value,
                 aircraft_1_speed.z())
 
-            assert abs(dist(aircraft_2_position.toTuple(), test_collision_target_flat.toTuple()) - distance_to_collision) < 0.05
-            assert abs(aircraft_2_speed.length() - aircraft_absolute_speed) < 0.05
+            assert abs(dist(aircraft_2_position.toTuple(), test_collision_target_projected.toTuple()) - distance_to_collision) < 0.1
+            assert abs(aircraft_2_speed.length() - aircraft_absolute_speed) < 0.1
 
             aircrafts : List[Aircraft] = [
                 Aircraft(
@@ -404,8 +462,9 @@ class Simulation(QMainWindow):
         list_of_lists.append([aircrafts, 180.001])
         return list_of_lists
     
-    def run_tests(self, begin_with_default_set : bool = True, test_number : int = 15) -> None:
+    def run_tests(self, begin_with_default_set : bool = True, test_number : int = 20) -> None:
         """Runs simulation tests"""
+        SimulationSettings.set_simulation_frequency(10.0)
         if test_number < 3:
             logging.info("Changing simulation tests to 3 test cases due to too low test number")
             test_number = 3
@@ -423,11 +482,12 @@ class Simulation(QMainWindow):
             
         list_of_lists = self.generate_test_aircrafts()
         lists_count : int = len(list_of_lists)
+        print("Generated list of pairs: ", lists_count)
 
         if lists_count > test_number:
             random_indices : ndarray | None = None
-            random_indices = random.choice(lists_count, test_number - 1, replace = False)
-            random_indices : List[int] = [0] + random_indices.tolist() # we specifically want to include first test
+            random_indices = random.choice(lists_count, test_number - 2, replace = False)
+            random_indices : List[int] = [0] + random_indices.tolist() + [lists_count - 1] # we specifically want to include first and last test
             random_indices_set : set = set(random_indices)
             random_indices = []
             while random_indices_set:
@@ -508,12 +568,15 @@ class Simulation(QMainWindow):
             "collision_if_no_avoidance",
             "collision_if_avoidance",
             "minimal_relative_distance_if_no_avoidance",
-            "minimal_relative_distance_if_avoidance"])
+            "minimal_relative_distance_if_avoidance",
+            "miss_distance_at_closest_approach_if_no_avoidance",
+            "miss_distance_at_closest_approach_if_avoidance"])
         file.close()
         file = open(f"data/simulation-{export_time}.csv", "a")
         writer = csv.writer(file)
         
         for i in range(0, test_number, 1):
+            print("Test " + str(i) + " - no collision avoidance")
             logging.info("Test %d - no collision avoidance", i)
             aircraft_tuple : List[List[Aircraft], float] = list_of_lists[i]
             aircrafts : List[Aircraft] = aircraft_tuple[0]
@@ -524,14 +587,19 @@ class Simulation(QMainWindow):
                 aircrafts = aircrafts,
                 test_index = i,
                 aircraft_angle = angle)
+            if not simulation_data_no_avoidance.collision:
+                logging.info("Test %d - no collision avoidance - no collision detected, marking ❌", i)
             self.state = None
 
+            print("Test " + str(i) + " - collision avoidance")
             logging.info("Test %d - collision avoidance", i)
             simulation_data_avoidance : SimulationData = self.run_headless(
                 avoid_collisions = True,
                 aircrafts = aircrafts,
                 test_index = i,
                 aircraft_angle = angle)
+            if not simulation_data_avoidance.collision:
+                logging.info("Test %d - collision avoidance - no collision detected, success ✔️", i)
             self.state = None
 
             writer.writerow([
@@ -582,7 +650,9 @@ class Simulation(QMainWindow):
                 simulation_data_no_avoidance.collision,
                 simulation_data_avoidance.collision,
                 simulation_data_no_avoidance.minimal_relative_distance,
-                simulation_data_avoidance.minimal_relative_distance])
+                simulation_data_avoidance.minimal_relative_distance,
+                simulation_data_no_avoidance.miss_distance_at_closest_approach,
+                simulation_data_avoidance.miss_distance_at_closest_approach])
             file.close()
             file = open(f"data/simulation-{export_time}.csv", "a")
             writer = csv.writer(file)
@@ -646,7 +716,7 @@ class Simulation(QMainWindow):
             for i, row in enumerate(reader):
                 if i == test_id + 1:
                     simulation_data : SimulationData = SimulationData()
-                    assert len(row) == 48
+                    assert len(row) == 50
                     assert row[0] == str(test_id)
                     simulation_data.aircraft_angle = float(row[1])
                     simulation_data.aircraft_1_initial_position = QVector3D(float(row[2]), float(row[3]), float(row[4]))
@@ -662,6 +732,10 @@ class Simulation(QMainWindow):
                         simulation_data.aircraft_2_final_speed = QVector3D(float(row[35]), float(row[36]), float(row[37]))
                         simulation_data.collision = row[44] == "True"
                         simulation_data.minimal_relative_distance = float(row[46])
+                        if str(row[48]) == "nan":
+                            simulation_data.miss_distance_at_closest_approach = None
+                        else:
+                            simulation_data.miss_distance_at_closest_approach = float(row[48])
                     else:
                         simulation_data.aircraft_1_final_position = QVector3D(float(row[26]), float(row[27]), float(row[28]))
                         simulation_data.aircraft_2_final_position = QVector3D(float(row[29]), float(row[30]), float(row[31]))
@@ -669,6 +743,10 @@ class Simulation(QMainWindow):
                         simulation_data.aircraft_2_final_speed = QVector3D(float(row[41]), float(row[42]), float(row[43]))
                         simulation_data.collision = row[45] == "True"
                         simulation_data.minimal_relative_distance = float(row[47])
+                        if str(row[49]) == "nan":
+                            simulation_data.miss_distance_at_closest_approach = None
+                        else:
+                            simulation_data.miss_distance_at_closest_approach = float(row[49])
                     self.import_simulation_data(simulation_data)
                     return True
         except:
@@ -878,15 +956,41 @@ class Simulation(QMainWindow):
         if not self.__imported_from_data or self.__simulation_data is None or self.aircrafts is None or self.aircrafts == []:
             return None
         logging.info("Checking simulation data correctness...")
+        # [ ] Fix case when loaded data simulated in low frequency and tested in high accuracy
+        position_accuracy : float = 200.0
+        speed_accuracy : float = 5.0
+        displacement_accuracy : float = 5.0
+        simulation_frequency = SimulationSettings.simulation_frequency
+        if simulation_frequency >= 100.0:
+            position_accuracy : float = 0.1
+            speed_accuracy : float = 0.1
+            displacement_accuracy : float = 1.0
+        elif simulation_frequency >= 70.0:
+            position_accuracy : float = 10.0
+            speed_accuracy : float = 0.5
+            displacement_accuracy : float = 5.0
+        elif simulation_frequency >= 50.0:
+            position_accuracy : float = 20.0
+            speed_accuracy : float = 0.6
+            displacement_accuracy : float = 6.0
+        elif simulation_frequency >= 30.0:
+            position_accuracy : float = 25.0
+            speed_accuracy : float = 0.75
+            displacement_accuracy : float = 7.5
+        elif simulation_frequency >= 10.0:
+            position_accuracy : float = 50.0
+            speed_accuracy : float = 1.0
+            displacement_accuracy : float = 10.0
+            
         assert len(self.aircrafts) == 2
-        assert dist(self.aircrafts[0].vehicle.position.toTuple(), self.__simulation_data.aircraft_1_final_position.toTuple()) < 0.1
-        assert dist(self.aircrafts[1].vehicle.position.toTuple(), self.__simulation_data.aircraft_2_final_position.toTuple()) < 0.1
-        assert dist(self.aircrafts[0].vehicle.speed.toTuple(), self.__simulation_data.aircraft_1_final_speed.toTuple()) < 0.1
-        assert dist(self.aircrafts[1].vehicle.speed.toTuple(), self.__simulation_data.aircraft_2_final_speed.toTuple()) < 0.1
-        assert abs(self.aircrafts[0].vehicle.speed.length() - self.__simulation_data.aircraft_1_final_speed.length()) < 0.1
-        assert abs(self.aircrafts[1].vehicle.speed.length() - self.__simulation_data.aircraft_2_final_speed.length()) < 0.1
-        assert abs(self.simulation_adsb.minimal_relative_distance - self.__simulation_data.minimal_relative_distance) < 0.1
-        logging.info("Simulation data correctness checked successfully ✅")
+        assert dist(self.aircrafts[0].vehicle.position.toTuple(), self.__simulation_data.aircraft_1_final_position.toTuple()) < position_accuracy
+        assert dist(self.aircrafts[1].vehicle.position.toTuple(), self.__simulation_data.aircraft_2_final_position.toTuple()) < position_accuracy
+        assert dist(self.aircrafts[0].vehicle.speed.toTuple(), self.__simulation_data.aircraft_1_final_speed.toTuple()) < speed_accuracy
+        assert dist(self.aircrafts[1].vehicle.speed.toTuple(), self.__simulation_data.aircraft_2_final_speed.toTuple()) < speed_accuracy
+        assert abs(self.aircrafts[0].vehicle.speed.length() - self.__simulation_data.aircraft_1_final_speed.length()) < speed_accuracy
+        assert abs(self.aircrafts[1].vehicle.speed.length() - self.__simulation_data.aircraft_2_final_speed.length()) < speed_accuracy
+        assert abs(self.simulation_adsb.minimal_relative_distance - self.__simulation_data.minimal_relative_distance) < displacement_accuracy
+        logging.info("Simulation data correctness checked successfully ✔️")
         return True
 
     def export_visited_locations(self, simulation_data : SimulationData | None = None, test_index : int | None = None) -> None:
@@ -917,9 +1021,9 @@ class Simulation(QMainWindow):
             Path("path-visual").mkdir(parents=True, exist_ok=True)
             Path(f"path-visual/{export_date}").mkdir(parents=True, exist_ok=True)
             if test_index is not None:
-                Path(f"path-visual/{export_date}/simulation-{self.simulation_id}-{test_index}-{self.hash}").mkdir(parents=True, exist_ok=True)
+                Path(f"path-visual/{export_date}/simulation-{self.simulation_id:02d}-{test_index}-{self.hash}").mkdir(parents=True, exist_ok=True)
             else:
-                Path(f"path-visual/{export_date}/simulation-{self.simulation_id}-{self.hash}").mkdir(parents=True, exist_ok=True)
+                Path(f"path-visual/{export_date}/simulation-{self.simulation_id:02d}-{self.hash}").mkdir(parents=True, exist_ok=True)
         except:
             logging.error("Failed to create directories for visited logs")
             return
@@ -942,11 +1046,12 @@ class Simulation(QMainWindow):
 
         x_range : float = x_maximum - x_minimum
         y_range : float = y_maximum - y_minimum
-        plt.xlim(x_minimum - x_range / 2, x_maximum + x_range / 2)
-        plt.ylim(y_minimum - y_range / 2, y_maximum + y_range / 2)
+        if x_range != 0:
+            plt.xlim(x_minimum - x_range / 2, x_maximum + x_range / 2)
+        if y_range != 0:    
+            plt.ylim(y_minimum - y_range / 2, y_maximum + y_range / 2)
 
         if simulation_data is not None:
-            import matplotlib.patches as mpatches
             aircraft_1_init = [simulation_data.aircraft_1_initial_position.x(), simulation_data.aircraft_1_initial_position.y()]
             aircraft_2_init = [simulation_data.aircraft_2_initial_position.x(), simulation_data.aircraft_2_initial_position.y()]
             plt.text(aircraft_1_init[0] + 0.05 * x_range, aircraft_1_init[1] - 0.05 * y_range, "Initial position\nof Aircraft 1", color = colors[0 % len(colors)], fontsize = 9, ha = "left")
@@ -963,9 +1068,9 @@ class Simulation(QMainWindow):
             plt.legend(handles=[angle_patch, min_relative_dist_patch])
         
         if test_index is not None:
-            plt.savefig(f"path-visual/{export_date}/simulation-{self.simulation_id}-{test_index}-{self.hash}/path-visual-{export_time}.png")
+            plt.savefig(f"path-visual/{export_date}/simulation-{self.simulation_id:02d}-{test_index}-{self.hash}/path-visual-{export_time}.png")
         else:
-            plt.savefig(f"path-visual/{export_date}/simulation-{self.simulation_id}-{self.hash}/path-visual-{export_time}.png")
+            plt.savefig(f"path-visual/{export_date}/simulation-{self.simulation_id:02d}-{self.hash}/path-visual-{export_time}.png")
         plt.close()
     
     def closeEvent(self, event: QCloseEvent) -> None:

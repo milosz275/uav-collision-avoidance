@@ -39,7 +39,9 @@ Wykrywanie i unikanie kolizji opierają się na podejściu geometrycznym. Algory
 
 ### Wyniki
 
-- [ ] Uzupełnić wyniki (Podejście geometryczne...)
+Podejście geometryczne okazuje się przydatne w wykrywaniu i unikaniu kolizji. System jest w stanie unikać kolizji w większości przypadków. System nie jest doskonały i może zawodzić w niektórych scenariuszach, zwłaszcza gdy samoloty są zbyt blisko siebie w momencie wykrycia konfliktu. System jest energooszczędny i może być używany przy ocenie prawdziwych scenariuszy.
+
+Zaproponowany system generacji i oceny przypadków testowych jest prosty i skuteczny. Umożliwia szybkie testowanie skuteczności systemu w różnych scenariuszach. System może być dalej rozwijany, aby uwzględniać bardziej przypadki i dodatkowe parametry.
 
 ## Projekt Python
 

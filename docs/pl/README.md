@@ -97,6 +97,11 @@ Klasa `Simulation` jest odpowiedzialna za tworzenie przypadków testowych, przep
 - `state`: Stan symulacji.
 - `imported_from_data`: Flaga reprezentująca czy symulacja została wczytana z pliku.
 - `simulation_data`: Zawiera strukturę danych wczytanej symulacji.
+- `simulation_physics`: Obiekt symulacji fizycznej.
+- `simulation_adsb`: Obiekt symulacji systemu ADS-B.
+- `simulation_widget`: Obiekt widżetu symulacji.
+- `simulation_render`: Obiekt renderowania symulacji.
+- `simulation_fps`: Obiekt liczenia klatek na sekundę.
 
 #### Metody:
 - `__init__(headless : bool, tests : bool, simulation_time : int) -> None`: Inicjalizuje nową instancję symulacji bez tworzenia obiektu jej stanu ani samolotów bezzałogowych.
@@ -166,6 +171,7 @@ Pozwala na utworzenie wątku odpowiedzialnego za symulację systemu ADS-B (Autom
 - `simulation_state`: Stan symulacji.
 - `adsb_cycles`: Liczbę zliczonych cykli systemu ADS-B.
 - `minimal_relative_distance`: Najmniejsza znana względna odległość między dwoma samolotami.
+- `silent`: Flaga reprezentująca czy system ADS-B jest w trybie cichego działania (bez wysyłania informacji do wiersza poleceń).
 
 #### Metody:
 - `__init__(aircrafts : List[Aircraft], simulation_state : SimulationState) -> None`: Inicjalizuje nową instancję symulacji ADS-B.

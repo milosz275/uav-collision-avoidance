@@ -97,6 +97,11 @@ The `Simulation` class is responsible for generating test cases, conducting seri
 - `state`: State of the simulation.
 - `imported_from_data`: Flag representing if the simulation was loaded from file.
 - `simulation_data`: Contains simulation data structure if loaded from file.
+- `simulation_physics`: Simulation physics object.
+- `simulation_adsb`: Simulation ADS-B object.
+- `simulation_widget`: Simulation widget object.
+- `simulation_render`: Simulation render object.
+- `simulation_fps`: Simulation FPS object.
 
 #### Methods:
 - `__init__(headless : bool, tests : bool, simulation_time : int) -> None`: Initializes a new simulation instance without initializing state and aircrafts.
@@ -166,6 +171,7 @@ Enables the creation of a thread responsible for simulating the ADS-B (Automatic
 - `simulation_state`: State of the simulation.
 - `adsb_cycles`: Number of counted ADS-B system cycles.
 - `minimal_relative_distance`: Minimal known relative distance between two aircrafts.
+- `silent`: Flag representing if the ADS-B system is silent and provides no command-line output.
 
 #### Methods:
 - `__init__(aircrafts : List[Aircraft], simulation_state : SimulationState) -> None`: Initializes a new ADS-B simulation instance.

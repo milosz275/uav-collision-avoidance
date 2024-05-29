@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "uav-collision-avoidance"
-version = "0.8.5"
+version = "0.8.6"
 authors = [
   { name="mldxo", email="miloszmaculewicz@gmail.com" },
 ]
@@ -41,3 +41,9 @@ Issues = "https://github.com/mldxo/uav-collision-avoidance/issues"
 
 [tool.setuptools.packages.find]
 where = [""]
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error",
+    "ignore::UserWarning",
+]
