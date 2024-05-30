@@ -37,8 +37,9 @@ Wszystkie klasy korzystają z właściwości i setterów Pythona, wykorzystując
 ## Stałe
 
 - Przyspieszenie grawitacyjne: `9.81 m/s^2`
-- Częstotliwość symulacji: `100 Hz`
-- Częstotliwość renderowania symulacji: `100 Hz`
+- Częstotliwość symulacji realtime i w tle: `100 Hz`
+- Częstotliwość symulacji w przypadku testów: `10 Hz`
+- Częstotliwość renderowania GUI symulacji: `100 Hz`
 - Częstotliwość systemu ADS-B: `1 Hz`
 - Opóźnienie samolotu w zmianie kąta przechylenia `1000 ms`
 - Opóźnienie samolotu w zmianie kąta nachylenia `2000 ms`
