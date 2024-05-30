@@ -37,8 +37,9 @@ All classes make use of Python's properties and setters utilizing mutexes and mu
 ## Constants
 
 - Gravitational acceleration: `9.81 m/s^2`
-- Simulation frequency: `100 Hz`
-- Simulation render frequency: `100 Hz`
+- Simulation frequency for realtime and headless types: `100 Hz`
+- Simulation frequency while conducting tests: `10 Hz`
+- Simulation render GUI frequency: `100 Hz`
 - ADS-B system frequency: `1 Hz`
 - Aircraft roll angle change delay: `1000 ms`
 - Aircraft pitch angle change delay: `2000 ms`
