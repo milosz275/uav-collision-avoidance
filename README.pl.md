@@ -11,7 +11,7 @@
 Implementacja algorytmu unikania kolizji dla dronów w przestrzeni 3D bazująca na podejściu geometrycznym.
 
 - [Github](https://github.com/mldxo/uav-collision-avoidance)
-- [PyPi](https://pypi.org/project/uav-collision-avoidance)
+- [PyPI](https://pypi.org/project/uav-collision-avoidance)
 
 ## Praca badawcza
 
@@ -47,7 +47,7 @@ Zaproponowany system generacji i oceny przypadków testowych jest prosty i skute
 
 ### Technologie
 
-Projekt Python3[^1] jest przygotowany jako pakiet PyPi[^2]. Do implementacji graficznego interfejsu użytkownika (GUI) wykorzystano PySide6[^3] (biblioteka Pythona Qt6).
+Projekt Python3[^1] jest przygotowany jako pakiet PyPI[^2]. Do implementacji graficznego interfejsu użytkownika (GUI) wykorzystano PySide6[^3] (biblioteka Pythona Qt6).
 
 ### Struktury
 
@@ -92,7 +92,7 @@ Program w wersji real-time wyposażono w sposób interakcji użytkownika z symul
 
 ### Instalacja
 
-Zainstaluj pakiet z PyPi:
+Zainstaluj pakiet z PyPI:
 
 ```bash
 pip install uav-collision-avoidance
@@ -207,7 +207,7 @@ Ikona drona wykonana przez Anthony Lui <a href="https://thenounproject.com/brows
 Wszystkie odnośniki do prac badawczych i wykorzystanych materiałów znajdują się poniżej.
 
 [^1]: [Python3](https://www.python.org/)
-[^2]: [PyPi](https://pypi.org/)
+[^2]: [PyPI](https://pypi.org/)
 [^3]: [PyQt6](https://doc.qt.io/qtforpython-6/)
 [^4]: [UAV Collision Avoidance Based on Geometric Approach](https://ieeexplore.ieee.org/document/4655013/)
 [^5]: [Energy Efficient UAV Flight Control Method in an Environment with Obstacles and Gusts of Wind](https://www.mdpi.com/1638452/)
