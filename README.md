@@ -11,7 +11,7 @@
 Python project regarding implementation of two UAVs simulation with collision avoidance system based on geometrical approach.
 
 - [Github](https://github.com/mldxo/uav-collision-avoidance)
-- [PyPi](https://pypi.org/project/uav-collision-avoidance)
+- [PyPI](https://pypi.org/project/uav-collision-avoidance)
 
 ## Research work
 
@@ -47,7 +47,7 @@ Proposed test cases generation and evaluation system is simple and effective. It
 
 ### Technologies
 
-Python3[^1] project is wrapped as a PyPi package[^2]. PySide6[^3] (Qt's Python Qt6 library) was used for GUI implementation.
+Python3[^1] project is wrapped as a PyPI package[^2]. PySide6[^3] (Qt's Python Qt6 library) was used for GUI implementation.
 
 ### Structures
 
@@ -206,7 +206,7 @@ Drone by Anthony Lui from <a href="https://thenounproject.com/browse/icons/term/
 All used references are listed below.
 
 [^1]: [Python3](https://www.python.org/)
-[^2]: [PyPi](https://pypi.org/)
+[^2]: [PyPI](https://pypi.org/)
 [^3]: [PyQt6](https://doc.qt.io/qtforpython-6/)
 [^4]: [UAV Collision Avoidance Based on Geometric Approach](https://ieeexplore.ieee.org/document/4655013/)
 [^5]: [Energy Efficient UAV Flight Control Method in an Environment with Obstacles and Gusts of Wind](https://www.mdpi.com/1638452/)
