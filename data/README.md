@@ -28,4 +28,7 @@ The simulation data is stored in CSV format. Each row in the CSV file represents
 ## Directory structure
 
 - `simulation.csv`: The latest simulation data file. This file is not created automatically. For having specific simulation data loaded, simply copy wanted simulation data into this file.
-- `simulation-*.csv`: Historical simulation data files, named with the timestamp of the simulation run. These files are not tracked by Git as per the `.gitignore` settings, except for specific examples like [simulation-2024-05-28-17-03-42.csv](/data/simulation-2024-05-28-17-03-42.csv).
+- `simulation-*.csv`: Historical simulation data files, named with the timestamp of the simulation run. These files are not tracked by Git as per the `.gitignore` settings, except for specific examples. 
+
+Simulation data consisting of 20 tests conducted with 100 `Hz` simulation frequency [simulation-2024-05-31-00-00-37.csv](/data/simulation-2024-05-31-00-00-37.csv).
+Simulation data consisting of 200 tests conducted with 10 `Hz` simulation frequency [simulation-2024-05-31-12-58-35.csv](/data/simulation-2024-05-31-12-58-35.csv).

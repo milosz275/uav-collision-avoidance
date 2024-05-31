@@ -468,7 +468,7 @@ class Simulation(QMainWindow):
         if test_number < 3:
             logging.info("Changing simulation tests to 3 test cases due to too low test number")
             test_number = 3
-        elif test_number > 100:
+        elif test_number > 200:
             logging.info("Changing simulation tests to 100 test cases due to too high test number")
             test_number = 100
         logging.info("Running simulation tests")
@@ -1016,14 +1016,16 @@ class Simulation(QMainWindow):
 
         export_date = datetime.datetime.now().strftime("%Y-%m-%d")
         export_time = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        simulation_path : str = ""
         try:
             Path("logs/visited").mkdir(parents=True, exist_ok=True)
             Path("path-visual").mkdir(parents=True, exist_ok=True)
             Path(f"path-visual/{export_date}").mkdir(parents=True, exist_ok=True)
             if test_index is not None:
-                Path(f"path-visual/{export_date}/simulation-{self.simulation_id:02d}-{test_index}-{self.hash}").mkdir(parents=True, exist_ok=True)
+                simulation_path = f"path-visual/{export_date}/simulation-{self.simulation_id:02d}-{test_index:02d}-{self.hash}"
             else:
-                Path(f"path-visual/{export_date}/simulation-{self.simulation_id:02d}-{self.hash}").mkdir(parents=True, exist_ok=True)
+                simulation_path = f"path-visual/{export_date}/simulation-{self.simulation_id:02d}-{self.hash}"
+            Path(simulation_path).mkdir(parents=True, exist_ok=True)
         except:
             logging.error("Failed to create directories for visited logs")
             return
@@ -1067,11 +1069,11 @@ class Simulation(QMainWindow):
                 label = "Min relative dist: " + "{:.3f}".format(simulation_data.minimal_relative_distance))
             plt.legend(handles=[angle_patch, min_relative_dist_patch])
         
-        if test_index is not None:
-            plt.savefig(f"path-visual/{export_date}/simulation-{self.simulation_id:02d}-{test_index}-{self.hash}/path-visual-{export_time}.png")
-        else:
-            plt.savefig(f"path-visual/{export_date}/simulation-{self.simulation_id:02d}-{self.hash}/path-visual-{export_time}.png")
+        plt.savefig(f"{simulation_path}/path-visual-{export_time}.png")
         plt.close()
+        
+        with open(f"{simulation_path}/README.md", 'a+') as readme_file:
+            readme_file.write(f'![](path-visual-{export_time}.png)\n')
     
     def closeEvent(self, event: QCloseEvent) -> None:
         """Qt method performed on the main window close event"""
