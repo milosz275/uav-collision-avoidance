@@ -121,7 +121,7 @@ uav-collision-avoidance
 ```
 
 ```bash
-uav-collision-avoidance realtime [nazwa_pliku] [indeks_testu] [unikanie_kolizji]
+uav-collision-avoidance realtime [ścieżka_pliku] [indeks_testu] [unikanie_kolizji]
 ```
 
 ```bash
@@ -137,7 +137,7 @@ uav-collision-avoidance ongoing
 ```
 
 ```bash
-uav-collision-avoidance load [nazwa_pliku] [indeks_testu]
+uav-collision-avoidance load [ścieżka_pliku] [indeks_testu]
 ```
 
 ```bash
