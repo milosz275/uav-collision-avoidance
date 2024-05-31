@@ -75,5 +75,6 @@
         "ylabel",
         "ylim",
         "zainicjalizowanej"
-    ]
+    ],
+    "editor.largeFileOptimizations": false,
 }
