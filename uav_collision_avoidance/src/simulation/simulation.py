@@ -468,7 +468,7 @@ class Simulation(QMainWindow):
         if test_number < 3:
             logging.info("Changing simulation tests to 3 test cases due to too low test number")
             test_number = 3
-        elif test_number > 100:
+        elif test_number > 200:
             logging.info("Changing simulation tests to 100 test cases due to too high test number")
             test_number = 100
         logging.info("Running simulation tests")
