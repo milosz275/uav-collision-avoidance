@@ -247,7 +247,7 @@ class Simulation(QMainWindow):
                 self.simulation_adsb.cycle()
                 partial_time_counter = 0
             partial_time_counter += time_step
-            if self.simulation_adsb.relative_distance > self.state.minimum_separation * 3 and self.simulation_adsb.minimal_relative_distance < self.state.minimum_separation:
+            if self.simulation_adsb.relative_distance > self.state.minimum_separation * 4 and self.simulation_adsb.minimal_relative_distance < self.state.minimum_separation:
                 logging.info("Headless simulation stopping due to aircrafts too far apart")
                 break
             if not self.aircrafts[0].fcc.destination and not self.aircrafts[1].fcc.destination:
@@ -295,8 +295,13 @@ class Simulation(QMainWindow):
             aircraft_init_height : float = random.uniform(test_minimal_altitude, test_maximal_altitude)
             aircraft_target_height : float = random.uniform(test_minimal_altitude, test_maximal_altitude)
             aircraft_absolute_speed : float = random.uniform(test_minimal_speed, test_maximal_speed)
-            sin_value : float = sin(radians(angle))
-            cos_value : float = cos(radians(angle))
+            
+            if angle < 90.0:
+                sin_value : float = sin(radians(angle))
+                cos_value : float = cos(radians(angle))
+            elif angle > 90.0:
+                sin_value = sin(radians(180 - angle))
+                cos_value = cos(radians(180 - angle))
             
             if sin_value == 0.0:
                 continue
@@ -306,16 +311,18 @@ class Simulation(QMainWindow):
                 continue
             
             distance_to_collision : float = 0.0
-            if 90 - angle > 0.0001: # acute angled triangle
-                distance_to_collision = test_start_aircrafts_relative_distance / sin_value
-            elif abs(90 - angle) < 0.0001: # right angled triangle
+            if 90 - angle > 0.001: # acute angled triangle
+                distance_to_collision = sqrt((test_start_aircrafts_relative_distance ** 2) / (2 * (1 - cos_value))) / 1.0
+                logging.info("Distance to collision: %f", distance_to_collision)
+            elif abs(90 - angle) < 0.001: # right angled triangle
                 distance_to_collision = test_start_aircrafts_relative_distance / sqrt(2)
-            elif 90 - angle < -0.0001: # obtuse angled triangle
-                continue # [ ] Add calculation
+                logging.info("Distance to collision: %f, right angle", distance_to_collision)
+            elif 90 - angle < -0.001: # obtuse angled triangle
+                distance_to_collision = sqrt((test_start_aircrafts_relative_distance ** 2) / (2 * (1 + cos_value))) / 1.0
+                logging.info("Distance to collision: %f", distance_to_collision)
             else:
                 logging.error("Invalid angle value: %f", angle)
                 continue
-            logging.info("Distance to collision: %f, sin value: %f", distance_to_collision, sin_value)
 
             aircraft_1_position : QVector3D = QVector3D(
                 0,
@@ -349,10 +356,12 @@ class Simulation(QMainWindow):
 
             assert abs(aircraft_2_speed.length() - aircraft_absolute_speed) < 0.1
 
-            logging.info("Relative distance between aircrafts: %fm with angle: %f", dist(aircraft_1_position.toTuple(), aircraft_2_position.toTuple()), angle)
-            assert abs(aircraft_1_position.distanceToPoint(aircraft_2_position) - test_start_aircrafts_relative_distance) < test_start_aircrafts_relative_distance # double wanted distance
-            if angle == 90.0:
-                assert abs(distance_to_collision - test_start_aircrafts_relative_distance / sqrt(2)) < 0.01
+            calculated_relative_distance_projected : float = dist(aircraft_1_position.toTuple(), aircraft_2_position.toTuple())
+            calculated_relative_distance : float = aircraft_1_position.distanceToPoint(aircraft_2_position)
+            logging.info("Relative distance between aircrafts: %fm (3D %fm) with angle: %f", calculated_relative_distance_projected, calculated_relative_distance, angle)
+            assert abs(aircraft_1_position.distanceToPoint(aircraft_2_position) - test_start_aircrafts_relative_distance) < test_start_aircrafts_relative_distance / 2 # for 10 km, actual 15 km is accepted
+            if abs(90 - angle) < 0.001:
+                assert abs(distance_to_collision - test_start_aircrafts_relative_distance / sqrt(2)) < 0.1
             
             aircrafts : List[Aircraft] = [
                 Aircraft(
@@ -1092,11 +1101,11 @@ class Simulation(QMainWindow):
         if simulation_data is not None:
             aircraft_1_init = [simulation_data.aircraft_1_initial_position.x(), simulation_data.aircraft_1_initial_position.y()]
             aircraft_2_init = [simulation_data.aircraft_2_initial_position.x(), simulation_data.aircraft_2_initial_position.y()]
-            plt.text(aircraft_1_init[0] + 0.05 * x_range, aircraft_1_init[1] - 0.05 * y_range, "Initial position\nof Aircraft 1", color = colors[0 % len(colors)], fontsize = 9, ha = "left")
-            plt.text(aircraft_2_init[0] + 0.05 * x_range, aircraft_2_init[1] - 0.05 * y_range, "Initial position\nof Aircraft 2", color = colors[1 % len(colors)], fontsize = 9, ha = "left")
+            plt.text(aircraft_1_init[0] + 0.05 * x_range, aircraft_1_init[1] + 0.05 * y_range, "Initial position\nof Aircraft 1", color = colors[0 % len(colors)], fontsize = 9, ha = "center", va="center")
+            plt.text(aircraft_2_init[0] - 0.05 * x_range, aircraft_2_init[1] - 0.05 * y_range, "Initial position\nof Aircraft 2", color = colors[1 % len(colors)], fontsize = 9, ha = "center", va="center")
             if simulation_data.collision:
                 aircraft_final = [simulation_data.aircraft_1_final_position.x(), simulation_data.aircraft_1_final_position.y()]
-                plt.text(aircraft_final[0] + 0.05 * x_range, aircraft_final[1] - 0.05 * y_range, "Collision", color = "r", fontsize = 9, ha = "left")
+                plt.text(aircraft_final[0] + 0.05 * x_range, aircraft_final[1] - 0.05 * y_range, "Collision", color = "r", fontsize = 9, ha = "center", va="center")
             angle_patch = mpatches.Patch(
                 color = "none",
                 label = "Init angle: " + "{:.3f}".format(simulation_data.aircraft_angle))
@@ -1105,11 +1114,15 @@ class Simulation(QMainWindow):
                 label = "Min relative dist: " + "{:.3f}".format(simulation_data.minimal_relative_distance))
             plt.legend(handles=[angle_patch, min_relative_dist_patch])
         
+        y_ticks = plt.gca().get_yticks()
+        plt.gca().set_xticks(y_ticks)
+        plt.xticks(fontsize=7)
+        plt.yticks(fontsize=7)
         plt.savefig(f"{simulation_path}/path-visual-{export_time}.png")
         plt.close()
         
-        with open(f"{simulation_path}/README.md", 'a+') as readme_file:
-            readme_file.write(f'![](path-visual-{export_time}.png)\n')
+        with open(f"{simulation_path}/README.md", "a+") as readme_file:
+            readme_file.write(f"![](path-visual-{export_time}.png)\n")
     
     def closeEvent(self, event: QCloseEvent) -> None:
         """Qt method performed on the main window close event"""
