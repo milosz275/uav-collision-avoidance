@@ -247,7 +247,7 @@ class Simulation(QMainWindow):
                 self.simulation_adsb.cycle()
                 partial_time_counter = 0
             partial_time_counter += time_step
-            if self.simulation_adsb.relative_distance > self.state.minimum_separation * 4 and self.simulation_adsb.minimal_relative_distance < self.state.minimum_separation:
+            if self.simulation_adsb.relative_distance > self.state.minimum_separation * 3 and self.simulation_adsb.minimal_relative_distance < self.state.minimum_separation:
                 logging.info("Headless simulation stopping due to aircrafts too far apart")
                 break
             if not self.aircrafts[0].fcc.destination and not self.aircrafts[1].fcc.destination:
@@ -1091,12 +1091,12 @@ class Simulation(QMainWindow):
             plt.scatter(df["x"], df["y"], color=colors[i % len(colors)], s = 2)
             plt.plot(df["x"], df["y"], color=colors[i % len(colors)])
 
-        x_range : float = x_maximum - x_minimum
-        y_range : float = y_maximum - y_minimum
+        x_range : float = abs(x_maximum - x_minimum)
+        y_range : float = abs(y_maximum - y_minimum)
         if x_range != 0:
-            plt.xlim(x_minimum - x_range / 2, x_maximum + x_range / 2)
+            plt.xlim(x_minimum - x_range * 0.25, x_maximum + x_range * 0.25)
         if y_range != 0:    
-            plt.ylim(y_minimum - y_range / 2, y_maximum + y_range / 2)
+            plt.ylim(y_minimum - y_range * 0.25, y_maximum + y_range * 0.25)
 
         if simulation_data is not None:
             aircraft_1_init = [simulation_data.aircraft_1_initial_position.x(), simulation_data.aircraft_1_initial_position.y()]
