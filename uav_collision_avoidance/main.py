@@ -63,17 +63,17 @@ def main(arg = None) -> None:
             if len(get_monitors()) == 0:
                 logging.warning("Launching GUI Application without monitors detected")
             sim = Simulation()
-            if len(args) > 1:
+            if len(args) >= 2:
                 file_path : str = args[1]
                 test_id : int = 0
                 avoid_collisions : bool = False
-                if len(args) >= 2:
-                    test_id = int(args[2])
                 if len(args) >= 3:
+                    test_id = int(args[2])
+                if len(args) >= 4:
                     avoidance : str = str(args[3])
                     if avoidance == "true" or avoidance == "True" or avoidance == "t" or avoidance == "T" or avoidance == "yes" or avoidance == "1":
                         avoid_collisions = True
-                if len(args) > 4:
+                if len(args) >= 5:
                     print(f"Invalid arguments: {args}")
                     logging.warning("Invalid arguments: %s", args)
                 sim.load_simulation_data_from_file(file_path = file_path, test_id = test_id, avoid_collisions = avoid_collisions)
