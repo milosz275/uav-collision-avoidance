@@ -95,7 +95,7 @@ def main(arg = None) -> None:
             QApplication.shutdown(app)
             sys.exit(0)
         elif args[0] == "load":
-            file_path : str = "data/simulation-2024-05-31-00-00-37.csv"
+            file_path : str = "data/simulation-2024-06-02-17-52-28.csv"
             test_id : int = 0
             if len(args) > 1:
                 file_path = args[1]
