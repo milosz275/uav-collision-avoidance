@@ -452,12 +452,12 @@ class Simulation(QMainWindow):
                 aircraft_id = 0,
                 position = QVector3D(0, -20_000, 1000),
                 speed = QVector3D(0, 100, 0),
-                initial_target = QVector3D(test_average_aircraft_size / 4.0, 2_000_000 + test_average_aircraft_size / 4.0, 1000)),
+                initial_target = QVector3D(test_average_aircraft_size * 3, 2_000_000 + test_average_aircraft_size * 3, 1000)),
             Aircraft(
                 aircraft_id = 1,
                 position = QVector3D(0, -10_000, 1000),
                 speed = QVector3D(0, 50, 0),
-                initial_target = QVector3D(-test_average_aircraft_size / 4.0, 2_000_000 - test_average_aircraft_size / 4.0, 1000))
+                initial_target = QVector3D(-test_average_aircraft_size * 3, 2_000_000 - test_average_aircraft_size * 3, 1000))
         ]
         list_of_lists.append([aircrafts, 0.001])
         aircrafts = [ # full angle collision, equal speeds
@@ -465,12 +465,12 @@ class Simulation(QMainWindow):
                 aircraft_id = 0,
                 position = QVector3D(0, -5000, 1000),
                 speed = QVector3D(0, 50, 0),
-                initial_target = QVector3D(test_average_aircraft_size / 4.0, 500_000 + test_average_aircraft_size / 4.0, 1000)),
+                initial_target = QVector3D(test_average_aircraft_size * 3, 500_000 + test_average_aircraft_size * 3, 1000)),
             Aircraft(
                 aircraft_id = 1,
                 position = QVector3D(0, 5000, 1000),
                 speed = QVector3D(0, -50, 0),
-                initial_target = QVector3D(-test_average_aircraft_size / 4.0, -500_000 - test_average_aircraft_size / 4.0, 1000))
+                initial_target = QVector3D(-test_average_aircraft_size * 3, -500_000 - test_average_aircraft_size * 3, 1000))
         ]
         list_of_lists.append([aircrafts, 180.001])
         aircrafts = [ # full angle collision
@@ -478,12 +478,12 @@ class Simulation(QMainWindow):
                 aircraft_id = 0,
                 position = QVector3D(0, -5000, 1000),
                 speed = QVector3D(0, 50, 0),
-                initial_target = QVector3D(test_average_aircraft_size / 4.0, 500_000 + test_average_aircraft_size / 4.0, 1000)),
+                initial_target = QVector3D(test_average_aircraft_size * 3, 500_000 + test_average_aircraft_size * 3, 1000)),
             Aircraft(
                 aircraft_id = 1,
                 position = QVector3D(0, 10000, 1000),
                 speed = QVector3D(0, -100, 0),
-                initial_target = QVector3D(-test_average_aircraft_size / 4.0, -500_000 - test_average_aircraft_size / 4.0, 1000))
+                initial_target = QVector3D(-test_average_aircraft_size * 3, -500_000 - test_average_aircraft_size * 3, 1000))
         ]
         list_of_lists.append([aircrafts, 180.001])
         return list_of_lists
