@@ -1053,7 +1053,6 @@ class Simulation(QMainWindow):
         plt.ylabel("y")
         plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
         plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
-        plt.gca().set_aspect("equal", adjustable="box")
 
         x_minimum : float = float("inf")
         x_maximum : float = float("-inf")
@@ -1097,20 +1096,21 @@ class Simulation(QMainWindow):
 
         x_range : float = abs(x_maximum - x_minimum)
         y_range : float = abs(y_maximum - y_minimum)
-        y_range_min = y_minimum - y_range * 0.33
-        y_range_max = y_maximum + y_range * 0.33
+        y_range_min = y_minimum - y_range * 0.4
+        y_range_max = y_maximum + y_range * 0.4
+        y_range_abs = abs(y_range_max - y_range_min)
         if y_range_min != y_range_max:
-            y_range_abs = abs(y_range_max - y_range_min)
-            plt.ylim(y_range_min, y_range_max)
+            plt.ylim(y_range_min - y_range_abs / 2, y_range_max + y_range_abs / 2)
 
         if simulation_data is not None:
             aircraft_1_init = [simulation_data.aircraft_1_initial_position.x(), simulation_data.aircraft_1_initial_position.y()]
             aircraft_2_init = [simulation_data.aircraft_2_initial_position.x(), simulation_data.aircraft_2_initial_position.y()]
-            plt.text(aircraft_1_init[0] + 0.05 * x_range, aircraft_1_init[1] + 0.05 * y_range, "Initial position\nof Aircraft 1", color = colors[0 % len(colors)], fontsize = 9, ha = "center", va="center")
-            plt.text(aircraft_2_init[0] - 0.05 * x_range, aircraft_2_init[1] - 0.05 * y_range, "Initial position\nof Aircraft 2", color = colors[1 % len(colors)], fontsize = 9, ha = "center", va="center")
+            plt.annotate("Initial position\nof Aircraft 1", color = colors[0 % len(colors)], xy=(aircraft_1_init[0], aircraft_1_init[1]), xytext=(aircraft_1_init[0] + 0.25 * x_range, aircraft_1_init[1] + 0.05 * y_range), arrowprops=dict(facecolor="black", arrowstyle="->"))
+            plt.annotate("Initial position\nof Aircraft 2", color = colors[1 % len(colors)], xy=(aircraft_2_init[0], aircraft_2_init[1]), xytext=(aircraft_2_init[0] + 0.25 * x_range, aircraft_2_init[1] + 0.05 * y_range), arrowprops=dict(facecolor="black", arrowstyle="->"))
             if simulation_data.collision:
                 aircraft_final = [simulation_data.aircraft_1_final_position.x(), simulation_data.aircraft_1_final_position.y()]
-                plt.text(aircraft_final[0] + 0.05 * x_range, aircraft_final[1] - 0.05 * y_range, "Collision", color = "r", fontsize = 9, ha = "center", va="center")
+                plt.annotate("Collision", color="red", xy=(aircraft_final[0], aircraft_final[1]), xytext=(aircraft_final[0] + 0.25 * x_range, aircraft_final[1] + 0.05 * y_range), arrowprops=dict(facecolor="red", arrowstyle="->"))
+                plt.scatter(aircraft_final[0], aircraft_final[1], color="red", s=10)
             angle_patch = mpatches.Patch(
                 color = "none",
                 label = "Init angle: " + "{:.3f}".format(simulation_data.aircraft_angle))
@@ -1121,9 +1121,9 @@ class Simulation(QMainWindow):
         
         y_ticks = plt.gca().get_yticks()
         plt.gca().set_xticks(y_ticks)
-        plt.xlim(-y_range_abs / 2, y_range_abs / 2)
         plt.xticks(fontsize=7)
         plt.yticks(fontsize=7)
+        plt.gca().set_aspect("equal", adjustable="box")
         plt.savefig(f"{simulation_path}/path-visual-{export_time}.png")
         plt.close()
         
