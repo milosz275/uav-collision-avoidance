@@ -3,6 +3,7 @@
 import csv
 import logging
 import datetime
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -1088,15 +1089,18 @@ class Simulation(QMainWindow):
                     writer.writerow([("{:.2f}".format(position.x())),("{:.2f}".format(position.y())),("{:.2f}".format(position.z()))])
                     
             df = pd.read_csv(f"{file_name}.csv")
-            plt.scatter(df["x"], df["y"], color=colors[i % len(colors)], s = 2)
-            plt.plot(df["x"], df["y"], color=colors[i % len(colors)])
+            x_points = np.array(df["x"])
+            y_points = np.array(df["y"])
+            plt.scatter(x_points, y_points, color=colors[i % len(colors)], s = 2)
+            plt.plot(x_points, y_points, color=colors[i % len(colors)])
 
         x_range : float = abs(x_maximum - x_minimum)
         y_range : float = abs(y_maximum - y_minimum)
-        if x_range != 0:
-            plt.xlim(x_minimum - x_range * 0.25, x_maximum + x_range * 0.25)
-        if y_range != 0:    
-            plt.ylim(y_minimum - y_range * 0.25, y_maximum + y_range * 0.25)
+        y_range_min = y_minimum - y_range * 0.25
+        y_range_max = y_maximum + y_range * 0.25
+        if y_range_min != y_range_max:
+            y_range_abs = abs(y_range_max - y_range_min)
+            plt.ylim(y_range_min, y_range_max)
 
         if simulation_data is not None:
             aircraft_1_init = [simulation_data.aircraft_1_initial_position.x(), simulation_data.aircraft_1_initial_position.y()]
@@ -1116,6 +1120,7 @@ class Simulation(QMainWindow):
         
         y_ticks = plt.gca().get_yticks()
         plt.gca().set_xticks(y_ticks)
+        plt.xlim(-y_range_abs / 2, y_range_abs / 2)
         plt.xticks(fontsize=7)
         plt.yticks(fontsize=7)
         plt.savefig(f"{simulation_path}/path-visual-{export_time}.png")
