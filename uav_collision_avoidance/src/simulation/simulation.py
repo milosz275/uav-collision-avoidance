@@ -1053,6 +1053,7 @@ class Simulation(QMainWindow):
         plt.ylabel("y")
         plt.gca().xaxis.set_major_locator(MaxNLocator(integer=True))
         plt.gca().yaxis.set_major_locator(MaxNLocator(integer=True))
+        plt.gca().set_aspect("equal", adjustable="box")
 
         x_minimum : float = float("inf")
         x_maximum : float = float("-inf")
@@ -1096,8 +1097,8 @@ class Simulation(QMainWindow):
 
         x_range : float = abs(x_maximum - x_minimum)
         y_range : float = abs(y_maximum - y_minimum)
-        y_range_min = y_minimum - y_range * 0.25
-        y_range_max = y_maximum + y_range * 0.25
+        y_range_min = y_minimum - y_range * 0.33
+        y_range_max = y_maximum + y_range * 0.33
         if y_range_min != y_range_max:
             y_range_abs = abs(y_range_max - y_range_min)
             plt.ylim(y_range_min, y_range_max)
