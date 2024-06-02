@@ -3,6 +3,7 @@
 import csv
 import logging
 import datetime
+import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -11,8 +12,8 @@ from copy import copy
 from pathlib import Path
 from typing import List, Tuple
 from numpy import random, ndarray
-from math import dist, sin, cos, radians
 from matplotlib.ticker import MaxNLocator
+from math import dist, sin, cos, radians, sqrt
 
 from PySide6.QtCore import QThread, QTime
 from PySide6.QtGui import QCloseEvent, QVector3D
@@ -224,14 +225,14 @@ class Simulation(QMainWindow):
             assert len(self.aircrafts) > 0
         simulation_data : SimulationData = SimulationData()
         simulation_data.aircraft_angle = aircraft_angle
-        simulation_data.aircraft_1_initial_position = copy(self.aircrafts[0].vehicle.position)
-        simulation_data.aircraft_2_initial_position = copy(self.aircrafts[1].vehicle.position)
-        simulation_data.aircraft_1_initial_speed = copy(self.aircrafts[0].vehicle.speed)
-        simulation_data.aircraft_2_initial_speed = copy(self.aircrafts[1].vehicle.speed)
-        simulation_data.aircraft_1_initial_target = copy(self.aircrafts[0].fcc.destination)
-        simulation_data.aircraft_2_initial_target = copy(self.aircrafts[1].fcc.destination)
-        simulation_data.aircraft_1_initial_roll_angle = copy(self.aircrafts[0].vehicle.roll_angle)
-        simulation_data.aircraft_2_initial_roll_angle = copy(self.aircrafts[1].vehicle.roll_angle)
+        simulation_data.aircraft_1_initial_position = copy(self.aircrafts[0].initial_position)
+        simulation_data.aircraft_2_initial_position = copy(self.aircrafts[1].initial_position)
+        simulation_data.aircraft_1_initial_speed = copy(self.aircrafts[0].initial_speed)
+        simulation_data.aircraft_2_initial_speed = copy(self.aircrafts[1].initial_speed)
+        simulation_data.aircraft_1_initial_target = copy(self.aircrafts[0].initial_target)
+        simulation_data.aircraft_2_initial_target = copy(self.aircrafts[1].initial_target)
+        simulation_data.aircraft_1_initial_roll_angle = copy(self.aircrafts[0].initial_roll_angle)
+        simulation_data.aircraft_2_initial_roll_angle = copy(self.aircrafts[1].initial_roll_angle)
         simulation_data.collision = False
 
         self.state = SimulationState(SimulationSettings(), is_realtime = False, avoid_collisions = avoid_collisions)
@@ -294,15 +295,35 @@ class Simulation(QMainWindow):
         for angle in test_random_collision_course_differences:
             aircraft_init_height : float = random.uniform(test_minimal_altitude, test_maximal_altitude)
             aircraft_target_height : float = random.uniform(test_minimal_altitude, test_maximal_altitude)
-            test_collision_target_projected : QVector3D = QVector3D(0, 0, aircraft_init_height)
             aircraft_absolute_speed : float = random.uniform(test_minimal_speed, test_maximal_speed)
-            sin_value : float = sin(radians(angle))
-            cos_value : float = cos(radians(angle))
+            
+            if angle < 90.0:
+                sin_value : float = sin(radians(angle))
+                cos_value : float = cos(radians(angle))
+            elif angle > 90.0:
+                sin_value = sin(radians(180 - angle))
+                cos_value = cos(radians(180 - angle))
+            
+            if sin_value == 0.0:
+                continue
             if abs(sin_value) < test_minimal_trigonometric_value:
                 continue
             if abs(cos_value) < test_minimal_trigonometric_value:
                 continue
-            distance_to_collision : float = test_start_aircrafts_relative_distance / sin_value # projected onto 2d plane
+            
+            distance_to_collision : float = 0.0
+            if 90 - angle > 0.001: # acute angled triangle
+                distance_to_collision = sqrt((test_start_aircrafts_relative_distance ** 2) / (2 * (1 - cos_value))) / 1.0
+                logging.info("Distance to collision: %f", distance_to_collision)
+            elif abs(90 - angle) < 0.001: # right angled triangle
+                distance_to_collision = test_start_aircrafts_relative_distance / sqrt(2)
+                logging.info("Distance to collision: %f, right angle", distance_to_collision)
+            elif 90 - angle < -0.001: # obtuse angled triangle
+                distance_to_collision = sqrt((test_start_aircrafts_relative_distance ** 2) / (2 * (1 + cos_value))) / 1.0
+                logging.info("Distance to collision: %f", distance_to_collision)
+            else:
+                logging.error("Invalid angle value: %f", angle)
+                continue
 
             aircraft_1_position : QVector3D = QVector3D(
                 0,
@@ -316,7 +337,6 @@ class Simulation(QMainWindow):
                 0,
                 aircraft_absolute_speed,
                 0)
-            assert abs(dist(aircraft_1_position.toTuple(), test_collision_target_projected.toTuple()) - distance_to_collision) < 0.1
             assert abs(aircraft_1_speed.length() - aircraft_absolute_speed) < 0.1
             
             # rotate angle to get circle equation
@@ -335,9 +355,15 @@ class Simulation(QMainWindow):
                 aircraft_absolute_speed * sin_value,
                 aircraft_1_speed.z())
 
-            assert abs(dist(aircraft_2_position.toTuple(), test_collision_target_projected.toTuple()) - distance_to_collision) < 0.1
             assert abs(aircraft_2_speed.length() - aircraft_absolute_speed) < 0.1
 
+            calculated_relative_distance_projected : float = dist(aircraft_1_position.toTuple(), aircraft_2_position.toTuple())
+            calculated_relative_distance : float = aircraft_1_position.distanceToPoint(aircraft_2_position)
+            logging.info("Relative distance between aircrafts: %fm (3D %fm) with angle: %f", calculated_relative_distance_projected, calculated_relative_distance, angle)
+            assert abs(aircraft_1_position.distanceToPoint(aircraft_2_position) - test_start_aircrafts_relative_distance) < test_start_aircrafts_relative_distance / 2 # for 10 km, actual 15 km is accepted
+            if abs(90 - angle) < 0.001:
+                assert abs(distance_to_collision - test_start_aircrafts_relative_distance / sqrt(2)) < 0.1
+            
             aircrafts : List[Aircraft] = [
                 Aircraft(
                     aircraft_id = 0,
@@ -426,12 +452,12 @@ class Simulation(QMainWindow):
                 aircraft_id = 0,
                 position = QVector3D(0, -20_000, 1000),
                 speed = QVector3D(0, 100, 0),
-                initial_target = QVector3D(test_average_aircraft_size / 4.0, 2_000_000 + test_average_aircraft_size / 4.0, 1000)),
+                initial_target = QVector3D(test_average_aircraft_size * 3, 2_000_000 + test_average_aircraft_size * 3, 1000)),
             Aircraft(
                 aircraft_id = 1,
                 position = QVector3D(0, -10_000, 1000),
                 speed = QVector3D(0, 50, 0),
-                initial_target = QVector3D(-test_average_aircraft_size / 4.0, 2_000_000 - test_average_aircraft_size / 4.0, 1000))
+                initial_target = QVector3D(-test_average_aircraft_size * 3, 2_000_000 - test_average_aircraft_size * 3, 1000))
         ]
         list_of_lists.append([aircrafts, 0.001])
         aircrafts = [ # full angle collision, equal speeds
@@ -439,12 +465,12 @@ class Simulation(QMainWindow):
                 aircraft_id = 0,
                 position = QVector3D(0, -5000, 1000),
                 speed = QVector3D(0, 50, 0),
-                initial_target = QVector3D(test_average_aircraft_size / 4.0, 500_000 + test_average_aircraft_size / 4.0, 1000)),
+                initial_target = QVector3D(test_average_aircraft_size * 3, 500_000 + test_average_aircraft_size * 3, 1000)),
             Aircraft(
                 aircraft_id = 1,
                 position = QVector3D(0, 5000, 1000),
                 speed = QVector3D(0, -50, 0),
-                initial_target = QVector3D(-test_average_aircraft_size / 4.0, -500_000 - test_average_aircraft_size / 4.0, 1000))
+                initial_target = QVector3D(-test_average_aircraft_size * 3, -500_000 - test_average_aircraft_size * 3, 1000))
         ]
         list_of_lists.append([aircrafts, 180.001])
         aircrafts = [ # full angle collision
@@ -452,12 +478,12 @@ class Simulation(QMainWindow):
                 aircraft_id = 0,
                 position = QVector3D(0, -5000, 1000),
                 speed = QVector3D(0, 50, 0),
-                initial_target = QVector3D(test_average_aircraft_size / 4.0, 500_000 + test_average_aircraft_size / 4.0, 1000)),
+                initial_target = QVector3D(test_average_aircraft_size * 3, 500_000 + test_average_aircraft_size * 3, 1000)),
             Aircraft(
                 aircraft_id = 1,
                 position = QVector3D(0, 10000, 1000),
                 speed = QVector3D(0, -100, 0),
-                initial_target = QVector3D(-test_average_aircraft_size / 4.0, -500_000 - test_average_aircraft_size / 4.0, 1000))
+                initial_target = QVector3D(-test_average_aircraft_size * 3, -500_000 - test_average_aircraft_size * 3, 1000))
         ]
         list_of_lists.append([aircrafts, 180.001])
         return list_of_lists
@@ -579,7 +605,7 @@ class Simulation(QMainWindow):
             print("Test " + str(i) + " - no collision avoidance")
             logging.info("Test %d - no collision avoidance", i)
             aircraft_tuple : List[List[Aircraft], float] = list_of_lists[i]
-            aircrafts : List[Aircraft] = aircraft_tuple[0]
+            aircrafts : List[Aircraft] = copy(aircraft_tuple[0])
             angle : float = aircraft_tuple[1]
             print("Current test pair aircrafts count: ", len(aircrafts))
             simulation_data_no_avoidance : SimulationData = self.run_headless(
@@ -593,6 +619,7 @@ class Simulation(QMainWindow):
 
             print("Test " + str(i) + " - collision avoidance")
             logging.info("Test %d - collision avoidance", i)
+            aircrafts = copy(aircraft_tuple[0])
             simulation_data_avoidance : SimulationData = self.run_headless(
                 avoid_collisions = True,
                 aircrafts = aircrafts,
@@ -601,6 +628,25 @@ class Simulation(QMainWindow):
             if not simulation_data_avoidance.collision:
                 logging.info("Test %d - collision avoidance - no collision detected, success ✔️", i)
             self.state = None
+            
+            assert simulation_data_no_avoidance.aircraft_1_initial_position.x() == simulation_data_avoidance.aircraft_1_initial_position.x()
+            assert simulation_data_no_avoidance.aircraft_1_initial_position.y() == simulation_data_avoidance.aircraft_1_initial_position.y()
+            assert simulation_data_no_avoidance.aircraft_1_initial_position.z() == simulation_data_avoidance.aircraft_1_initial_position.z()
+            assert simulation_data_no_avoidance.aircraft_2_initial_position.x() == simulation_data_avoidance.aircraft_2_initial_position.x()
+            assert simulation_data_no_avoidance.aircraft_2_initial_position.y() == simulation_data_avoidance.aircraft_2_initial_position.y()
+            assert simulation_data_no_avoidance.aircraft_2_initial_position.z() == simulation_data_avoidance.aircraft_2_initial_position.z()
+            assert simulation_data_no_avoidance.aircraft_1_initial_speed.x() == simulation_data_avoidance.aircraft_1_initial_speed.x()
+            assert simulation_data_no_avoidance.aircraft_1_initial_speed.y() == simulation_data_avoidance.aircraft_1_initial_speed.y()
+            assert simulation_data_no_avoidance.aircraft_1_initial_speed.z() == simulation_data_avoidance.aircraft_1_initial_speed.z()
+            assert simulation_data_no_avoidance.aircraft_2_initial_speed.x() == simulation_data_avoidance.aircraft_2_initial_speed.x()
+            assert simulation_data_no_avoidance.aircraft_2_initial_speed.y() == simulation_data_avoidance.aircraft_2_initial_speed.y()
+            assert simulation_data_no_avoidance.aircraft_2_initial_speed.z() == simulation_data_avoidance.aircraft_2_initial_speed.z()
+            assert simulation_data_no_avoidance.aircraft_1_initial_target.x() == simulation_data_avoidance.aircraft_1_initial_target.x()
+            assert simulation_data_no_avoidance.aircraft_1_initial_target.y() == simulation_data_avoidance.aircraft_1_initial_target.y()
+            assert simulation_data_no_avoidance.aircraft_1_initial_target.z() == simulation_data_avoidance.aircraft_1_initial_target.z()
+            assert simulation_data_no_avoidance.aircraft_2_initial_target.x() == simulation_data_avoidance.aircraft_2_initial_target.x()
+            assert simulation_data_no_avoidance.aircraft_2_initial_target.y() == simulation_data_avoidance.aircraft_2_initial_target.y()
+            assert simulation_data_no_avoidance.aircraft_2_initial_target.z() == simulation_data_avoidance.aircraft_2_initial_target.z()
 
             writer.writerow([
                 i,
@@ -818,7 +864,7 @@ class Simulation(QMainWindow):
 
     def setup_aircrafts(self, aircrafts : List[Aircraft]) -> None:
         """Sets up aircrafts list"""
-        del self.__aircrafts
+        self.__aircrafts = None
         self.__aircrafts = aircrafts
 
     def setup_debug_aircrafts(self, test_case : int = 0) -> None:
@@ -1043,24 +1089,28 @@ class Simulation(QMainWindow):
                     writer.writerow([("{:.2f}".format(position.x())),("{:.2f}".format(position.y())),("{:.2f}".format(position.z()))])
                     
             df = pd.read_csv(f"{file_name}.csv")
-            plt.scatter(df["x"], df["y"], color=colors[i % len(colors)], s = 2)
-            plt.plot(df["x"], df["y"], color=colors[i % len(colors)])
+            x_points = np.array(df["x"])
+            y_points = np.array(df["y"])
+            plt.scatter(x_points, y_points, color=colors[i % len(colors)], s = 2)
+            plt.plot(x_points, y_points, color=colors[i % len(colors)])
 
-        x_range : float = x_maximum - x_minimum
-        y_range : float = y_maximum - y_minimum
-        if x_range != 0:
-            plt.xlim(x_minimum - x_range / 2, x_maximum + x_range / 2)
-        if y_range != 0:    
-            plt.ylim(y_minimum - y_range / 2, y_maximum + y_range / 2)
+        x_range : float = abs(x_maximum - x_minimum)
+        y_range : float = abs(y_maximum - y_minimum)
+        y_range_min = y_minimum - y_range * 0.4
+        y_range_max = y_maximum + y_range * 0.4
+        y_range_abs = abs(y_range_max - y_range_min)
+        if y_range_min != y_range_max:
+            plt.ylim(y_range_min - y_range_abs / 2, y_range_max + y_range_abs / 2)
 
         if simulation_data is not None:
             aircraft_1_init = [simulation_data.aircraft_1_initial_position.x(), simulation_data.aircraft_1_initial_position.y()]
             aircraft_2_init = [simulation_data.aircraft_2_initial_position.x(), simulation_data.aircraft_2_initial_position.y()]
-            plt.text(aircraft_1_init[0] + 0.05 * x_range, aircraft_1_init[1] - 0.05 * y_range, "Initial position\nof Aircraft 1", color = colors[0 % len(colors)], fontsize = 9, ha = "left")
-            plt.text(aircraft_2_init[0] + 0.05 * x_range, aircraft_2_init[1] - 0.05 * y_range, "Initial position\nof Aircraft 2", color = colors[1 % len(colors)], fontsize = 9, ha = "left")
+            plt.annotate("Initial position\nof Aircraft 1", color = colors[0 % len(colors)], xy=(aircraft_1_init[0], aircraft_1_init[1]), xytext=(aircraft_1_init[0] + 0.25 * x_range, aircraft_1_init[1] + 0.05 * y_range), arrowprops=dict(facecolor="black", arrowstyle="->"))
+            plt.annotate("Initial position\nof Aircraft 2", color = colors[1 % len(colors)], xy=(aircraft_2_init[0], aircraft_2_init[1]), xytext=(aircraft_2_init[0] + 0.25 * x_range, aircraft_2_init[1] + 0.05 * y_range), arrowprops=dict(facecolor="black", arrowstyle="->"))
             if simulation_data.collision:
                 aircraft_final = [simulation_data.aircraft_1_final_position.x(), simulation_data.aircraft_1_final_position.y()]
-                plt.text(aircraft_final[0] + 0.05 * x_range, aircraft_final[1] - 0.05 * y_range, "Collision", color = "r", fontsize = 9, ha = "left")
+                plt.annotate("Collision", color="red", xy=(aircraft_final[0], aircraft_final[1]), xytext=(aircraft_final[0] + 0.25 * x_range, aircraft_final[1] + 0.05 * y_range), arrowprops=dict(facecolor="red", arrowstyle="->"))
+                plt.scatter(aircraft_final[0], aircraft_final[1], color="red", s=10)
             angle_patch = mpatches.Patch(
                 color = "none",
                 label = "Init angle: " + "{:.3f}".format(simulation_data.aircraft_angle))
@@ -1069,11 +1119,16 @@ class Simulation(QMainWindow):
                 label = "Min relative dist: " + "{:.3f}".format(simulation_data.minimal_relative_distance))
             plt.legend(handles=[angle_patch, min_relative_dist_patch])
         
+        y_ticks = plt.gca().get_yticks()
+        plt.gca().set_xticks(y_ticks)
+        plt.xticks(fontsize=7)
+        plt.yticks(fontsize=7)
+        plt.gca().set_aspect("equal", adjustable="box")
         plt.savefig(f"{simulation_path}/path-visual-{export_time}.png")
         plt.close()
         
-        with open(f"{simulation_path}/README.md", 'a+') as readme_file:
-            readme_file.write(f'![](path-visual-{export_time}.png)\n')
+        with open(f"{simulation_path}/README.md", "a+") as readme_file:
+            readme_file.write(f"![](path-visual-{export_time}.png)\n")
     
     def closeEvent(self, event: QCloseEvent) -> None:
         """Qt method performed on the main window close event"""

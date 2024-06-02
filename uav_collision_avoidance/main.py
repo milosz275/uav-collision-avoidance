@@ -63,17 +63,17 @@ def main(arg = None) -> None:
             if len(get_monitors()) == 0:
                 logging.warning("Launching GUI Application without monitors detected")
             sim = Simulation()
-            if len(args) > 1:
+            if len(args) >= 2:
                 file_path : str = args[1]
                 test_id : int = 0
                 avoid_collisions : bool = False
-                if len(args) >= 2:
-                    test_id = int(args[2])
                 if len(args) >= 3:
-                    avoidance : str = str(args[2])
+                    test_id = int(args[2])
+                if len(args) >= 4:
+                    avoidance : str = str(args[3])
                     if avoidance == "true" or avoidance == "True" or avoidance == "t" or avoidance == "T" or avoidance == "yes" or avoidance == "1":
                         avoid_collisions = True
-                if len(args) > 4:
+                if len(args) >= 5:
                     print(f"Invalid arguments: {args}")
                     logging.warning("Invalid arguments: %s", args)
                 sim.load_simulation_data_from_file(file_path = file_path, test_id = test_id, avoid_collisions = avoid_collisions)
@@ -95,7 +95,7 @@ def main(arg = None) -> None:
             QApplication.shutdown(app)
             sys.exit(0)
         elif args[0] == "load":
-            file_path : str = "data/simulation-2024-05-31-00-00-37.csv"
+            file_path : str = "data/simulation-2024-06-02-17-52-28.csv"
             test_id : int = 0
             if len(args) > 1:
                 file_path = args[1]
@@ -125,7 +125,7 @@ def main(arg = None) -> None:
                 process.join()
         elif args[0] == "help" and len(args) > 1:
             if args[1] == "realtime":
-                print("Usage: uav_collision_avoidance realtime")
+                print("Usage: uav_collision_avoidance realtime [file_path] [test_index] [collision_avoidance]")
                 print("Description: Runs the simulation in real-time with GUI")
                 sys.exit(0)
             elif args[1] == "headless":
@@ -137,7 +137,7 @@ def main(arg = None) -> None:
                 print("Description: Runs the simulation multiple times in headless mode without GUI defaulting to 10 times")
                 sys.exit(0)
             elif args[1] == "load":
-                print("Usage: uav_collision_avoidance load [file_path]")
+                print("Usage: uav_collision_avoidance load [file_path] [test_index]")
                 print("Description: Loads a simulation data file and runs the simulation in headless mode without GUI, defaults to example data file")
                 sys.exit(0)
             elif args[1] == "ongoing":
