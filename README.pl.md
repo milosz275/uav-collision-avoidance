@@ -57,12 +57,12 @@ Aplikacja została stworzona bazując na dwóch typach obiektów: symulacji i st
 
 Obecnie dostępne jest osiem możliwych argumentów wywołania aplikacji:
 - domyślny (bez argumentów) - uruchamia symulację GUI; unikanie kolizji można osiągnąć naciskając T, gdy strefy bezpieczeństwa dronów zostały naruszone
-- realtime [nazwa_pliku] [indeks_testu] [unikanie_kolizji] - uruchamia symulację GUI; nazwa pliku może być sprecyzowana i domyślnie odnosi się do najnowszego pliku danych symulacyjnych; indeks testu może być określony i domyślnie wynosi 0; unikanie kolizji może być określone i domyślnie jest wyłączone
+- realtime `nazwa_pliku` `indeks_testu` `unikanie_kolizji` - uruchamia symulację GUI; nazwa pliku może być sprecyzowana i domyślnie odnosi się do najnowszego pliku danych symulacyjnych; indeks testu może być określony i domyślnie wynosi 0; unikanie kolizji może być określone i domyślnie jest wyłączone
 - headless - uruchamia fizyczną symulację z ADS-B i algorytmem unikania kolizji w tle
-- tests [liczba_testów] - uruchamia pełne testy porównujące skuteczność algorytmu unikania kolizji, domyślna liczba testów wynosi 15
+- tests `liczba_testów` - uruchamia pełne testy porównujące skuteczność algorytmu unikania kolizji, domyślna liczba testów wynosi 15
 - ongoing - uruchamia domyślną liczbę testów równolegle (liczba rdzeni procesora) porównując skuteczność algorytmu unikania kolizji do momentu przerwania Ctrl+C
-- load [nazwa_pliku] [indeks_testu] - wczytuje i przeprowadza symulację w tle z pliku, gdy jest określony, w przeciwnym razie wczytuje domyślny przykładowy przypadek testowy z katalogu danych `/data`; indeks testu może być określony i domyślnie wynosi 0
-- help [argument_aplikacji] - wyświetla komunikat pomocy dla argumentu aplikacji; domyślnie wyświetla listę wszystkich argumentów
+- load `nazwa_pliku` `indeks_testu` - wczytuje i przeprowadza symulację w tle z pliku, gdy jest określony, w przeciwnym razie wczytuje domyślny przykładowy przypadek testowy z katalogu danych `/data`; indeks testu może być określony i domyślnie wynosi 0
+- help `argument_aplikacji` - wyświetla komunikat pomocy dla argumentu aplikacji; domyślnie wyświetla listę wszystkich argumentów
 - version - wyświetla informacje o wersji aplikacji
 
 ### Skróty klawiszowe
