@@ -61,7 +61,7 @@ Obecnie dostępne jest osiem możliwych argumentów wywołania aplikacji:
 - headless - uruchamia fizyczną symulację z ADS-B i algorytmem unikania kolizji w tle
 - tests `liczba_testów` - uruchamia pełne testy porównujące skuteczność algorytmu unikania kolizji, domyślna liczba testów wynosi 15
 - ongoing - uruchamia domyślną liczbę testów równolegle (liczba rdzeni procesora) porównując skuteczność algorytmu unikania kolizji do momentu przerwania Ctrl+C
-- load `nazwa_pliku` `indeks_testu` - wczytuje i przeprowadza symulację w tle z pliku, gdy jest określony, w przeciwnym razie wczytuje domyślny przykładowy przypadek testowy z katalogu danych `/data`; indeks testu może być określony i domyślnie wynosi 0
+- load `nazwa_pliku` `indeks_testu` - wczytuje i przeprowadza symulację w tle z pliku, gdy jest określony, w przeciwnym razie wczytuje domyślny przykładowy przypadek testowy z katalogu danych [data](/data); indeks testu może być określony i domyślnie wynosi 0
 - help `argument_aplikacji` - wyświetla komunikat pomocy dla argumentu aplikacji; domyślnie wyświetla listę wszystkich argumentów
 - version - wyświetla informacje o wersji aplikacji
 
