@@ -497,7 +497,7 @@ Współpraca z projektem jest mile widziana. Proszę postępować zgodnie z poni
 
 ## Licencja
 
-Projekt jest dostępny na licencji MIT. Więcej informacji można znaleźć w pliku [LICENSE](/LICENSE).
+Projekt jest dostępny na licencji CC0-1.0. Więcej informacji można znaleźć w pliku [LICENSE](/LICENSE).
 
 ---
 
