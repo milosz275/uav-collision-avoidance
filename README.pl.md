@@ -61,7 +61,7 @@ Drzewo struktury plików zostało wygenerowane korzystając z następującej kom
 tree --gitignore -I "__pycache__|.env|.github|.pytest_cache|.vscode|assets|build|logs|path-visual|uav_collision_avoidance.egg-info|venv|docs"
 ```
 
-Struktura plików: [File structure](docs/pl/README.md#struktura-kodu)
+Struktura plików: [Struktura kodu](docs/pl/README.md#struktura-kodu)
 
 ### Argumenty wywołania aplikacji
 
