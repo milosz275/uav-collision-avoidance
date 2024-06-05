@@ -201,11 +201,11 @@ class AircraftFCC(QObject):
             else:
                 print("Attempted to set destination too low")
                 logging.warning("Attempted to set destination too low: (%s, %s, %s)", destination.x(), destination.y(), destination.z())
-            destination = QVector3D(destination.x(), destination.y(), 500)
+            destination = QVector3D(destination.x(), destination.y(), 800)
         elif destination.z() > 10000:
             print("Attempted to set destination too high")
             logging.warning("Attempted to set destination too high: (%s, %s, %s)", destination.x(), destination.y(), destination.z())
-            destination = QVector3D(destination.x(), destination.y(), 10000)
+            destination = QVector3D(destination.x(), destination.y(), 8000)
         return destination
 
     def add_last_destination(self, destination : QVector3D) -> None:
