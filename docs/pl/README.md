@@ -3,25 +3,26 @@
 ## Spis treści
 
 1. [Przegląd](#przegląd)
-2. [Stałe](#stałe)
-3. [Plik: `main.py`](#plik-mainpy)
-4. [Plik: `src/main.py`](#plik-srcmainpy)
-5. [Plik: `src/version.py`](#plik-srcversionpy)
-6. [Plik: `src/simulation/simulation.py`](#plik-srcsimulationsimulationpy)
-7. [Plik: `src/simulation/simulation_physics.py`](#plik-srcsimulationsimulation_physicspy)
-8. [Plik: `src/simulation/simulation_adsb.py`](#plik-srcsimulationsimulation_adsbpy)
-9. [Plik: `src/simulation/simulation_state.py`](#plik-srcsimulationsimulation_statepy)
-10. [Plik: `src/simulation/simulation_settings.py`](#plik-srcsimulationsimulation_settingspy)
-11. [Plik: `src/simulation/simulation_widget.py`](#plik-srcsimulationsimulation_widgetpy)
-12. [Plik: `src/simulation/simulation_render.py`](#plik-srcsimulationsimulation_renderpy)
-13. [Plik: `src/simulation/simulation_fps.py`](#plik-srcsimulationsimulation_fpspy)
-14. [Plik: `src/simulation/simulation_data.py`](#plik-srcsimulationsimulation_datapy)
-15. [Plik: `src/aircraft/aircraft.py`](#plik-srcaircraftaircraftpy)
-16. [Plik: `src/aircraft/aircraft_fcc.py`](#plik-srcaircraftaircraft_fccpy)
-17. [Plik: `src/aircraft/aircraft_vehicle.py`](#plik-srcaircraftaircraft_vehiclepy)
-18. [Wytyczne dotyczące współpracy](#wytyczne-dotyczące-współpracy)
-19. [Licencja](#licencja)
-20. [Referencje](#referencje)
+2. [Struktura kodu](#struktura-kodu)
+3. [Stałe](#stałe)
+4. [Plik: `main.py`](#plik-mainpy)
+5. [Plik: `src/main.py`](#plik-srcmainpy)
+6. [Plik: `src/version.py`](#plik-srcversionpy)
+7. [Plik: `src/simulation/simulation.py`](#plik-srcsimulationsimulationpy)
+8. [Plik: `src/simulation/simulation_physics.py`](#plik-srcsimulationsimulation_physicspy)
+9. [Plik: `src/simulation/simulation_adsb.py`](#plik-srcsimulationsimulation_adsbpy)
+10. [Plik: `src/simulation/simulation_state.py`](#plik-srcsimulationsimulation_statepy)
+11. [Plik: `src/simulation/simulation_settings.py`](#plik-srcsimulationsimulation_settingspy)
+12. [Plik: `src/simulation/simulation_widget.py`](#plik-srcsimulationsimulation_widgetpy)
+13. [Plik: `src/simulation/simulation_render.py`](#plik-srcsimulationsimulation_renderpy)
+14. [Plik: `src/simulation/simulation_fps.py`](#plik-srcsimulationsimulation_fpspy)
+15. [Plik: `src/simulation/simulation_data.py`](#plik-srcsimulationsimulation_datapy)
+16. [Plik: `src/aircraft/aircraft.py`](#plik-srcaircraftaircraftpy)
+17. [Plik: `src/aircraft/aircraft_fcc.py`](#plik-srcaircraftaircraft_fccpy)
+18. [Plik: `src/aircraft/aircraft_vehicle.py`](#plik-srcaircraftaircraft_vehiclepy)
+19. [Wytyczne dotyczące współpracy](#wytyczne-dotyczące-współpracy)
+20. [Licencja](#licencja)
+21. [Referencje](#referencje)
 
 ## Przegląd
 
@@ -33,6 +34,62 @@ Klasy są zorganizowane w następujące kategorie:
 - `aircraft`: Klasy reprezentujące UAV.
 
 Wszystkie klasy korzystają z właściwości i setterów Pythona, wykorzystując mutexy i blokady mutexów w celu zapewnienia hermetyzacji i integralności danych.
+
+Uwaga: Wszystkie klasy są zdefiniowane w plikach w katalogu `src/` zawartym w podkatalogu `uav_collision_avoidance`.
+
+## Struktura kodu
+
+Kod źródłowy projektu UAV Collision Avoidance jest zorganizowany w następujący sposób:
+
+```plaintext
+├── CITATION.cff
+├── CODE_OF_CONDUCT.md
+├── compile.ps1
+├── CONTRIBUTING.md
+├── data
+│   ├── README.md
+│   ├── ...
+└── docs
+    ├── en
+    │   ├── README.md
+    ├── pl
+    │   ├── README.md
+    ├── README.md
+├── LICENSE
+├── main.py
+├── path-visual
+│   ├── README.md
+│   ├── ...
+├── PULL_REQUEST_TEMPLATE.md
+├── pyproject.toml
+├── pyrightconfig.json
+├── README.md
+├── README.pl.md
+├── requirements.txt
+├── SECURITY.md
+├── tests
+│   ├── __init__.py
+│   └── test_headless.py
+└── uav_collision_avoidance
+    ├── __init__.py
+    ├── main.py
+    ├── src
+    │   ├── aircraft
+    │   │   ├── aircraft_fcc.py
+    │   │   ├── aircraft.py
+    │   │   └── aircraft_vehicle.py
+    │   └── simulation
+    │       ├── simulation_adsb.py
+    │       ├── simulation_data.py
+    │       ├── simulation_fps.py
+    │       ├── simulation_physics.py
+    │       ├── simulation.py
+    │       ├── simulation_render.py
+    │       ├── simulation_settings.py
+    │       ├── simulation_state.py
+    │       └── simulation_widget.py
+    └── version.py
+```
 
 ## Stałe
 
