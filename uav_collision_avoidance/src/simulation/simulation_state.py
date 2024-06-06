@@ -55,6 +55,7 @@ class SimulationState(QSettings):
             self.__draw_speed_vectors : bool = True
             self.__draw_safe_zones : bool = True
             self.__draw_collision_detection : bool = True
+            self.__draw_coordinate_origin : bool = True
             self.__optimize_drawing : bool = False
             self.__follow_aircraft : bool = False
 
@@ -354,6 +355,17 @@ class SimulationState(QSettings):
         """Toggles collision detection display"""
         with QMutexLocker(self.__mutex):
             self.__draw_collision_detection = not self.__draw_collision_detection
+            
+    @property
+    def draw_coordinate_origin(self) -> bool:
+        """Returns coordinate origin display flag"""
+        with QMutexLocker(self.__mutex):
+            return self.__draw_coordinate_origin
+        
+    def toggle_draw_coordinate_origin(self) -> None:
+        """Toggles coordinate origin display"""
+        with QMutexLocker(self.__mutex):
+            self.__draw_coordinate_origin = not self.__draw_coordinate_origin
 
     @property
     def optimize_drawing(self) -> bool:

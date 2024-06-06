@@ -501,6 +501,9 @@ class SimulationWidget(QWidget):
             self.draw_text(QVector3D(self.__window_width - 120, self.__window_height - 10, 0), 0, "Selected Aircraft 1", QColor(0, 0, 255))
         if self.__simulation_state.draw_collision_detection:
             self.draw_collision_detection(scale)
+        if self.__simulation_state.draw_coordinate_origin:
+            self.draw_circle(QVector3D(0, 0, 0), 2.5 / scale, scale)
+            self.draw_text(QVector3D(0, 0, 0), scale, "(0, 0, 0)")
         for aircraft in self.__aircraft_vehicles:
             if self.__simulation_state.draw_aircraft:
                 self.draw_aircraft(aircraft, scale)
