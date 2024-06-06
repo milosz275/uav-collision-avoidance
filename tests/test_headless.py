@@ -22,7 +22,6 @@ class Test:
     @pytest.mark.parametrize("tester", list(range(lowest_frequency_tested, highest_frequency_tested + 1, 10)), indirect=["tester"])
     def test_tc1(self, tester):
        tester.test_headless_load()
-       assert 1
 
 class TestHeadless:
     """Test headless simulation"""
@@ -31,6 +30,9 @@ class TestHeadless:
 
     def test_headless_load(self):
         with pytest.raises(SystemExit) as e:
+            app = QApplication.instance()
+            if app:
+                app.quit()
             app = QApplication()
             SimulationSettings.__init__()
             SimulationSettings.set_simulation_frequency(self.simulation_frequency)
