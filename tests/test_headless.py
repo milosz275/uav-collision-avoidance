@@ -31,7 +31,9 @@ class TestHeadless:
 
     def test_headless_load(self):
         with pytest.raises(SystemExit) as e:
-            app = QApplication()
+            app = QApplication.instance()
+            if not app:
+                app = QApplication()
             SimulationSettings.__init__()
             SimulationSettings.set_simulation_frequency(self.simulation_frequency)
             sim = Simulation(headless = True)
