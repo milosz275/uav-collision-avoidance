@@ -492,7 +492,7 @@ class Simulation(QMainWindow):
     
     def run_tests(self, begin_with_default_set : bool = True, test_number : int = 20) -> None:
         """Runs simulation tests"""
-        SimulationSettings.set_simulation_frequency(10.0)
+        # SimulationSettings.set_simulation_frequency(10.0)
         if test_number < 3:
             logging.info("Changing simulation tests to 3 test cases due to too low test number")
             test_number = 3
