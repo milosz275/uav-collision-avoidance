@@ -180,9 +180,9 @@ class SimulationPhysics(QThread):
                         new_pitch_angle = current_pitch_angle - delta_pitch_angle
                 else: # target_pitch_angle < 0
                     if target_pitch_angle < current_pitch_angle:
-                        new_pitch_angle = current_pitch_angle + delta_pitch_angle
-                    else:
                         new_pitch_angle = current_pitch_angle - delta_pitch_angle
+                    else:
+                        new_pitch_angle = current_pitch_angle + delta_pitch_angle
 
                 if new_pitch_angle > 45.0 or new_pitch_angle < -45.0:
                     new_pitch_angle = current_pitch_angle
