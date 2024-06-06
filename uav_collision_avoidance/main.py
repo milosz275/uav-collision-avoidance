@@ -97,11 +97,11 @@ def main(arg = None) -> None:
         elif args[0] == "load":
             file_path : str = "data/simulation-2024-06-02-17-52-28.csv"
             test_id : int = 0
-            if len(args) > 1:
+            if len(args) >= 2:
                 file_path = args[1]
-                if len(args) == 2:
+                if len(args) == 3:
                     test_id = int(args[2])
-                if len(args) > 3:
+                if len(args) >= 4:
                     print(f"Invalid arguments: {args}")
                     logging.warning("Invalid arguments: %s", args)
             sim = Simulation(headless = True)
