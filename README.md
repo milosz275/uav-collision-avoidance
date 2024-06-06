@@ -53,6 +53,15 @@ Python3[^1] project is wrapped as a PyPI package[^2]. PySide6[^3] (Qt's Python Q
 
 Application is built based on two main object types, simulation and aircraft. Simulation is created up to initial settings, allowing for concurrent realtime variant and linear pre-rendering. Aircraft consists of two elements, physical representation of the UAV and Flight Control Computer, which is controlled by the ADS-B thread. Research among the UAV systems was drawn on from second cited paper[^5].
 
+### File tree
+The file structure was generated using `tree` command:
+
+```bash
+tree --gitignore -I "__pycache__|.env|.github|.pytest_cache|.vscode|assets|build|logs|path-visual|uav_collision_avoidance.egg-info|venv|docs"
+```
+
+View the file structure here: [File structure](docs/en/README.md#code-structure)
+
 ### App arguments
 
 There are eight possible arguments at the moment:

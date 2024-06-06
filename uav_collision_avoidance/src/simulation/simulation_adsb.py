@@ -25,7 +25,7 @@ class SimulationADSB(QThread):
         self.__simulation_state = simulation_state
         self.__adsb_cycles : int = 0
         self.__minimal_relative_distance : float = float("inf")
-        self.__is_silent : bool = True
+        self.__is_silent : bool = False
         self.__miss_distance_at_closest_approach : float | np.nan = np.nan
         
     @property

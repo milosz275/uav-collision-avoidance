@@ -3,25 +3,26 @@
 ### Table of Contents
 
 1. [Overview](#overview)
-2. [Constants](#constants)
-3. [File: `main.py`](#file-mainpy)
-4. [File: `src/main.py`](#file-srcmainpy)
-5. [File: `src/version.py`](#file-srcversionpy)
-6. [File: `src/simulation/simulation.py`](#file-srcsimulationsimulationpy)
-7. [File: `src/simulation/simulation_physics.py`](#file-srcsimulationsimulation_physicspy)
-8. [File: `src/simulation/simulation_adsb.py`](#file-srcsimulationsimulation_adsbpy)
-9. [File: `src/simulation/simulation_state.py`](#file-srcsimulationsimulation_statepy)
-10. [File: `src/simulation/simulation_settings.py`](#file-srcsimulationsimulation_settingspy)
-11. [File: `src/simulation/simulation_widget.py`](#file-srcsimulationsimulation_widgetpy)
-12. [File: `src/simulation/simulation_render.py`](#file-srcsimulationsimulation_renderpy)
-13. [File: `src/simulation/simulation_fps.py`](#file-srcsimulationsimulation_fpspy)
-14. [File: `src/simulation/simulation_data.py`](#file-srcsimulationsimulation_datapy)
-15. [File: `src/aircraft/aircraft.py`](#file-srcaircraftaircraftpy)
-16. [File: `src/aircraft/aircraft_fcc.py`](#file-srcaircraftaircraft_fccpy)
-17. [File: `src/aircraft/aircraft_vehicle.py`](#file-srcaircraftaircraft_vehiclepy)
-18. [Contribution Guidelines](#contribution-guidelines)
-19. [License](#license)
-20. [References](#references)
+2. [Code structure](#code-structure)
+3. [Constants](#constants)
+4. [File: `main.py`](#file-mainpy)
+5. [File: `src/main.py`](#file-srcmainpy)
+6. [File: `src/version.py`](#file-srcversionpy)
+7. [File: `src/simulation/simulation.py`](#file-srcsimulationsimulationpy)
+8. [File: `src/simulation/simulation_physics.py`](#file-srcsimulationsimulation_physicspy)
+9. [File: `src/simulation/simulation_adsb.py`](#file-srcsimulationsimulation_adsbpy)
+10. [File: `src/simulation/simulation_state.py`](#file-srcsimulationsimulation_statepy)
+11. [File: `src/simulation/simulation_settings.py`](#file-srcsimulationsimulation_settingspy)
+12. [File: `src/simulation/simulation_widget.py`](#file-srcsimulationsimulation_widgetpy)
+13. [File: `src/simulation/simulation_render.py`](#file-srcsimulationsimulation_renderpy)
+14. [File: `src/simulation/simulation_fps.py`](#file-srcsimulationsimulation_fpspy)
+15. [File: `src/simulation/simulation_data.py`](#file-srcsimulationsimulation_datapy)
+16. [File: `src/aircraft/aircraft.py`](#file-srcaircraftaircraftpy)
+17. [File: `src/aircraft/aircraft_fcc.py`](#file-srcaircraftaircraft_fccpy)
+18. [File: `src/aircraft/aircraft_vehicle.py`](#file-srcaircraftaircraft_vehiclepy)
+19. [Contribution Guidelines](#contribution-guidelines)
+20. [License](#license)
+21. [References](#references)
 
 ## Overview
 
@@ -33,6 +34,62 @@ The classes are organized into the following categories:
 - `aircraft`: Classes representing UAVs.
 
 All classes make use of Python's properties and setters utilizing mutexes and mutex locks to ensure encapsulation and data integrity.
+
+Remark: The `src` directory is located in `uav_collision_avoidance` subdirectory.
+
+## Code structure
+
+The code structure is as follows:
+
+```plaintext
+├── CITATION.cff
+├── CODE_OF_CONDUCT.md
+├── compile.ps1
+├── CONTRIBUTING.md
+├── data
+│   ├── README.md
+│   ├── ...
+└── docs
+    ├── en
+    │   ├── README.md
+    ├── pl
+    │   ├── README.md
+    ├── README.md
+├── LICENSE
+├── main.py
+├── path-visual
+│   ├── README.md
+│   ├── ...
+├── PULL_REQUEST_TEMPLATE.md
+├── pyproject.toml
+├── pyrightconfig.json
+├── README.md
+├── README.pl.md
+├── requirements.txt
+├── SECURITY.md
+├── tests
+│   ├── __init__.py
+│   └── test_headless.py
+└── uav_collision_avoidance
+    ├── __init__.py
+    ├── main.py
+    ├── src
+    │   ├── aircraft
+    │   │   ├── aircraft_fcc.py
+    │   │   ├── aircraft.py
+    │   │   └── aircraft_vehicle.py
+    │   └── simulation
+    │       ├── simulation_adsb.py
+    │       ├── simulation_data.py
+    │       ├── simulation_fps.py
+    │       ├── simulation_physics.py
+    │       ├── simulation.py
+    │       ├── simulation_render.py
+    │       ├── simulation_settings.py
+    │       ├── simulation_state.py
+    │       └── simulation_widget.py
+    └── version.py
+```
 
 ## Constants
 
@@ -497,7 +554,7 @@ Contributions to the project are welcome. Please follow these steps:
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](/LICENSE) file for more details.
+This project is licensed under the CC0-1.0. See the [LICENSE](/LICENSE) file for more details.
 
 ---
 

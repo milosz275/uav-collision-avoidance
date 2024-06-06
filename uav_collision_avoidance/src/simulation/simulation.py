@@ -238,6 +238,7 @@ class Simulation(QMainWindow):
         self.state = SimulationState(SimulationSettings(), is_realtime = False, avoid_collisions = avoid_collisions)
         self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
         self.simulation_adsb = SimulationADSB(self, self.aircrafts, self.state)
+        self.simulation_adsb.is_silent = True
         self.simulation_adsb.reset_destinations()
         time_step : int = int(self.state.simulation_threshold)
         adsb_step : int = int(self.state.adsb_threshold)
@@ -274,7 +275,8 @@ class Simulation(QMainWindow):
         return simulation_data
     
     def generate_test_aircrafts(self) -> List[Tuple[List[Aircraft], float]]:
-        """Generates test cases consisting of list of lists of aircrafts and angle between them"""
+        """Generates test cases consisting of
+        list of lists of aircrafts and angle between them"""
         logging.info("Generating test cases")
         list_of_lists : List[Tuple[List[Aircraft], float]] = []
 
@@ -286,13 +288,13 @@ class Simulation(QMainWindow):
         test_minimal_course_difference : float = 0.5
         test_maximal_course_difference : float = 179.5
         test_minimal_trigonometric_value : float = 0.0001
-        test_course_difference_count : int = 400
-        test_random_collision_course_differences : List[float] = random.uniform(test_minimal_course_difference, test_maximal_course_difference, test_course_difference_count).tolist()
-        test_random_collision_course_differences.sort(reverse = False)
-        logging.info("Randomly generated angles: %s", test_random_collision_course_differences)
+        test_cases_count : int = 400
+        test_cases : List[float] = random.uniform(test_minimal_course_difference, test_maximal_course_difference, test_cases_count).tolist()
+        test_cases.sort(reverse = False)
+        logging.info("Randomly generated angles: %s", test_cases)
 
         # equal speeds, equal distances to cover, both climbing or both descending
-        for angle in test_random_collision_course_differences:
+        for angle in test_cases:
             aircraft_init_height : float = random.uniform(test_minimal_altitude, test_maximal_altitude)
             aircraft_target_height : float = random.uniform(test_minimal_altitude, test_maximal_altitude)
             aircraft_absolute_speed : float = random.uniform(test_minimal_speed, test_maximal_speed)

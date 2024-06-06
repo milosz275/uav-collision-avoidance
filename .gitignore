@@ -168,13 +168,13 @@ logs/
 # Linting
 .pylintrc
 
-# Simulation's data simulation-*.csv files and latest simulation except example file
+# Simulation's data simulation-*.csv files and latest simulation except example files
 simulation.csv
 simulation-*.csv
 !simulation-2024-06-02-17-52-28.csv
 !simulation-2024-06-02-21-36-15.csv
 
-# Simulation's visualization directories
+# Simulation's visualization directories and files
 path-visual/*
 !path-visual/README.md
 !path-visual/2024-06-02/simulation-00-00-2836571040/

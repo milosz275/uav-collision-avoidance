@@ -53,6 +53,16 @@ Projekt Python3[^1] jest przygotowany jako pakiet PyPI[^2]. Do implementacji gra
 
 Aplikacja została stworzona bazując na dwóch typach obiektów: symulacji i statku powietrznego. Symulacja jest tworzona zależnie od danych początkowych, udostępniając interfejs w czasie rzeczywistym bądź liniowe renderowanie przypadku testowego. Statek powietrzny składa się z dwóch elementów, fizycznej reprezentacji samolotu bezzałogowego (UAV) oraz komputera pokładowego, który jest kontrolowany przez wątek ADS-B. Badania nad systemami UAV były możliwe dzięki drugiej pracy[^5].
 
+### Drzewo plików
+
+Drzewo struktury plików zostało wygenerowane korzystając z następującej komendy `tree`:
+
+```bash
+tree --gitignore -I "__pycache__|.env|.github|.pytest_cache|.vscode|assets|build|logs|path-visual|uav_collision_avoidance.egg-info|venv|docs"
+```
+
+Struktura plików: [Struktura kodu](docs/pl/README.md#struktura-kodu)
+
 ### Argumenty wywołania aplikacji
 
 Obecnie dostępne jest osiem możliwych argumentów wywołania aplikacji:
