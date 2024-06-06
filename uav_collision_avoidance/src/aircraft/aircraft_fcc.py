@@ -1,10 +1,11 @@
 """Aircraft Flight Control Computer"""
 
+import random
 import logging
 from copy import copy
 from typing import List
 from collections import deque
-from math import dist, atan2, degrees
+from math import dist, tan, atan2, degrees, radians
 
 from PySide6.QtCore import QObject, QMutex, QMutexLocker
 from PySide6.QtGui import QVector3D
@@ -194,7 +195,11 @@ class AircraftFCC(QObject):
                 print("Attempted to stack same destination")
                 logging.warning("Attempted to stack the same destination: (%s, %s, %s)", destination.x(), destination.y(), destination.z())
                 return None
-        if destination.z() < 500:
+        if self.aircraft.position.distanceToPoint(destination) < self.aircraft.size:
+            print("Attempted to set current position as destination")
+            logging.warning("Attempted to set current position as destination: (%s, %s, %s)", destination.x(), destination.y(), destination.z())
+            return None
+        if destination.z() < 800:
             if destination.z() < 0:
                 print("Attempted to set destination below ground")
                 logging.warning("Attempted to set destination below ground: (%s, %s, %s)", destination.x(), destination.y(), destination.z())
@@ -202,10 +207,25 @@ class AircraftFCC(QObject):
                 print("Attempted to set destination too low")
                 logging.warning("Attempted to set destination too low: (%s, %s, %s)", destination.x(), destination.y(), destination.z())
             destination = QVector3D(destination.x(), destination.y(), 800)
-        elif destination.z() > 10000:
+        elif destination.z() > 8000:
             print("Attempted to set destination too high")
             logging.warning("Attempted to set destination too high: (%s, %s, %s)", destination.x(), destination.y(), destination.z())
             destination = QVector3D(destination.x(), destination.y(), 8000)
+        height_difference = abs(destination.z() - self.aircraft.position.z())
+        distance_to_destination = dist(destination.toTuple(), self.aircraft.position.toTuple())
+        min_pitch_angle = abs(degrees(atan2(height_difference, distance_to_destination)))
+        if destination.z() > self.aircraft.position.z() and min_pitch_angle > 25:
+            print("Attempted to set destination with too steep climb angle")
+            logging.warning("Attempted to set destination too steep climb angle: (%s, %s, %s)", destination.x(), destination.y(), destination.z())
+            max_height_difference = distance_to_destination * tan(radians(15))
+            assert self.aircraft.position.z() + max_height_difference <= 8000
+            destination = QVector3D(destination.x(), destination.y(), self.aircraft.position.z() + max_height_difference)
+        elif destination.z() < self.aircraft.position.z() and min_pitch_angle > 25:
+            print("Attempted to set destination with too steep descent angle")
+            logging.warning("Attempted to set destination too steep descent angle: (%s, %s, %s)", destination.x(), destination.y(), destination.z())
+            max_height_difference = distance_to_destination * tan(radians(15))
+            assert self.aircraft.position.z() - max_height_difference >= 800
+            destination = QVector3D(destination.x(), destination.y(), self.aircraft.position.z() - max_height_difference)
         return destination
 
     def add_last_destination(self, destination : QVector3D) -> None:
@@ -299,7 +319,9 @@ class AircraftFCC(QObject):
 
             # this is temporal solution of the problem below
             if miss_distance_vector.length() == 0:
-                miss_distance_vector = QVector3D(0.01, 0.01, 0.0)
+                miss_distance_vector = QVector3D(
+                    (random.choice([-1, 1])) * self.aircraft.size * 0.1,
+                    (random.choice([-1, 1])) * self.aircraft.size * 0.1, 0.0)
 
             target_avoiding : QVector3D = QVector3D()
             if miss_distance_vector.length() == 0:
@@ -385,8 +407,8 @@ class AircraftFCC(QObject):
         """Updates current yaw angle"""
         if self.destinations and self.autopilot and not self.ignore_destinations:
             destination = self.destinations[0]
-            distance = dist(self.aircraft.position.toTuple(), destination.toTuple())
-            if distance < self.aircraft.size / 2:
+            distance = self.aircraft.position.distanceToPoint(destination)
+            if distance < self.aircraft.size * 5: # [x] Tmp set to 5 instead of size / 2
                 self.destinations_history.append(self.destinations.popleft())
                 if self.destinations:
                     destination = self.destinations[0]
