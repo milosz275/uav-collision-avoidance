@@ -238,6 +238,7 @@ class Simulation(QMainWindow):
         self.state = SimulationState(SimulationSettings(), is_realtime = False, avoid_collisions = avoid_collisions)
         self.simulation_physics = SimulationPhysics(self, self.aircrafts, self.state)
         self.simulation_adsb = SimulationADSB(self, self.aircrafts, self.state)
+        self.simulation_adsb.is_silent = True
         self.simulation_adsb.reset_destinations()
         time_step : int = int(self.state.simulation_threshold)
         adsb_step : int = int(self.state.adsb_threshold)
