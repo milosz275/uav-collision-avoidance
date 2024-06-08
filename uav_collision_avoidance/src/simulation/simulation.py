@@ -1101,7 +1101,7 @@ class Simulation(QMainWindow):
                 color = colors[1 % len(colors)],
                 xy=(aircraft_2_init[0], aircraft_2_init[1]),
                 xycoords="data",
-                xytext=(0.15, 0.75),
+                xytext=(0.7, 0.5),
                 textcoords="axes fraction", va="top", ha="left",
                 arrowprops=dict(facecolor="black", arrowstyle="->"))
             if simulation_data.collision:
@@ -1111,7 +1111,8 @@ class Simulation(QMainWindow):
                     color="red",
                     xy=(aircraft_final[0], aircraft_final[1]),
                     xycoords="data",
-                    xytext=(aircraft_final[0] + 0.25 * x_range, aircraft_final[1] + 0.05 * y_range),
+                    xytext=(0.65, 0.25),
+                    textcoords="axes fraction", va="top", ha="left",
                     arrowprops=dict(facecolor="red", arrowstyle="->"))
                 plt.scatter(aircraft_final[0], aircraft_final[1], color="red", s=10)
             angle_patch = mpatches.Patch(
@@ -1127,7 +1128,7 @@ class Simulation(QMainWindow):
         plt.xticks(fontsize=7)
         plt.yticks(fontsize=7)
         plt.gca().set_aspect("equal", adjustable="box")
-        plt.savefig(f"{simulation_path}/path-visual-{export_time}.png")
+        plt.savefig(f"{simulation_path}/path-visual-{export_time}.png", dpi=300)
         plt.close()
         
         with open(f"{simulation_path}/README.md", "a+") as readme_file:
