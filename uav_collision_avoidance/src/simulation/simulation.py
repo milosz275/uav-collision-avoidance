@@ -249,7 +249,7 @@ class Simulation(QMainWindow):
                 self.simulation_adsb.cycle()
                 partial_time_counter = 0
             partial_time_counter += time_step
-            if self.simulation_adsb.relative_distance > self.state.minimum_separation * 3 and self.simulation_adsb.minimal_relative_distance < self.state.minimum_separation:
+            if self.simulation_adsb.relative_distance > self.state.minimum_separation * 2 and self.simulation_adsb.minimal_relative_distance < self.state.minimum_separation:
                 logging.info("Headless simulation stopping due to aircrafts too far apart")
                 break
             if not self.aircrafts[0].fcc.destination and not self.aircrafts[1].fcc.destination:
@@ -284,7 +284,7 @@ class Simulation(QMainWindow):
         test_maximal_altitude : int = 5000
         test_minimal_speed : int = 40
         test_maximal_speed : int = 130
-        test_start_aircrafts_relative_distance : int = 10_000 # distance between aircrafts headed to test collision target
+        test_start_aircrafts_relative_distance : int = 15_000 # distance between aircrafts headed to test collision target
         test_minimal_course_difference : float = 0.5
         test_maximal_course_difference : float = 179.5
         test_minimal_trigonometric_value : float = 0.0001
@@ -492,7 +492,7 @@ class Simulation(QMainWindow):
     
     def run_tests(self, begin_with_default_set : bool = True, test_number : int = 20) -> None:
         """Runs simulation tests"""
-        # SimulationSettings.set_simulation_frequency(10.0)
+        SimulationSettings.set_simulation_frequency(10.0)
         if test_number < 3:
             logging.info("Changing simulation tests to 3 test cases due to too low test number")
             test_number = 3
@@ -1003,9 +1003,10 @@ class Simulation(QMainWindow):
     def check_simulation_data_correctness(self) -> bool | None:
         if not self.__imported_from_data or self.__simulation_data is None or self.aircrafts is None or self.aircrafts == []:
             return None
-        # logging.info("Checking simulation data correctness...")
+        # # [ ] Restore checks
         # # [ ] Fix case when loaded data simulated in low frequency and tested in high accuracy
         # # [ ] Fix test not passing for smaller position accuracy
+        # logging.info("Checking simulation data correctness...")
         # position_accuracy : float = 200.0
         # speed_accuracy : float = 5.0
         # displacement_accuracy : float = 5.0
@@ -1078,8 +1079,8 @@ class Simulation(QMainWindow):
 
         x_range : float = abs(x_maximum - x_minimum)
         y_range : float = abs(y_maximum - y_minimum)
-        y_range_min = y_minimum - y_range * 0.4
-        y_range_max = y_maximum + y_range * 0.4
+        y_range_min = y_minimum - y_range * 0.36
+        y_range_max = y_maximum + y_range * 0.36
         y_range_abs = abs(y_range_max - y_range_min)
         if y_range_min != y_range_max:
             plt.ylim(y_range_min - y_range_abs / 2, y_range_max + y_range_abs / 2)
@@ -1087,11 +1088,32 @@ class Simulation(QMainWindow):
         if simulation_data is not None:
             aircraft_1_init = [simulation_data.aircraft_1_initial_position.x(), simulation_data.aircraft_1_initial_position.y()]
             aircraft_2_init = [simulation_data.aircraft_2_initial_position.x(), simulation_data.aircraft_2_initial_position.y()]
-            plt.annotate("Initial position\nof Aircraft 1", color = colors[0 % len(colors)], xy=(aircraft_1_init[0], aircraft_1_init[1]), xytext=(aircraft_1_init[0] + 0.25 * x_range, aircraft_1_init[1] + 0.05 * y_range), arrowprops=dict(facecolor="black", arrowstyle="->"))
-            plt.annotate("Initial position\nof Aircraft 2", color = colors[1 % len(colors)], xy=(aircraft_2_init[0], aircraft_2_init[1]), xytext=(aircraft_2_init[0] + 0.25 * x_range, aircraft_2_init[1] + 0.05 * y_range), arrowprops=dict(facecolor="black", arrowstyle="->"))
+            plt.annotate(
+                "Initial position\nof Aircraft 1",
+                color = colors[0 % len(colors)],
+                xy=(aircraft_1_init[0], aircraft_1_init[1]),
+                xycoords="data",
+                xytext=(0.15, 0.25),
+                textcoords="axes fraction", va="top", ha="left",
+                arrowprops=dict(facecolor="black", arrowstyle="->"))
+            plt.annotate(
+                "Initial position\nof Aircraft 2",
+                color = colors[1 % len(colors)],
+                xy=(aircraft_2_init[0], aircraft_2_init[1]),
+                xycoords="data",
+                xytext=(0.7, 0.5),
+                textcoords="axes fraction", va="top", ha="left",
+                arrowprops=dict(facecolor="black", arrowstyle="->"))
             if simulation_data.collision:
                 aircraft_final = [simulation_data.aircraft_1_final_position.x(), simulation_data.aircraft_1_final_position.y()]
-                plt.annotate("Collision", color="red", xy=(aircraft_final[0], aircraft_final[1]), xytext=(aircraft_final[0] + 0.25 * x_range, aircraft_final[1] + 0.05 * y_range), arrowprops=dict(facecolor="red", arrowstyle="->"))
+                plt.annotate(
+                    "Collision",
+                    color="red",
+                    xy=(aircraft_final[0], aircraft_final[1]),
+                    xycoords="data",
+                    xytext=(0.65, 0.25),
+                    textcoords="axes fraction", va="top", ha="left",
+                    arrowprops=dict(facecolor="red", arrowstyle="->"))
                 plt.scatter(aircraft_final[0], aircraft_final[1], color="red", s=10)
             angle_patch = mpatches.Patch(
                 color = "none",
@@ -1106,7 +1128,7 @@ class Simulation(QMainWindow):
         plt.xticks(fontsize=7)
         plt.yticks(fontsize=7)
         plt.gca().set_aspect("equal", adjustable="box")
-        plt.savefig(f"{simulation_path}/path-visual-{export_time}.png")
+        plt.savefig(f"{simulation_path}/path-visual-{export_time}.png", dpi=300)
         plt.close()
         
         with open(f"{simulation_path}/README.md", "a+") as readme_file:

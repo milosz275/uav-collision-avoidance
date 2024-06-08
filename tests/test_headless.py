@@ -9,7 +9,7 @@ def test_headless():
             main("headless")
         assert e.value.code == 0
 
-test_path : str = "data/simulation-2024-06-02-17-52-28.csv"
+test_path : str = "data/simulation-2024-06-08-15-52-45.csv"
 lowest_frequency_tested : int = 10
 highest_frequency_tested : int = 100
 
