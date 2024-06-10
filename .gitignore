@@ -172,6 +172,7 @@ logs/
 simulation.csv
 simulation-*.csv
 !simulation-2024-06-08-15-52-45.csv
+!simulation-2024-06-10-00-21-19.csv
 
 # Simulation's visualization directories and files
 path-visual/*

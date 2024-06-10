@@ -6,6 +6,7 @@ This directory contains the simulation data files for the UAV collision avoidanc
 
 The simulation data is stored in CSV format. Each row in the CSV file represents a single simulation data point. The columns in the CSV file represent the following information:
 - `test_id`: The unique identifier for the test case.
+- `aircraft_angle`: The initial angle between the two aircraft in degrees.
 - `aircraft_1_init_pos_x`, `aircraft_1_init_pos_y`, `aircraft_1_init_pos_z`: The initial position of the first aircraft.
 - `aircraft_2_init_pos_x`, `aircraft_2_init_pos_y`, `aircraft_2_init_pos_z`: The initial position of the second aircraft.
 - `aircraft_1_init_speed_x`, `aircraft_1_init_speed_y`, `aircraft_1_init_speed_z`: The initial speed of the first aircraft.
@@ -31,3 +32,4 @@ The simulation data is stored in CSV format. Each row in the CSV file represents
 - `simulation-*.csv`: Historical simulation data files, named with the timestamp of the simulation run. These files are not tracked by Git as per the `.gitignore` settings, except for specific examples. 
 
 Simulation data consisting of 20 tests conducted with 10 `Hz` simulation frequency [simulation-2024-06-08-15-52-45.csv](/data/simulation-2024-06-08-15-52-45.csv).
+Simulation data consisting of 200 tests conducted with 10 `Hz` simulation frequency [simulation-2024-06-10-00-21-19.csv](/data/simulation-2024-06-10-00-21-19.csv).
