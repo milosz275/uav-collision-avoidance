@@ -31,7 +31,7 @@ Implementacja algorytmu unikania kolizji dla dronów w przestrzeni 3D bazująca 
 3. Charakterystyka statków powietrznych: Statki powietrzne są uważane za drony z poziomym startem i lądowaniem (HTOL). Mogą poruszać się tylko w kierunku swoich wektorów prędkości. Forma statku powietrznego jest przybliżona do sfery.
 4. Środowisko: Przestrzeń jest współdzielona przez dwa lub trzy drony. Nie zakłada się obecności innych obiektów, przeszkód ani podmuchów wiatru.
 5. Aerodynamika: Nie zakłada się obecności siły nośnej aerodynamicznej. Podczas skręcania samolot zawsze przyjmuje maksymalny kąt zmiany na jaki pozwala fizyka, respektując bezwład maszyny przy obracaniu. Obowiązują maksymalne kąty natarcia i wychylenia - odpowiednio przedziały `-45°, 45°` i `-90°, 90°`, przy czym dodatni kąt natarcia oznacza lot w górę, a dodatni kąt wychylenia oznacza pochylenie na prawe skrzydło. Kąty nie są przybliżane dla zachowania realizmu.
-6. Jednostki miary: Domyślnymi jednostkami odległości są metry $\pu{m}$, prędkość mierzona jest w metrach na sekundę $\pu{m/s}$, a czasy klatki reprezentowane są w milisekundach $\pu{ms}$.
+6. Jednostki miary: Domyślnymi jednostkami odległości są metry $m$, prędkość mierzona jest w metrach na sekundę $m/s$, a czasy klatki reprezentowane są w milisekundach $ms$.
 
 ### Algorytmy
 
@@ -52,6 +52,12 @@ Projekt Python3[^1] jest przygotowany jako pakiet PyPI[^2]. Do implementacji gra
 ### Struktury
 
 Aplikacja została stworzona bazując na dwóch typach obiektów: symulacji i statku powietrznego. Symulacja jest tworzona zależnie od danych początkowych, udostępniając interfejs w czasie rzeczywistym bądź liniowe renderowanie przypadku testowego. Statek powietrzny składa się z dwóch elementów, fizycznej reprezentacji samolotu bezzałogowego (UAV) oraz komputera pokładowego, który jest kontrolowany przez wątek ADS-B. Badania nad systemami UAV były możliwe dzięki drugiej pracy[^5].
+
+### Dane 
+
+Dane symulacyjne są przechowywane w formacie CSV. Każdy wiersz w pliku CSV reprezentuje pojedynczy przypadek testowy. Kolumny w pliku CSV reprezentują szczegółowe informacje o symulacji, początkowe i końcowe dane samolotów, minimalna odległość względna, wystąpienie kolizji i inne.
+
+Przykładowe dane symulacyjne składające się z 200 testów przeprowadzonych z częstotliwością symulacji 10 `Hz` znajdują się w pliku [simulation-2024-06-10-00-21-19.csv](/data/simulation-2024-06-10-00-21-19.csv).
 
 ### Drzewo plików
 

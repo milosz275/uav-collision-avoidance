@@ -31,7 +31,7 @@ Python project regarding implementation of two UAVs simulation with collision av
 3. Aircraft Characteristics: The aircraft are considered Horizontal Take-off and Landing (HTOL) drones. They can only move in the direction of their speed vectors. The form of the aircraft is approximated to a simple solid sphere.
 4. Environment: The space is shared by two or three UAVs. There are no other objects or wind gusts assumed in this environment.
 5. Aerodynamics: No aerodynamic lift force is assumed at this moment. When turning, aircraft always take the maximum angle change that physics allow, respecting its mass inertia. Maximum pitch and roll angles are considered `-45°, 45°` and `-90°, 90°` respectively, where positive pitch angle means climbing and positive roll angle means banking right. Angles are not approximated for realism preservation.
-6. Units of Measurement: The default distance units are meters $\pu{m}$, speed is measured in meters per second $\pu{m/s}$, and frame times are represented in milliseconds $\pu{ms}$.
+6. Units of Measurement: The default distance units are meters $m$, speed is measured in meters per second $m/s$, and frame times are represented in milliseconds $ms$.
 
 ### Algorithms
 
@@ -53,7 +53,14 @@ Python3[^1] project is wrapped as a PyPI package[^2]. PySide6[^3] (Qt's Python Q
 
 Application is built based on two main object types, simulation and aircraft. Simulation is created up to initial settings, allowing for concurrent realtime variant and linear pre-rendering. Aircraft consists of two elements, physical representation of the UAV and Flight Control Computer, which is controlled by the ADS-B thread. Research among the UAV systems was drawn on from second cited paper[^5].
 
+### Data
+
+Simulation data is stored in CSV format. Each row in the file represents a single simulation conducted. The columns in the CSV file represent detailed information about the test case, including initial and final parameters of the aircrafts, collision detection results, and minimal relative distance between the aircrafts for both cases with and without avoidance.
+
+Example simulation data files are stored in the data directory [data](/data). Results of 200 simulation tests conducted with 10 `Hz` simulation frequency are stored in the file [simulation-2024-06-10-00-21-19.csv](/data/simulation-2024-06-10-00-21-19.csv).
+
 ### File tree
+
 The file structure was generated using `tree` command:
 
 ```bash
