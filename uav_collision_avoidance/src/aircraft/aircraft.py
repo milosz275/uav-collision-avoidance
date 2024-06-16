@@ -1,7 +1,5 @@
 """Aircraft class module"""
 
-import logging
-
 from copy import copy
 
 from PySide6.QtCore import QObject, QMutex, QMutexLocker
