@@ -8,7 +8,9 @@
 
 [![Otwórz w GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/mldxo/uav-collision-avoidance)
 
-Implementacja algorytmu unikania kolizji dla dronów w przestrzeni 3D bazująca na podejściu geometrycznym.
+![](https://tripleboot.org/Pictures/BuiltWithQtLogoSuggestion.png)
+
+Implementacja algorytmu unikania kolizji dla dronów w przestrzeni 3D bazująca na podejściu geometrycznym. Odnośniki do projektu:
 
 - [Github](https://github.com/mldxo/uav-collision-avoidance)
 - [PyPI](https://pypi.org/project/uav-collision-avoidance)
