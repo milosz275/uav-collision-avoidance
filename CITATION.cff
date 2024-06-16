@@ -6,5 +6,5 @@ authors:
   orcid: "https://orcid.org/0009-0005-1309-9200"
 title: "UAV Collision Avoidance - Physics, ADS-B simulation"
 version: 1.0.0
-date-released: 2024-05-01
+date-released: 2024-06-16
 url: "https://github.com/mldxo/uav-collision-avoidance"

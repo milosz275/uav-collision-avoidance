@@ -317,33 +317,21 @@ class AircraftFCC(QObject):
             logging.info("Aircraft %s applying evade maneuver", self.aircraft.aircraft_id)
             self.__evade_maneuver = True
 
-            # this is temporal solution of the problem below
             if miss_distance_vector.length() == 0:
                 miss_distance_vector = QVector3D(
                     (random.choice([-1, 1])) * self.aircraft.size * 0.1,
                     (random.choice([-1, 1])) * self.aircraft.size * 0.1, 0.0)
 
             target_avoiding : QVector3D = QVector3D()
-            if miss_distance_vector.length() == 0:
-                # todo: fix or just change height
-                # modified_speed_vector : QVector3D = self.aircraft.speed + 0.01 * (self.aircraft.speed.normalized().z() * self.aircraft.speed)
-                # modified_speed_vector : QVector3D = self.aircraft.speed + 0.01 * QVector3D.crossProduct(self.aircraft.speed.normalized(), self.aircraft.speed)
-                # modified_speed_vector : QVector3D = self.aircraft.speed + (QVector3D.crossProduct(QVector3D(0, 0, self.aircraft.speed.normalized().z()), self.aircraft.speed))
-                # print("Modified speed vector: " + "{:.2f}".format(modified_speed_vector.x()) + " " + "{:.2f}".format(modified_speed_vector.y()) + " " + "{:.2f}".format(modified_speed_vector.z()))
-                # unit_vector : QVector3D = modified_speed_vector.normalized()
-                # print("Unit vector: " + "{:.2f}".format(unit_vector.x()) + " " + "{:.2f}".format(unit_vector.y()) + " " + "{:.2f}".format(unit_vector.z()))
-                # target_avoiding = self.aircraft.position + (unit_vector * modified_speed_vector.length())
-                pass
-            else:
-                self.vector_sharing_resolution : QVector3D | None = None
-                if self.aircraft_id == 0:
-                    self.vector_sharing_resolution = (opponent_speed.length() * unresolved_region * -(miss_distance_vector)) / ((self.aircraft.speed.length() + opponent_speed.length()) * miss_distance_vector.length())
-                elif self.aircraft_id == 1:
-                    self.vector_sharing_resolution = (opponent_speed.length() * unresolved_region * miss_distance_vector) / ((opponent_speed.length() + self.aircraft.speed.length()) * miss_distance_vector.length())
-                print("Vector sharing resolution: (" + "{:.2f}".format(self.vector_sharing_resolution.x()) + ", " + "{:.2f}".format(self.vector_sharing_resolution.y()) + ", " + "{:.2f}".format(self.vector_sharing_resolution.z()) + ")")
-                modified_speed_vector : QVector3D = (self.aircraft.speed * time_to_closest_approach + self.vector_sharing_resolution)
-                unit_vector : QVector3D = modified_speed_vector.normalized()
-                target_avoiding = self.aircraft.position + (unit_vector * modified_speed_vector.length())
+            self.vector_sharing_resolution : QVector3D | None = None
+            if self.aircraft_id == 0:
+                self.vector_sharing_resolution = (opponent_speed.length() * unresolved_region * -(miss_distance_vector)) / ((self.aircraft.speed.length() + opponent_speed.length()) * miss_distance_vector.length())
+            elif self.aircraft_id == 1:
+                self.vector_sharing_resolution = (opponent_speed.length() * unresolved_region * miss_distance_vector) / ((opponent_speed.length() + self.aircraft.speed.length()) * miss_distance_vector.length())
+            print("Vector sharing resolution: (" + "{:.2f}".format(self.vector_sharing_resolution.x()) + ", " + "{:.2f}".format(self.vector_sharing_resolution.y()) + ", " + "{:.2f}".format(self.vector_sharing_resolution.z()) + ")")
+            modified_speed_vector : QVector3D = (self.aircraft.speed * time_to_closest_approach + self.vector_sharing_resolution)
+            unit_vector : QVector3D = modified_speed_vector.normalized()
+            target_avoiding = self.aircraft.position + (unit_vector * modified_speed_vector.length())
             
             print("Set target avoiding collision: (" + "{:.2f}".format(target_avoiding.x()) + ", " + "{:.2f}".format(target_avoiding.y()) + ", " + "{:.2f}".format(target_avoiding.z()) + ")")
             self.add_first_destination(target_avoiding)

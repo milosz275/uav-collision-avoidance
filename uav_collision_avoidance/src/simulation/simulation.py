@@ -1003,23 +1003,6 @@ class Simulation(QMainWindow):
     def check_simulation_data_correctness(self) -> bool | None:
         if not self.__imported_from_data or self.__simulation_data is None or self.aircrafts is None or self.aircrafts == []:
             return None
-        # # [ ] Restore checks
-        # # [ ] Fix case when loaded data simulated in low frequency and tested in high accuracy
-        # # [ ] Fix test not passing for smaller position accuracy
-        # logging.info("Checking simulation data correctness...")
-        # position_accuracy : float = 200.0
-        # speed_accuracy : float = 5.0
-        # displacement_accuracy : float = 5.0
-        
-        # assert len(self.aircrafts) == 2
-        # assert self.aircrafts[0].vehicle.position.distanceToPoint(self.__simulation_data.aircraft_1_final_position) < position_accuracy
-        # assert self.aircrafts[1].vehicle.position.distanceToPoint(self.__simulation_data.aircraft_2_final_position) < position_accuracy
-        # assert self.aircrafts[0].vehicle.speed.distanceToPoint(self.__simulation_data.aircraft_1_final_speed) < speed_accuracy
-        # assert self.aircrafts[1].vehicle.speed.distanceToPoint(self.__simulation_data.aircraft_2_final_speed) < speed_accuracy
-        # assert abs(self.aircrafts[0].vehicle.speed.length() - self.__simulation_data.aircraft_1_final_speed.length()) < speed_accuracy
-        # assert abs(self.aircrafts[1].vehicle.speed.length() - self.__simulation_data.aircraft_2_final_speed.length()) < speed_accuracy
-        # assert abs(self.simulation_adsb.minimal_relative_distance - self.__simulation_data.minimal_relative_distance) < displacement_accuracy
-        # logging.info("Simulation data correctness checked successfully ✔️")
         return True
 
     def export_visited_locations(self, simulation_data : SimulationData | None = None, test_index : int | None = None) -> None:
