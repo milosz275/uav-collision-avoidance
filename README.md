@@ -1,6 +1,7 @@
 # UAV Collision Avoidance
 
 [![pl](https://img.shields.io/badge/lang-pl-blue.svg)](https://github.com/mldxo/uav-collision-avoidance/blob/master/README.pl.md)
+[![Qt6](https://img.shields.io/badge/Qt-6.7-41cd52.svg)](https://img.shields.io/badge/Qt-6.7-41cd52.svg)
 [![Build](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/python-app.yml/badge.svg)](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/python-app.yml)
 [![CodeQL](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/mldxo/uav-collision-avoidance/actions/workflows/github-code-scanning/codeql)
 [![PyPI version](https://badge.fury.io/py/uav-collision-avoidance.svg)](https://badge.fury.io/py/uav-collision-avoidance)
