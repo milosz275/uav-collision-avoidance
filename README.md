@@ -8,8 +8,6 @@
 
 [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/mldxo/uav-collision-avoidance)
 
-![](https://tripleboot.org/Pictures/BuiltWithQtLogoSuggestion.png)
-
 Python3 project regarding implementation of two UAVs simulation with collision avoidance system based on geometrical approach. Project links:
 
 - [Github](https://github.com/mldxo/uav-collision-avoidance)
